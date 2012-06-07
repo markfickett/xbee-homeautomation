@@ -3,6 +3,13 @@ XBee Home Automation
 
 Tools for XBee-based sensor/control networks, with an emphasis on ease of setup, extensability, and ability to integrate with existing systems.
 
+Examples
+--------
+
+Print information about a connected XBee:
+
+	xh info
+
 Dependencies
 ------------
 
