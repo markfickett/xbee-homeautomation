@@ -12,23 +12,12 @@ log = logging.getLogger('xh')
 
 from Manifest import sys, os, time, optparse, serial, xbee, Config
 
+from serial.tools import list_ports
+EXCLUDE_DEVICES = 'Bluetooth' # ignore in finding Serial ports
+
 def getSerialCandidates():
-	candidates = []
-	if sys.platform == 'darwin':
-		# Expect paths like:
-		#	/dev/tty.usbserial-AH01D4Q3 # Sparkfun XBee USB dongle
-		#	/dev/tty.usbmodemfa141 # Arduino Uno
-		#	/dev/tty.usbserial-A600dSBW # Sparkfun USB FTDI adapter
-		basePath = '/dev'
-		for device in os.listdir(basePath):
-			if (device.startswith('tty.usbserial') or
-					device.startswith('tty.usbmodem')):
-				candidates.append(os.path.join(
-					basePath, device))
-	else:
-		raise RuntimeError(('Likely candidates for serial devices on'
-			+ ' platform "%s" not known. Could not get serial'
-			+ ' device candidates.') % sys.platform)
+	candidates = [d[0] for d in list_ports.comports()
+		if EXCLUDE_DEVICES not in d[0]]
 	if not candidates:
 		raise RuntimeError('No candidates for serial devices found.')
 	return candidates
