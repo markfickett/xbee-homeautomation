@@ -11,7 +11,7 @@ from Manifest import logging
 log = logging.getLogger('xh')
 
 from Manifest import sys, os, time, optparse, serial, xbee
-from Manifest import Config, Encoding
+from Manifest import Config, Encoding, Protocol
 
 from serial.tools import list_ports
 EXCLUDE_DEVICES = 'Bluetooth' # ignore in finding Serial ports
@@ -39,7 +39,26 @@ def pickSerialDevice():
 log.info('started')
 log.info('Type control-C to exit.')
 
-def logData(data):
+
+def logData(rawData):
+	F = Protocol.DATA_FIELD
+	data = {}
+	for k, v in rawData.iteritems():
+		if k == str(F.frame_id):
+			data[F.frame_id] = Encoding.PrintedStringToNumber(v)
+		elif k == str(F.command):
+			data[F.command] = v
+		elif k == str(F.status):
+			data[F.status] = Protocol.STATUS[
+				Encoding.StringToNumber(v)]
+		elif k == str(F.parameter):
+			if rawData[str(F.command)] == str(Protocol.COMMAND.ND):
+				converted = Protocol.ParseNodeDiscover(v)
+			else:
+				converted = Encoding.StringToNumber(v)
+			data[F.parameter] = converted
+		else:
+			data[k] = v
 	log.info('data from XBee:\n%s' % data)
 
 try:

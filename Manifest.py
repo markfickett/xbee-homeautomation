@@ -26,4 +26,4 @@ except ImportError, e:
 	'Required: enum from http://pypi.python.org/pypi/enum/'
 	raise e
 
-import Config, Encoding
+import Config, Encoding, Protocol
