@@ -20,4 +20,10 @@ except ImportError, e:
 	'Required: python-xbee from http://code.google.com/p/python-xbee/'
 	raise e
 
+try:
+	from enum import Enum
+except ImportError, e:
+	'Required: enum from http://pypi.python.org/pypi/enum/'
+	raise e
+
 import Config, Encoding

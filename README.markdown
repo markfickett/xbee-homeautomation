@@ -13,5 +13,6 @@ Print information about a connected XBee:
 Dependencies
 ------------
 
-* [pySerial](http://pyserial.sourceforge.net/)
+* [pySerial](http://pyserial.sourceforge.net/) >= 2.6
 * [python-xbee](http://code.google.com/p/python-xbee/downloads/list) (version 2.0.0)
+* [enum](http://pypi.python.org/pypi/enum/)
