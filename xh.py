@@ -10,7 +10,8 @@ Examples:
 from Manifest import logging
 log = logging.getLogger('xh')
 
-from Manifest import sys, os, time, optparse, serial, xbee, Config
+from Manifest import sys, os, time, optparse, serial, xbee
+from Manifest import Config, Encoding
 
 from serial.tools import list_ports
 EXCLUDE_DEVICES = 'Bluetooth' # ignore in finding Serial ports
@@ -35,18 +36,6 @@ def pickSerialDevice():
 		i = 0
 	return serialDevices[i]
 
-def packNumberInString(n):
-	"""
-	Pack numbers of arbitrary size into (little-endian) strings.
-	Example: 0x3ef7 => '\x3e\xf7'
-	"""
-	s = ''
-	while n > 0:
-		lowByte = n % 0x100
-		s = chr(lowByte) + s
-		n = n / 0x100
-	return s
-
 log.info('started')
 log.info('Type control-C to exit.')
 
@@ -64,7 +53,7 @@ try:
 		'ID', # network ID
 		#('ID', '\x3E\xF7'), # set network ID to 0x3EF7
 		#('KY', '\x32\x10'), # set network key to 0x3210
-		#('KY', packNumberInString(Config.LINK_KEY)),
+		#('KY', Encoding.NumberToString(Config.LINK_KEY)),
 		#'WR', # write network key
 		#'EE', # encryption enable (0 or 1)
 		#'SH', # serial (high bits)

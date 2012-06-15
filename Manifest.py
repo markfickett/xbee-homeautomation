@@ -20,4 +20,4 @@ except ImportError, e:
 	'Required: python-xbee from http://code.google.com/p/python-xbee/'
 	raise e
 
-import Config
+import Config, Encoding
