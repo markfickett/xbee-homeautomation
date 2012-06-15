@@ -12,7 +12,7 @@ import optparse
 try:
 	import serial
 except ImportError, e:
-	'Required: pySerial from http://pyserial.sourceforge.net/'
+	'Required: pySerial >=2.6 from http://pyserial.sourceforge.net/'
 	raise e
 try:
 	import xbee
