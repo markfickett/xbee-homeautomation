@@ -104,10 +104,17 @@ class Command:
 		return c
 
 	def _parseParameterDefault(self, encoded):
+		"""
+		By default, parse a parameter as a packed number. Warn if the
+		command may not actually have a numeric parameter.
+		@return The parameter parsed as a number.
+		"""
 		parameter = Encoding.StringToNumber(encoded)
 		if self.getName() not in (
-			Command.NAME.MY,
 			Command.NAME.__getattribute__('%V'),
+			Command.NAME.ID,
+			Command.NAME.MY,
+			Command.NAME.NT,
 		):
 			log.warning(('uncertain conversion of encoded parameter'
 				+ ' "%s" to number 0x%X for command %s')
