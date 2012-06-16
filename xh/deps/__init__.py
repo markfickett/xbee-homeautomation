@@ -1,13 +1,9 @@
 """
-Centralized imports and module setup.
+Verify and import third-party dependencies.
 """
 
 import logging
-logging.basicConfig(
-        format='[%(levelname)s %(name)s] %(message)s',
-        level=logging.DEBUG)
-import sys, os, time
-import optparse
+log = logging.getLogger('xh.deps')
 
 try:
 	import serial
@@ -28,6 +24,3 @@ try:
 except ImportError as e:
 	log.error('Required: enum from http://pypi.python.org/pypi/enum/')
 	raise e
-
-import Config, Encoding
-import protocol

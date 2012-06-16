@@ -2,10 +2,20 @@
 Convert to/from XBee API protocol values.
 """
 
-from Manifest import logging
+__all__ = [
+	'DATA_FIELD',
+	'COMMAND',
+	'STATUS',
+	'DEVICE_TYPE',
+
+	'ParseNodeDiscover',
+]
+
+import logging
 log = logging.getLogger('Protocol')
 
-from Manifest import Encoding, Enum
+from xh.deps import Enum
+from xh import Encoding
 
 DATA_FIELD = Enum(
 	'frame_id',	# sequence; stringified number

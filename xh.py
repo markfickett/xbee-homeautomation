@@ -7,11 +7,13 @@ Examples:
  $ xh setup --name 'Living Room' # set up and name a new sensor/control
 """
 
-from Manifest import logging
+import logging
 log = logging.getLogger('xh')
 
-from Manifest import sys, os, time, optparse, serial, xbee
-from Manifest import Config, Encoding, Protocol
+import sys, os, time, optparse
+from xh import Config, Encoding
+from xh.deps import serial, xbee
+from xh.protocol import DATA_FIELD, COMMAND, STATUS, ParseNodeDiscover
 
 from serial.tools import list_ports
 EXCLUDE_DEVICES = 'Bluetooth' # ignore in finding Serial ports
@@ -40,26 +42,32 @@ log.info('started')
 log.info('Type control-C to exit.')
 
 
-def logData(rawData):
-	F = Protocol.DATA_FIELD
+def logData_(rawData):
 	data = {}
 	for k, v in rawData.iteritems():
-		if k == str(F.frame_id):
-			data[F.frame_id] = Encoding.PrintedStringToNumber(v)
-		elif k == str(F.command):
-			data[F.command] = v
-		elif k == str(F.status):
-			data[F.status] = Protocol.STATUS[
+		if k == str(DATA_FIELD.frame_id):
+			data[DATA_FIELD.frame_id] = \
+				Encoding.PrintedStringToNumber(v)
+		elif k == str(DATA_FIELD.command):
+			data[DATA_FIELD.command] = v
+		elif k == str(DATA_FIELD.status):
+			data[DATA_FIELD.status] = STATUS[
 				Encoding.StringToNumber(v)]
-		elif k == str(F.parameter):
-			if rawData[str(F.command)] == str(Protocol.COMMAND.ND):
-				converted = Protocol.ParseNodeDiscover(v)
+		elif k == str(DATA_FIELD.parameter):
+			if rawData[str(DATA_FIELD.command)] == str(COMMAND.ND):
+				converted = ParseNodeDiscover(v)
 			else:
 				converted = Encoding.StringToNumber(v)
-			data[F.parameter] = converted
+			data[DATA_FIELD.parameter] = converted
 		else:
 			data[k] = v
 	log.info('data from XBee:\n%s' % data)
+
+def logData(data):
+	try:
+		logData_(data)
+	except:
+		log.error('could not deal with data', exc_info=True)
 
 try:
 	xb = None
@@ -92,9 +100,9 @@ try:
 		xb.at(command=cmd, frame_id=frameId, parameter=parameter)
 	while True:
 		time.sleep(0.02)
-except KeyboardInterrupt, e:
+except KeyboardInterrupt as e:
 	log.info('Got ^C.')
-except Exception, e:
+except Exception as e:
 	log.error(e.message, exc_info=True)
 finally:
 	if xb:
