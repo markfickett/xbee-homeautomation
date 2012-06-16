@@ -11,9 +11,8 @@ import logging
 log = logging.getLogger('xh')
 
 import sys, os, time, optparse
-from xh import Config, Encoding
+import xh
 from xh.deps import serial, xbee
-from xh.protocol import DATA_FIELD, COMMAND, STATUS, ParseNodeDiscover
 
 from serial.tools import list_ports
 EXCLUDE_DEVICES = 'Bluetooth' # ignore in finding Serial ports
@@ -41,38 +40,17 @@ def pickSerialDevice():
 log.info('started')
 log.info('Type control-C to exit.')
 
-
-def logData_(rawData):
-	data = {}
-	for k, v in rawData.iteritems():
-		if k == str(DATA_FIELD.frame_id):
-			data[DATA_FIELD.frame_id] = \
-				Encoding.PrintedStringToNumber(v)
-		elif k == str(DATA_FIELD.command):
-			data[DATA_FIELD.command] = v
-		elif k == str(DATA_FIELD.status):
-			data[DATA_FIELD.status] = STATUS[
-				Encoding.StringToNumber(v)]
-		elif k == str(DATA_FIELD.parameter):
-			if rawData[str(DATA_FIELD.command)] == str(COMMAND.ND):
-				converted = ParseNodeDiscover(v)
-			else:
-				converted = Encoding.StringToNumber(v)
-			data[DATA_FIELD.parameter] = converted
-		else:
-			data[k] = v
-	log.info('data from XBee:\n%s' % data)
-
-def logData(data):
+def logData(rawData):
 	try:
-		logData_(data)
+		command = xh.protocol.Command.ParseFromDict(rawData)
+		log.info('received %s' % command)
 	except:
 		log.error('could not deal with data', exc_info=True)
 
 try:
 	xb = None
 	serialDevice = pickSerialDevice()
-	s = serial.Serial(serialDevice, Config.SERIAL_BAUD)
+	s = serial.Serial(serialDevice, xh.Config.SERIAL_BAUD)
 	xb = xbee.XBee(s, callback=logData)
 	log.info('Created XBee object.')
 	for i, cmd in enumerate([
@@ -80,7 +58,7 @@ try:
 		'ID', # network ID
 		#('ID', '\x3E\xF7'), # set network ID to 0x3EF7
 		#('KY', '\x32\x10'), # set network key to 0x3210
-		#('KY', Encoding.NumberToString(Config.LINK_KEY)),
+		#('KY', xh.Encoding.NumberToString(xh.Config.LINK_KEY)),
 		#'WR', # write network key
 		#'EE', # encryption enable (0 or 1)
 		#'SH', # serial (high bits)

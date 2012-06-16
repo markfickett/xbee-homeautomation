@@ -3,9 +3,7 @@ Convert to/from XBee API protocol values.
 """
 
 __all__ = [
-	'DATA_FIELD',
 	'COMMAND',
-	'STATUS',
 	'DEVICE_TYPE',
 
 	'ParseNodeDiscover',
@@ -17,23 +15,8 @@ log = logging.getLogger('Protocol')
 from xh.deps import Enum
 from xh import Encoding
 
-DATA_FIELD = Enum(
-	'frame_id',	# sequence; stringified number
-	'command',	# command name; ascii
-	'parameter',	# value sent with or received from command; packed
-	'status',	# status code; packed
-)
-
 COMMAND = Enum(
 	'ND',	# Node Discover
-)
-
-STATUS = Enum(
-	'OK',			# must be index 0
-	'ERROR',		# 1
-	'INVALID_COMMAND',	# 2
-	'INVALID_PARAMETER',	# 3
-	'TRANSMIT_FAILURE',	# 4
 )
 
 DEVICE_TYPE = Enum(
@@ -55,7 +38,6 @@ def ParseNodeDiscover(s):
 	# network Address (2)
 	d['MY'] = Encoding.StringToNumber(s[i:i+2])
 	i = i + 2
-	log.debug('MY: 0x%x' % d['MY'])
 
 	# serial high (4)
 	# serial low (4)
@@ -65,7 +47,6 @@ def ParseNodeDiscover(s):
 	serial = serial + Encoding.StringToNumber(s[i:i+4])
 	i = i + 4
 	d['SERIAL'] = serial
-	log.debug('serial: 0x%x' % serial)
 
 	# node identifier string (null-terminated)
 	nameEnd = i
