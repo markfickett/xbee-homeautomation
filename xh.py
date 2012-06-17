@@ -42,7 +42,7 @@ log.info('Type control-C to exit.')
 
 def logData(rawData):
 	try:
-		command = xh.protocol.Command.ParseFromDict(rawData)
+		command = xh.protocol.ParseCommandFromDict(rawData)
 		log.info('received %s' % command)
 	except:
 		log.error('could not deal with data', exc_info=True)

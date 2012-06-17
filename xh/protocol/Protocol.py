@@ -6,14 +6,15 @@ __all__ = [
 	'COMMAND',
 	'DEVICE_TYPE',
 
-	'ParseNodeDiscover',
+	'ParseCommandFromDict',
 ]
 
 import logging
 log = logging.getLogger('Protocol')
 
 from xh.deps import Enum
-from xh import Encoding
+from xh import Encoding, EnumUtil
+from xh.protocol import Command, NodeDiscover
 
 COMMAND = Enum(
 	'ND',	# Node Discover
@@ -25,56 +26,32 @@ DEVICE_TYPE = Enum(
 	'END_DEVICE',	# 2
 )
 
-def ParseNodeDiscover(s):
+
+# map from Command.NAME to the associated class
+COMMAND_CLASSES = {
+	Command.NAME.ND: NodeDiscover,
+}
+
+
+def ParseCommandFromDict(d):
 	"""
-	Parse out the fields of a node-discovery (ND) response.
+	Parse common fields from a response dict and create a Command of the
+	appropriate class.
 	"""
-	d = {}
-	i = 0
-	n = len(s)
+	frameId = Encoding.PrintedStringToNumber(
+		d[str(Command.FIELD.frame_id)])
 
-	# field (num bytes)
+	name = EnumUtil.FromString(Command.NAME, d['command'])
 
-	# network Address (2)
-	d['MY'] = Encoding.StringToNumber(s[i:i+2])
-	i = i + 2
+	status = d.get(str(Command.FIELD.status))
+	if status is not None:
+		status = Command.STATUS[Encoding.StringToNumber(status)]
 
-	# serial high (4)
-	# serial low (4)
-	serial = Encoding.StringToNumber(s[i:i+4])
-	i = i + 4
-	serial = serial * Encoding.BYTE_BASE**4
-	serial = serial + Encoding.StringToNumber(s[i:i+4])
-	i = i + 4
-	d['SERIAL'] = serial
-
-	# node identifier string (null-terminated)
-	nameEnd = i
-	while nameEnd < n and s[nameEnd] != chr(0):
-		nameEnd = nameEnd + 1
-	d['NI'] = s[i:nameEnd]
-	i = nameEnd + 1
-
-	# parent network address (2)
-	d['PARENT_NETWORK ADDRESS'] = Encoding.StringToNumber(s[i:i+2])
-	i = i + 2
-
-	# device type (1)
-	deviceType = Encoding.StringToNumber(s[i:i+1])
-	d['DEVICE_TYPE'] = DEVICE_TYPE[deviceType]
-	i = i + 1
-
-	# status, "Reserved" (1)
-	d['STATUS'] = Encoding.StringToNumber(s[i:i+1])
-	i = i + 1
-
-	# profile ID (2)
-	d['PROFILE_ID'] = Encoding.StringToNumber(s[i:i+2])
-	i = i + 2
-
-	# manufacturer ID (2)
-	d['MANUFACTURER_ID'] = Encoding.StringToNumber(s[i:i+2])
-	i = i + 2
-
-	return d
+	commandClass = COMMAND_CLASSES.get(name)
+	if commandClass:
+		c = commandClass(frameId)
+	else:
+		c = Command(frameId, name)
+	c.mergeFromDict(d)
+	return c
 

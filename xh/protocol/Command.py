@@ -3,7 +3,7 @@ log = logging.getLogger('xh.protocol.Command')
 
 from xh.deps import Enum
 from xh import Encoding, EnumUtil
-import Protocol
+import xh.protocol
 
 class Command:
 	# The fields expected to be in a command dict.
@@ -45,23 +45,26 @@ class Command:
 		'TRANSMIT_FAILURE',	# 4
 	)
 
-	def __init__(self, frameId, name, status=None):
+	def __init__(self, frameId, name):
 		self.__frameId = int(frameId)
 		if name not in Command.NAME:
 			raise ValueError('Name "%s" not in NAME enum.' % name)
 		self.__name = name
-		if not (status is None or status in Command.STATUS):
-			raise ValueError(
-				'Status "%s" not None or in STATUS enum.'
-				% status)
-		self.__status = status
 		self.__parameter = None
+		self.setStatus(None)
 
 	def getFrameId(self):
 		return self.__frameId
 
 	def getName(self):
 		return self.__name
+
+	def setStatus(self, status):
+		if not (status is None or status in Command.STATUS):
+			raise ValueError(
+				'Status "%s" not None or in STATUS enum.'
+				% status)
+		self.__status = status
 
 	def getStatus(self):
 		return self.__status
@@ -85,23 +88,27 @@ class Command:
 		}
 		return '#%(id)d %(name)s%(status)s%(param)s' % d
 
-	@classmethod
-	def ParseFromDict(cls, d):
-		frameId = Encoding.PrintedStringToNumber(
-			d[str(Command.FIELD.frame_id)])
-		name = EnumUtil.FromString(Command.NAME, d['command'])
-
+	def mergeFromDict(self, d):
+		"""
+		Parse status, parameter, and any class-specific fields from a
+		response dict.
+		"""
 		status = d.get(str(Command.FIELD.status))
 		if status is not None:
 			status = Command.STATUS[Encoding.StringToNumber(status)]
-
-		c = Command(frameId, name, status=status)
+			self.setStatus(status)
 
 		parameter = d.get(str(Command.FIELD.parameter))
 		if parameter is not None:
-			c.parseParameter(parameter)
+			self.parseParameter(parameter)
 
-		return c
+	def parseParameter(self, encoded):
+		n = self.getName()
+		if n is Command.NAME.ND:
+			parameter = xh.protocol.ParseNodeDiscover(encoded)
+		else:
+			parameter = self._parseParameterDefault(encoded)
+		self.setParameter(parameter)
 
 	def _parseParameterDefault(self, encoded):
 		"""
@@ -120,12 +127,4 @@ class Command:
 				+ ' "%s" to number 0x%X for command %s')
 				% (encoded, parameter, self.getName()))
 		return parameter
-
-	def parseParameter(self, encoded):
-		n = self.getName()
-		if n is Command.NAME.ND:
-			parameter = Protocol.ParseNodeDiscover(encoded)
-		else:
-			parameter = self._parseParameterDefault(encoded)
-		self.setParameter(parameter)
 
