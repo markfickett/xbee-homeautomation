@@ -127,15 +127,24 @@ class Command:
 		"""
 		Parse status, parameter, and any class-specific fields from a
 		response dict.
+		@return a set of the keys used
 		"""
-		status = d.get(str(Command.FIELD.status))
+		usedKeys = set()
+
+		statusKey = str(Command.FIELD.status)
+		status = d.get(statusKey)
 		if status is not None:
 			status = Command.STATUS[Encoding.StringToNumber(status)]
 			self.setStatus(status)
+			usedKeys.add(statusKey)
 
-		parameter = d.get(str(Command.FIELD.parameter))
+		paramKey = str(Command.FIELD.parameter)
+		parameter = d.get(paramKey)
 		if parameter is not None:
 			self.parseParameter(parameter)
+			usedKeys.add(paramKey)
+
+		return usedKeys
 
 
 	def parseParameter(self, encoded):

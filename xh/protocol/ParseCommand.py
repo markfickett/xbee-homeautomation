@@ -17,20 +17,28 @@ def ParseCommandFromDict(d):
 	Parse common fields from a response dict and create a Command of the
 	appropriate class.
 	"""
-	frameId = Encoding.PrintedStringToNumber(
-		d[str(Command.FIELD.frame_id)])
+	usedKeys = set()
+	frameIdKey = str(Command.FIELD.frame_id)
+	frameId = Encoding.PrintedStringToNumber(d[frameIdKey])
+	usedKeys.add(frameIdKey)
 
-	name = EnumUtil.FromString(Command.NAME, d['command'])
-
-	status = d.get(str(Command.FIELD.status))
-	if status is not None:
-		status = Command.STATUS[Encoding.StringToNumber(status)]
+	nameKey = str(Command.FIELD.command)
+	name = EnumUtil.FromString(Command.NAME, d[nameKey])
+	usedKeys.add(nameKey)
 
 	commandClass = COMMAND_CLASSES.get(name)
 	if commandClass:
 		c = commandClass(frameId=frameId)
 	else:
 		c = Command(name, frameId=frameId)
-	c.mergeFromDict(d)
+	usedKeys.update(c.mergeFromDict(d))
+
+	unusedKeys = set(d.keys()).difference(usedKeys)
+	if unusedKeys:
+		unused = {}
+		for k in unusedKeys:
+			unused[k] = d[k]
+		log.warning('In parsing %s, did not use %s.' % (c, unused))
+
 	return c
 
