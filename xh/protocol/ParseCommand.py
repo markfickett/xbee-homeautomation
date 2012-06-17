@@ -2,12 +2,13 @@ import logging
 log = logging.getLogger('ParseCommandFromDict')
 
 from .. import Encoding, EnumUtil
-from . import Command, InputVolts, NodeDiscover
+from . import Command, EncryptionEnable, InputVolts, NodeDiscover
 
 
 # map from Command.NAME to the associated class
 COMMAND_CLASSES = {
 	Command.NAME.__getattribute__('%V'): InputVolts,
+	Command.NAME.EE: EncryptionEnable,
 	Command.NAME.ND: NodeDiscover,
 }
 

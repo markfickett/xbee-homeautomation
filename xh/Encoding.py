@@ -50,6 +50,21 @@ def StringToNumber(s):
 	return n
 
 
+def StringToBoolean(s):
+	"""
+	Unpack a string to boolean. The string is expected to be a packed
+	number, where 0 is False and 1 is True.
+	"""
+	n = StringToNumber(s)
+	if n == 0:
+		return False
+	elif n == 1:
+		return True
+	else:
+		raise ValueError(('Encoded value "%s" is not an expected '
+			+ 'boolean value, should be 0 or 1.') % s)
+
+
 def StringToVolts(s):
 	"""
 	Unpack a string to a number, and convert that number to volts on
