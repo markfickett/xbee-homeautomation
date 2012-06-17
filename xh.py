@@ -12,6 +12,7 @@ log = logging.getLogger('xh')
 
 import sys, os, time, optparse
 import xh
+from xh.protocol import Command, NodeDiscover
 from xh.deps import serial, xbee
 
 from serial.tools import list_ports
@@ -53,29 +54,19 @@ try:
 	s = serial.Serial(serialDevice, xh.Config.SERIAL_BAUD)
 	xb = xbee.XBee(s, callback=logData)
 	log.info('Created XBee object.')
-	for i, cmd in enumerate([
-		#'MY', # node's network ID (0 for coordinator)
-		'ID', # network ID
-		#('ID', '\x3E\xF7'), # set network ID to 0x3EF7
-		#('KY', '\x32\x10'), # set network key to 0x3210
-		#('KY', xh.Encoding.NumberToString(xh.Config.LINK_KEY)),
-		#'WR', # write network key
-		#'EE', # encryption enable (0 or 1)
-		#'SH', # serial (high bits)
-		#'SL', # serial (low bits)
-		#'NI', # string node name
-		'%V', # Vcc voltage, value * 1200/1024.0 = mV
-		'NT', # discovery timeout
-		'ND'] # node discover
+	for cmd in (
+		Command(Command.NAME.MY),
+		Command(Command.NAME.ID),
+		Command(Command.NAME.KY),
+		Command(Command.NAME.EE),
+		Command(Command.NAME.SH),
+		Command(Command.NAME.SL),
+		Command(Command.NAME.NI),
+		Command(Command.NAME.__getattribute__('%V')),
+		Command(Command.NAME.NT),
+		NodeDiscover(),
 	):
-		frameId = '%X' % i
-		parameter = None
-		if type(cmd) is tuple:
-			cmd, parameter = cmd
-		log.info('Sending %s with frame ID %s%s' %
-			(cmd, frameId,
-			(parameter and ' and parameter %s' % parameter) or ''))
-		xb.at(command=cmd, frame_id=frameId, parameter=parameter)
+		cmd.send(xb)
 	while True:
 		time.sleep(0.02)
 except KeyboardInterrupt as e:

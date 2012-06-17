@@ -4,9 +4,15 @@ Conversion functions to pack/unpack values for XBee API communication.
 
 BYTE_BASE = 0x100
 
+def NumberToPrintedString(n):
+	"""
+	Pack a number as a printed, hex-formatted string.
+	"""
+	return '%x' % n
+
 def NumberToString(n):
 	"""
-	Pack numbers of arbitrary size into (little-endian) strings.
+	Pack a number of arbitrary size into (little-endian) a string.
 	Example: 0x3ef7 => '\x3e\xf7'
 	"""
 	s = ''

@@ -49,9 +49,9 @@ def ParseCommandFromDict(d):
 
 	commandClass = COMMAND_CLASSES.get(name)
 	if commandClass:
-		c = commandClass(frameId)
+		c = commandClass(frameId=frameId)
 	else:
-		c = Command(frameId, name)
+		c = Command(name, frameId=frameId)
 	c.mergeFromDict(d)
 	return c
 

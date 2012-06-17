@@ -2,8 +2,8 @@ import xh.Encoding
 from xh.protocol import Command
 
 class NodeDiscover(Command):
-	def __init__(self, frameId):
-		Command.__init__(self, frameId, Command.NAME.ND)
+	def __init__(self, **kwargs):
+		Command.__init__(self, Command.NAME.ND, **kwargs)
 
 	def parseParameter(self, p):
 		self.setParameter(ParseNodeDiscover(p))
