@@ -143,13 +143,25 @@ class Command:
 		"""
 		Format the parameter (or its parsed value(s)) for __str__.
 		"""
-		param = self.getParameter()
-		if param:
-			if type(param) is int:
-				param = '0x%X' % param
-			return ' parameter=%s' % param
-		else:
-			return ''
+		return self._FormatNamedValues(
+			{'parameter': self.getParameter()})
+
+
+	@staticmethod
+	def _FormatNamedValues(d):
+		"""
+		{'a': 29, 'b': None, 'c':'XBee'} -> ' a=0x1d c=XBee'
+		"""
+		s = ''
+		for k, v in d.iteritems():
+			if v is None:
+				continue
+			if type(v) is int:
+				formattedV = '0x%x' % v
+			else:
+				formattedV = str(v)
+			s = '%s %s=%s' % (s, k, formattedV)
+		return s
 
 
 	def mergeFromDict(self, d):
