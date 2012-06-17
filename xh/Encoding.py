@@ -2,14 +2,17 @@
 Conversion functions to pack/unpack values for XBee API communication.
 """
 
+
 BYTE_BASE = 0x100
 MILLIVOLTS_PER_VOLT = 1e-3
+
 
 def NumberToPrintedString(n):
 	"""
 	Pack a number as a printed, hex-formatted string.
 	"""
 	return '%x' % n
+
 
 def NumberToString(n):
 	"""
@@ -23,6 +26,7 @@ def NumberToString(n):
 		n = n / BYTE_BASE
 	return s
 
+
 def PrintedStringToNumber(s):
 	"""
 	Unpack a %s-formatted number. (Try to return an int, then a float.)
@@ -32,6 +36,7 @@ def PrintedStringToNumber(s):
 		return int(s)
 	except ValueError, e:
 		return float(s)
+
 
 def StringToNumber(s):
 	"""
@@ -43,6 +48,7 @@ def StringToNumber(s):
 		n *= BYTE_BASE
 		n += ord(c)
 	return n
+
 
 def StringToVolts(s):
 	"""

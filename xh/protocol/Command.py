@@ -6,6 +6,8 @@ from xh import Encoding, EnumUtil
 import xh.protocol
 import threading
 
+
+
 class Command:
 	# The fields expected to be in a command dict.
 	FIELD = Enum(
@@ -22,6 +24,7 @@ class Command:
 		'status',
 	)
 
+
 	# Recognized command names (alphabetized).
 	NAME = Enum(
 		'%V', # InputVolts (voltage level on Vcc pin)
@@ -37,6 +40,7 @@ class Command:
 		'WR', # write configuration to non-volatile memory
 	)
 
+
 	# Response status.
 	STATUS = Enum(
 		'OK',			# must be index 0
@@ -46,9 +50,11 @@ class Command:
 		'TRANSMIT_FAILURE',	# 4
 	)
 
+
 	# Next unclaimed frame ID for a command to send.
 	__sendingFrameId = 0
 	__frameIdLock = threading.Lock()
+
 
 	def __init__(self, name, frameId=None):
 		if frameId is None:
@@ -64,11 +70,14 @@ class Command:
 		self.__parameter = None
 		self.setStatus(None)
 
+
 	def getFrameId(self):
 		return self.__frameId
 
+
 	def getName(self):
 		return self.__name
+
 
 	def setStatus(self, status):
 		if not (status is None or status in Command.STATUS):
@@ -77,14 +86,18 @@ class Command:
 				% status)
 		self.__status = status
 
+
 	def getStatus(self):
 		return self.__status
+
 
 	def setParameter(self, parameter):
 		self.__parameter = parameter
 
+
 	def getParameter(self):
 		return self.__parameter
+
 
 	def __str__(self):
 		status = self.getStatus()
@@ -95,6 +108,7 @@ class Command:
 			'param': self._formatParameter(),
 		}
 		return '#%(id)d %(name)s%(status)s%(param)s' % d
+
 
 	def _formatParameter(self):
 		"""
@@ -107,6 +121,7 @@ class Command:
 			return ' parameter=%s' % param
 		else:
 			return ''
+
 
 	def mergeFromDict(self, d):
 		"""
@@ -122,6 +137,7 @@ class Command:
 		if parameter is not None:
 			self.parseParameter(parameter)
 
+
 	def parseParameter(self, encoded):
 		n = self.getName()
 		if n is Command.NAME.ND:
@@ -129,6 +145,7 @@ class Command:
 		else:
 			parameter = self._parseParameterDefault(encoded)
 		self.setParameter(parameter)
+
 
 	def _parseParameterDefault(self, encoded):
 		"""
@@ -151,14 +168,17 @@ class Command:
 				% (encoded, parameter, self.getName()))
 		return parameter
 
+
 	def send(self, xb):
 		log.info('sending %s' % self)
 		xb.at(command=str(self.getName()),
 			frame_id=self._encodedFrameId(),
 			parameter=self._encodedParameter())
 
+
 	def _encodedFrameId(self):
 		return Encoding.NumberToPrintedString(self.getFrameId())
+
 
 	def _encodedParameter(self):
 		return Encoding.NumberToString(self.getParameter())

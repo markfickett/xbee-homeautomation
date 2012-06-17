@@ -4,6 +4,7 @@ __all__ = [
 
 from ..deps import Enum
 
+
 DEVICE_TYPE = Enum(
 	'COORDINATOR',	# must be index 0
 	'ROUTER',	# 1

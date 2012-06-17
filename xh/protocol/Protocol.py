@@ -13,6 +13,7 @@ from .. import Encoding, EnumUtil, deps
 from deps import Enum
 from . import Command, InputVolts, NodeDiscover
 
+
 DEVICE_TYPE = Enum(
 	'COORDINATOR',	# must be index 0
 	'ROUTER',	# 1

@@ -4,6 +4,7 @@ log = logging.getLogger('ParseCommandFromDict')
 from .. import Encoding, EnumUtil
 from . import Command, InputVolts, NodeDiscover
 
+
 # map from Command.NAME to the associated class
 COMMAND_CLASSES = {
 	Command.NAME.__getattribute__('%V'): InputVolts,

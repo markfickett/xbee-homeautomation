@@ -1,12 +1,16 @@
 from .. import Encoding
 from . import Command, DEVICE_TYPE
 
+
+
 class NodeDiscover(Command):
 	def __init__(self, **kwargs):
 		Command.__init__(self, Command.NAME.ND, **kwargs)
 
 	def parseParameter(self, p):
 		self.setParameter(ParseNodeDiscover(p))
+
+
 
 def ParseNodeDiscover(s):
 	"""
