@@ -24,7 +24,7 @@ class Command:
 
 	# Recognized command names (alphabetized).
 	NAME = Enum(
-		'%V', # Vcc voltage, value * 1200/1024.0 = mV
+		'%V', # InputVolts (voltage level on Vcc pin)
 		'EE', # encryption enable (0 or 1)
 		'ID', # network id
 		'KY', # xh.Encoding.NumberToString(xh.Config.LINK_KEY)
@@ -88,16 +88,25 @@ class Command:
 
 	def __str__(self):
 		status = self.getStatus()
-		param = self.getParameter()
-		if type(param) is int:
-			param = '0x%X' % param
 		d = {
 			'name': self.getName(),
 			'id': self.getFrameId(),
 			'status': status and (' (%s)' % status) or '',
-			'param': param and (' parameter=%s' % param) or '',
+			'param': self._formatParameter(),
 		}
 		return '#%(id)d %(name)s%(status)s%(param)s' % d
+
+	def _formatParameter(self):
+		"""
+		Format the parameter (or its parsed value(s)) for __str__.
+		"""
+		param = self.getParameter()
+		if param:
+			if type(param) is int:
+				param = '0x%X' % param
+			return ' parameter=%s' % param
+		else:
+			return ''
 
 	def mergeFromDict(self, d):
 		"""

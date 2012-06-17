@@ -1,24 +1,8 @@
-"""
-Convert to/from XBee API protocol values.
-"""
-
-__all__ = [
-	'ParseCommandFromDict',
-]
-
 import logging
-log = logging.getLogger('Protocol')
+log = logging.getLogger('ParseCommandFromDict')
 
-from .. import Encoding, EnumUtil, deps
-from deps import Enum
+from .. import Encoding, EnumUtil
 from . import Command, InputVolts, NodeDiscover
-
-DEVICE_TYPE = Enum(
-	'COORDINATOR',	# must be index 0
-	'ROUTER',	# 1
-	'END_DEVICE',	# 2
-)
-
 
 # map from Command.NAME to the associated class
 COMMAND_CLASSES = {

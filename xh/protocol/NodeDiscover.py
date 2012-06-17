@@ -1,5 +1,5 @@
-import xh.Encoding
-from xh.protocol import Command
+from .. import Encoding
+from . import Command, DEVICE_TYPE
 
 class NodeDiscover(Command):
 	def __init__(self, **kwargs):
@@ -19,15 +19,15 @@ def ParseNodeDiscover(s):
 	# field (num bytes)
 
 	# network Address (2)
-	d['MY'] = xh.Encoding.StringToNumber(s[i:i+2])
+	d['MY'] = Encoding.StringToNumber(s[i:i+2])
 	i = i + 2
 
 	# serial high (4)
 	# serial low (4)
-	serial = xh.Encoding.StringToNumber(s[i:i+4])
+	serial = Encoding.StringToNumber(s[i:i+4])
 	i = i + 4
-	serial = serial * xh.Encoding.BYTE_BASE**4
-	serial = serial + xh.Encoding.StringToNumber(s[i:i+4])
+	serial = serial * Encoding.BYTE_BASE**4
+	serial = serial + Encoding.StringToNumber(s[i:i+4])
 	i = i + 4
 	d['SERIAL'] = serial
 
@@ -39,24 +39,24 @@ def ParseNodeDiscover(s):
 	i = nameEnd + 1
 
 	# parent network address (2)
-	d['PARENT_NETWORK ADDRESS'] = xh.Encoding.StringToNumber(s[i:i+2])
+	d['PARENT_NETWORK ADDRESS'] = Encoding.StringToNumber(s[i:i+2])
 	i = i + 2
 
 	# device type (1)
-	deviceType = xh.Encoding.StringToNumber(s[i:i+1])
+	deviceType = Encoding.StringToNumber(s[i:i+1])
 	d['DEVICE_TYPE'] = DEVICE_TYPE[deviceType]
 	i = i + 1
 
 	# status, "Reserved" (1)
-	d['STATUS'] = xh.Encoding.StringToNumber(s[i:i+1])
+	d['STATUS'] = Encoding.StringToNumber(s[i:i+1])
 	i = i + 1
 
 	# profile ID (2)
-	d['PROFILE_ID'] = xh.Encoding.StringToNumber(s[i:i+2])
+	d['PROFILE_ID'] = Encoding.StringToNumber(s[i:i+2])
 	i = i + 2
 
 	# manufacturer ID (2)
-	d['MANUFACTURER_ID'] = xh.Encoding.StringToNumber(s[i:i+2])
+	d['MANUFACTURER_ID'] = Encoding.StringToNumber(s[i:i+2])
 	i = i + 2
 
 	return d

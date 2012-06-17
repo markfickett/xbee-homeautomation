@@ -3,6 +3,7 @@ Conversion functions to pack/unpack values for XBee API communication.
 """
 
 BYTE_BASE = 0x100
+MILLIVOLTS_PER_VOLT = 1e-3
 
 def NumberToPrintedString(n):
 	"""
@@ -42,4 +43,11 @@ def StringToNumber(s):
 		n *= BYTE_BASE
 		n += ord(c)
 	return n
+
+def StringToVolts(s):
+	"""
+	Unpack a string to a number, and convert that number to volts on
+	an analog input pin.
+	"""
+	return StringToNumber(s) * (1200.0 / 1024.0) * MILLIVOLTS_PER_VOLT
 
