@@ -233,3 +233,36 @@ class Command:
 	def _encodedParameter(self):
 		return Encoding.NumberToString(self.getParameter())
 
+
+
+class _CommandRegistry:
+	def __init__(self):
+		self.__registry = {}
+
+
+	@staticmethod
+	def _CheckName(name):
+		if name not in Command.NAME:
+			raise ValueError(('Name "%s" not in the Command.NAME'
+				+ ' enum.') % name)
+
+
+	def put(self, name, commandClass):
+		"""
+		Register a command subclass to be autocreated for
+		a given command.
+		"""
+		if name in self.__registry:
+			raise RuntimeError(('Command registry already has an '
+				+ 'entry for %s: %s.')
+				% (name, self.__registry[name]))
+		self.__registry[name] = commandClass
+
+
+	def get(self, name):
+		self._CheckName(name)
+		return self.__registry.get(name)
+
+
+
+CommandRegistry = _CommandRegistry()

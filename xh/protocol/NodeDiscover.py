@@ -1,5 +1,5 @@
 from .. import Encoding
-from . import Command, DEVICE_TYPE
+from . import Command, CommandRegistry, DEVICE_TYPE
 
 
 
@@ -110,3 +110,6 @@ class NodeDiscover(Command):
 		self.__manufacturerId = Encoding.StringToNumber(s[i:i+2])
 		i = i + 2
 
+
+
+CommandRegistry.put(Command.NAME.ND, NodeDiscover)

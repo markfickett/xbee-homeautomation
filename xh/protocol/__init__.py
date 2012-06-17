@@ -1,5 +1,5 @@
 from Constants import *
-from Command import Command
+from Command import Command, CommandRegistry
 
 from EncryptionEnable import EncryptionEnable
 from InputVolts import InputVolts

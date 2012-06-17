@@ -2,15 +2,7 @@ import logging
 log = logging.getLogger('ParseCommandFromDict')
 
 from .. import Encoding, EnumUtil
-from . import Command, EncryptionEnable, InputVolts, NodeDiscover
-
-
-# map from Command.NAME to the associated class
-COMMAND_CLASSES = {
-	Command.NAME.__getattribute__('%V'): InputVolts,
-	Command.NAME.EE: EncryptionEnable,
-	Command.NAME.ND: NodeDiscover,
-}
+from . import Command, CommandRegistry
 
 
 def ParseCommandFromDict(d):
@@ -31,7 +23,7 @@ def ParseCommandFromDict(d):
 	name = EnumUtil.FromString(Command.NAME, d[nameKey])
 	usedKeys.add(nameKey)
 
-	commandClass = COMMAND_CLASSES.get(name)
+	commandClass = CommandRegistry.get(name)
 	if commandClass:
 		c = commandClass(frameId=frameId, frameType=frameType)
 	else:

@@ -1,5 +1,5 @@
 from .. import Encoding
-from . import Command
+from . import Command, CommandRegistry
 
 
 
@@ -30,3 +30,6 @@ class InputVolts(Command):
 		else:
 			return ''
 
+
+
+CommandRegistry.put(Command.NAME.__getattribute__('%V'), InputVolts)
