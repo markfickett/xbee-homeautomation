@@ -65,10 +65,17 @@ def StringToBoolean(s):
 			+ 'boolean value, should be 0 or 1.') % s)
 
 
+def NumberToVolts(n):
+	"""
+	Convert a number to volts on an analog input pin.
+	"""
+	return n * (1200.0 / 1024.0) * MILLIVOLTS_PER_VOLT
+
+
 def StringToVolts(s):
 	"""
 	Unpack a string to a number, and convert that number to volts on
 	an analog input pin.
 	"""
-	return StringToNumber(s) * (1200.0 / 1024.0) * MILLIVOLTS_PER_VOLT
+	return NumberToVolts(StringToNumber(s))
 

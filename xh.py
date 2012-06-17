@@ -43,16 +43,16 @@ log.info('Type control-C to exit.')
 
 def logData(rawData):
 	try:
-		command = xh.protocol.ParseCommandFromDict(rawData)
-		log.info('received %s' % command)
+		frame = xh.protocol.ParseFromDict(rawData)
+		log.info('received %s' % frame)
 	except:
-		log.error('could not deal with data', exc_info=True)
+		log.error('error handling data: %s' % rawData, exc_info=True)
 
 try:
 	xb = None
 	serialDevice = pickSerialDevice()
 	s = serial.Serial(serialDevice, xh.Config.SERIAL_BAUD)
-	xb = xbee.XBee(s, callback=logData)
+	xb = xbee.ZigBee(s, callback=logData)
 	log.info('Created XBee object.')
 	for cmd in (
 		Command(Command.NAME.MY),

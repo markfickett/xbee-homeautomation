@@ -1,19 +1,17 @@
 import logging
 log = logging.getLogger('xh.protocol.Command')
 
-from xh.deps import Enum
-from xh import Encoding, EnumUtil
+from ..deps import Enum
+from .. import Encoding, EnumUtil
+from . import Frame
 import xh.protocol
 import threading
 
 
 
-class Command:
+class Command(Frame):
 	# The fields expected to be in a command dict.
 	FIELD = Enum(
-		# frame type; packed number
-		'id',
-
 		# sequence; stringified number
 		'frame_id',
 
@@ -54,40 +52,20 @@ class Command:
 	)
 
 
-	# Frame types, matching the xbee library's names.
-	FRAME_TYPE = Enum(
-		# AT command (immediate)	# 0x08 in XBee API
-		# AT command (queued)		# 0x09
-		# Remote Command Request	# 0x17
-		'at_response',			# 0x88
-		# Modem Status			# 0x8A
-		# TX request			# 0x10
-		# TX response			# 0x8B
-		# RX received			# 0x90
-		# RX I/O data received		# 0x92
-		# Node Identification Indicator	# 0x95
-		'remote_at_response'		# 0x97
-	)
-
-
 	# Next unclaimed frame ID for a command to send.
 	__sendingFrameId = 0
 	__frameIdLock = threading.Lock()
 
 
-	def __init__(self, name, frameId=None, frameType=None):
+	def __init__(self, name, frameId=None):
+		Frame.__init__(self)
+
 		if frameId is None:
 			with Command.__frameIdLock:
 				self.__frameId = Command.__sendingFrameId
 				Command.__sendingFrameId += 1
 		else:
 			self.__frameId = int(frameId)
-
-		if not (frameType is None or frameType in Command.FRAME_TYPE):
-			raise ValueError(
-				'Frame type "%s" not in FRAME_TYPE enum.'
-				% frameType)
-		self.__frameType = frameType
 
 		if name not in Command.NAME:
 			raise ValueError('Name "%s" not in NAME enum.' % name)
@@ -98,10 +76,6 @@ class Command:
 
 	def getFrameId(self):
 		return self.__frameId
-
-
-	def getFrameType(self):
-		return self.__frameType
 
 
 	def getName(self):
@@ -147,23 +121,6 @@ class Command:
 			{'parameter': self.getParameter()})
 
 
-	@staticmethod
-	def _FormatNamedValues(d):
-		"""
-		{'a': 29, 'b': None, 'c':'XBee'} -> ' a=0x1d c=XBee'
-		"""
-		s = ''
-		for k, v in d.iteritems():
-			if v is None:
-				continue
-			if type(v) is int:
-				formattedV = '0x%x' % v
-			else:
-				formattedV = str(v)
-			s = '%s %s=%s' % (s, k, formattedV)
-		return s
-
-
 	def mergeFromDict(self, d):
 		"""
 		Parse status, parameter, and any class-specific fields from a
@@ -190,11 +147,7 @@ class Command:
 
 	def parseParameter(self, encoded):
 		n = self.getName()
-		if n is Command.NAME.ND:
-			parameter = xh.protocol.ParseNodeDiscover(encoded)
-		else:
-			parameter = self._parseParameterDefault(encoded)
-		self.setParameter(parameter)
+		self.setParameter(self._parseParameterDefault(encoded))
 
 
 	def _parseParameterDefault(self, encoded):
