@@ -22,15 +22,19 @@ def ParseCommandFromDict(d):
 	frameId = Encoding.PrintedStringToNumber(d[frameIdKey])
 	usedKeys.add(frameIdKey)
 
+	frameTypeKey = str(Command.FIELD.id)
+	frameType = EnumUtil.FromString(Command.FRAME_TYPE, d[frameTypeKey])
+	usedKeys.add(frameTypeKey)
+
 	nameKey = str(Command.FIELD.command)
 	name = EnumUtil.FromString(Command.NAME, d[nameKey])
 	usedKeys.add(nameKey)
 
 	commandClass = COMMAND_CLASSES.get(name)
 	if commandClass:
-		c = commandClass(frameId=frameId)
+		c = commandClass(frameId=frameId, frameType=frameType)
 	else:
-		c = Command(name, frameId=frameId)
+		c = Command(name, frameId=frameId, frameType=frameType)
 	usedKeys.update(c.mergeFromDict(d))
 
 	unusedKeys = set(d.keys()).difference(usedKeys)
