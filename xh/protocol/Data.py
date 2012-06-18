@@ -107,8 +107,9 @@ class Data(Frame):
 		usedKeys.add(optionsKey)
 
 		samplesKey = str(self.FIELD.samples)
-		self.__samples = [Sample.CreateFromDict(sd)
-			for sd in d[samplesKey]]
+		self.__samples = []
+		for sd in d[samplesKey]:
+			self.__samples += Sample.CreateFromDict(sd)
 		usedKeys.add(samplesKey)
 
 		return usedKeys
@@ -128,10 +129,10 @@ class Sample:
 
 	def __str__(self):
 		valueStr = ','
-		if self.__volts:
-			valueStr = valueStr + ' volts=%.3f' % self.__volts
-		else:
+		if self.__volts is None:
 			valueStr = ''
+		else:
+			valueStr = valueStr + ' volts=%.3f' % self.__volts
 
 		return 'Sample(%d, %s%s)' % (
 			self.__pinNum,
@@ -142,20 +143,19 @@ class Sample:
 
 	@classmethod
 	def CreateFromDict(cls, d):
-		if len(d) != 1:
-			raise ValueError(('Sample dicts can only contain '
-				+ 'one key, but got %s.') % d)
-		key, value = d.items()[0]
-		pinType, pinNum = key.split('-')
-		pinNum = int(pinNum)
-		pinType = EnumUtil.FromString(cls.PIN_TYPE, pinType)
-		valueKwargs = {}
-		if pinType == cls.PIN_TYPE.adc:
-			valueKwargs['volts'] = Encoding.NumberToVolts(value)
-		else:
-			raise RuntimeError(('unprepared to convert value "%s" '
-				+ 'for pin %s-%d') % (value, pinType, pinNum))
-		return Sample(pinNum, pinType, **valueKwargs)
+		for key, value in d.iteritems():
+			pinType, pinNum = key.split('-')
+			pinNum = int(pinNum)
+			pinType = EnumUtil.FromString(cls.PIN_TYPE, pinType)
+			valueKwargs = {}
+			if pinType == cls.PIN_TYPE.adc:
+				valueKwargs['volts'] = Encoding.NumberToVolts(
+					value)
+			else:
+				raise RuntimeError(('unprepared to convert '
+					+ 'value "%s" for pin %s-%d')
+					% (value, pinType, pinNum))
+			yield Sample(pinNum, pinType, **valueKwargs)
 
 
 
