@@ -54,6 +54,11 @@ class Data(Frame):
 		return self.__timestamp
 
 
+	def formatTimestamp(self):
+		return datetime.datetime.strftime(
+			self.getTimestamp(), self.DATETIME_FORMAT)
+
+
 	def getSourceAddress(self):
 		return self.__sourceAddress
 
@@ -79,8 +84,7 @@ class Data(Frame):
 		if t is None:
 			t = ''
 		else:
-			t = ' ' + datetime.datetime.strftime(t,
-				self.DATETIME_FORMAT)
+			t = ' ' + self.formatTimestamp()
 		return '%s%s%s' % (s, t, self._FormatNamedValues({
 			'sourceAddress': self.getSourceAddress(),
 			'sourceAddressLong': self.getSourceAddressLong(),
@@ -125,6 +129,18 @@ class Sample:
 		self.__pinNum = pinNum
 		self.__pinType = pinType
 		self.__volts = volts
+
+
+	def getPinNumber(self):
+		return self.__pinNum
+
+
+	def getPinType(self):
+		return self.__pinType
+
+
+	def getVolts(self):
+		return self.__volts
 
 
 	def __str__(self):
