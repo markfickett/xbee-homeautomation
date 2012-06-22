@@ -57,15 +57,20 @@ class Command(Frame):
 	__frameIdLock = threading.Lock()
 
 
-	def __init__(self, name, frameId=None):
-		Frame.__init__(self)
+	def __init__(self, name, responseFrameId=None):
+		if responseFrameId is None:
+			frameType = Frame.TYPE.at
+		else:
+			frameType = Frame.TYPE.at_response
 
-		if frameId is None:
+		Frame.__init__(self, frameType=frameType)
+
+		if responseFrameId is None:
 			with Command.__frameIdLock:
 				self.__frameId = Command.__sendingFrameId
 				Command.__sendingFrameId += 1
 		else:
-			self.__frameId = int(frameId)
+			self.__frameId = int(responseFrameId)
 
 		if name not in Command.NAME:
 			raise ValueError('Name "%s" not in NAME enum.' % name)

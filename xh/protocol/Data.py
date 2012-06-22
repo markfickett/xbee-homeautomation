@@ -32,7 +32,7 @@ class Data(Frame):
 
 
 	def __init__(self, setTimestamp=True):
-		Frame.__init__(self)
+		Frame.__init__(self, frameType=Frame.TYPE.rx_io_data_long_addr)
 		self.__sourceAddress = None
 		self.__sourceAddressLong = None
 		self.__options = None

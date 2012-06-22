@@ -20,6 +20,8 @@ def ParseFromDict(d):
 		o = _ParseAtCommand(d, usedKeys)
 	elif frameType is Frame.TYPE.rx_io_data_long_addr:
 		o = _ParseData(d, usedKeys)
+	elif frameType is Frame.TYPE.node_id_indicator:
+		o = _ParseId(d, usedKeys)
 
 	unusedKeys = set(d.keys()).difference(usedKeys)
 	if unusedKeys:
@@ -45,9 +47,9 @@ def _ParseAtCommand(d, usedKeys):
 
 	commandClass = CommandRegistry.get(name)
 	if commandClass:
-		c = commandClass(frameId=frameId)
+		c = commandClass(responseFrameId=frameId)
 	else:
-		c = Command(name, frameId=frameId)
+		c = Command(name, responseFrameId=frameId)
 	usedKeys.update(c.mergeFromDict(d))
 
 	return c
@@ -57,4 +59,8 @@ def _ParseData(d, usedKeys):
 	parsedData = Data()
 	usedKeys.update(parsedData.mergeFromDict(d))
 	return parsedData
+
+def _ParseId(d, usedKeys):
+	raise NotImplementedError()
+	# parse a node ID, make share with NodeIdentify
 

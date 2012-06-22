@@ -4,8 +4,9 @@ from ..deps import Enum
 
 class Frame:
 	# ZigBee Mesh frame types, matching the xbee library's names.
+	# See: http://code.google.com/p/python-xbee/source/browse/xbee/zigbee.py
 	TYPE = Enum(
-		# AT command (immediate)	# 0x08 in XBee API
+		'at',				# 0x08 in XBee API
 		# AT command (queued)		# 0x09
 		# Remote Command Request	# 0x17
 		'at_response',			# 0x88
@@ -14,7 +15,7 @@ class Frame:
 		# TX response			# 0x8B
 		# RX received			# 0x90
 		'rx_io_data_long_addr',		# 0x92
-		# Node Identification Indicator	# 0x95
+		'node_id_indicator',		# 0x95
 		'remote_at_response',		# 0x97
 	)
 
@@ -23,8 +24,15 @@ class Frame:
 	FIELD = Enum('id')
 
 
-	def __init__(self):
-		pass
+	def __init__(self, frameType=None):
+		if not (frameType is None or frameType in self.TYPE):
+			raise ValueError(('Frame type %s is neither None nor '
+				+ 'one of the TYPE enum values.') % frameType)
+		self.__frameType = frameType
+
+
+	def getFrameType(self):
+		return self.__frameType
 
 
 	def mergeFrom(self, d):
