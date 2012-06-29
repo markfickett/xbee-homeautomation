@@ -12,15 +12,18 @@ log = logging.getLogger('xh')
 
 import sys, os, time, optparse
 import xh
-from xh.protocol import Command, NodeDiscover
+from xh.protocol import Command, NodeDiscover, Data
 from xh.deps import serial, xbee
 
 from serial.tools import list_ports
-EXCLUDE_DEVICES = 'Bluetooth' # ignore in finding Serial ports
+EXCLUDE_DEVICES = set(['Bluetooth', '-COM']) # ignore in finding Serial ports
+
+DATA_LOG_FILE = 'datalog.csv'
+log.info('also logging CSV to %s' % DATA_LOG_FILE)
 
 def getSerialCandidates():
 	candidates = [d[0] for d in list_ports.comports()
-		if EXCLUDE_DEVICES not in d[0]]
+		if all([e not in d[0] for e in EXCLUDE_DEVICES])]
 	if not candidates:
 		raise RuntimeError('No candidates for serial devices found.')
 	return candidates
@@ -45,6 +48,14 @@ def logData(rawData):
 	try:
 		frame = xh.protocol.ParseFromDict(rawData)
 		log.info('received %s' % frame)
+		if isinstance(frame, Data):
+			with open(DATA_LOG_FILE, 'a') as dataFile:
+				fields = []
+				fields.append(frame.formatTimestamp())
+				for s in frame.getSamples():
+					fields.append(str(s.getVolts()))
+				dataFile.write(','.join(fields) + '\n')
+				
 	except:
 		log.error('error handling data: %s' % rawData, exc_info=True)
 
