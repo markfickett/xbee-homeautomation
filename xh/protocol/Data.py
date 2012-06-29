@@ -3,7 +3,7 @@ log = logging.getLogger('xh.protocol.Data')
 
 from ..deps import Enum
 from .. import Encoding, EnumUtil
-from . import Frame
+from . import Frame, FrameRegistry
 import datetime
 
 
@@ -31,27 +31,27 @@ class Data(Frame):
 	DATETIME_FORMAT = '%Y %b %d %H:%M:%S UTC'
 
 
-	def __init__(self, setTimestamp=True):
+	def __init__(self, setTimestampToNow=True):
 		Frame.__init__(self, frameType=Frame.TYPE.rx_io_data_long_addr)
-		self.__sourceAddress = None
-		self.__sourceAddressLong = None
-		self.__options = None
-		self.__samples = []
-		if setTimestamp:
-			self.setTimestamp()
+		self._sourceAddress = None
+		self._sourceAddressLong = None
+		self._options = None
+		self._samples = []
+		if setTimestampToNow:
+			self.setTimestampToNow()
 		else:
-			self.__timestamp = None
+			self._timestamp = None
 
 
-	def setTimestamp(self):
-		self.__timestamp = datetime.datetime.utcnow()
+	def setTimestampToNow(self):
+		self._timestamp = datetime.datetime.utcnow()
 
 
 	def getTimestamp(self):
 		"""
 		@return the UTC creation timestamp of the sample data
 		"""
-		return self.__timestamp
+		return self._timestamp
 
 
 	def formatTimestamp(self):
@@ -60,19 +60,19 @@ class Data(Frame):
 
 
 	def getSourceAddress(self):
-		return self.__sourceAddress
+		return self._sourceAddress
 
 
 	def getSourceAddressLong(self):
-		return self.__sourceAddressLong
+		return self._sourceAddressLong
 
 
 	def getOptions(self):
-		return self.__options
+		return self._options
 
 
 	def getSamples(self):
-		return list(self.__samples)
+		return list(self._samples)
 
 
 	def __str__(self):
@@ -93,30 +93,31 @@ class Data(Frame):
 		}))
 
 
-	def mergeFromDict(self, d):
-		usedKeys = set()
+	@classmethod
+	def _CreateFromDict(cls, d, usedKeys):
+		data = cls()
 
-		sourceAddrKey = str(self.FIELD.source_addr)
-		self.__sourceAddress = Encoding.StringToNumber(d[sourceAddrKey])
+		sourceAddrKey = str(cls.FIELD.source_addr)
+		data._sourceAddress = Encoding.StringToNumber(d[sourceAddrKey])
 		usedKeys.add(sourceAddrKey)
 
-		sourceAddrLongKey = str(self.FIELD.source_addr_long)
-		self.__sourceAddressLong = Encoding.StringToNumber(
+		sourceAddrLongKey = str(cls.FIELD.source_addr_long)
+		data._sourceAddressLong = Encoding.StringToNumber(
 			d[sourceAddrLongKey])
 		usedKeys.add(sourceAddrLongKey)
 
-		optionsKey = str(self.FIELD.options)
-		self.__options = self.OPTIONS[
+		optionsKey = str(cls.FIELD.options)
+		data._options = cls.OPTIONS[
 			Encoding.StringToNumber(d[optionsKey]) - 1]
 		usedKeys.add(optionsKey)
 
-		samplesKey = str(self.FIELD.samples)
-		self.__samples = []
+		samplesKey = str(cls.FIELD.samples)
+		data._samples = []
 		for sd in d[samplesKey]:
-			self.__samples += Sample.CreateFromDict(sd)
+			data._samples += Sample.CreateFromDict(sd)
 		usedKeys.add(samplesKey)
 
-		return usedKeys
+		return data
 
 
 
@@ -175,3 +176,4 @@ class Sample:
 
 
 
+FrameRegistry.put(Frame.TYPE.rx_io_data_long_addr, Data)

@@ -3,7 +3,7 @@ log = logging.getLogger('xh.protocol.Command')
 
 from ..deps import Enum
 from .. import Encoding, EnumUtil
-from . import Frame
+from . import Frame, FrameRegistry, Registry
 import xh.protocol
 import threading
 
@@ -126,13 +126,12 @@ class Command(Frame):
 			{'parameter': self.getParameter()})
 
 
-	def mergeFromDict(self, d):
+	def _updateFromDict(self, d, usedKeys):
 		"""
 		Parse status, parameter, and any class-specific fields from a
 		response dict.
-		@return a set of the keys used
 		"""
-		usedKeys = set()
+		Frame._updateFromDict(self, d, usedKeys)
 
 		statusKey = str(Command.FIELD.status)
 		status = d.get(statusKey)
@@ -146,8 +145,6 @@ class Command(Frame):
 		if parameter is not None:
 			self.parseParameter(parameter)
 			usedKeys.add(paramKey)
-
-		return usedKeys
 
 
 	def parseParameter(self, encoded):
@@ -192,35 +189,33 @@ class Command(Frame):
 		return Encoding.NumberToString(self.getParameter())
 
 
+	@classmethod
+	def _CreateFromDict(cls, d, usedKeys):
+		frameIdKey = str(Command.FIELD.frame_id)
+		frameId = d.get(frameIdKey)
+		frameId = Encoding.PrintedStringToNumber(d[frameIdKey])
+		usedKeys.add(frameIdKey)
 
-class _CommandRegistry:
-	def __init__(self):
-		self.__registry = {}
+		nameKey = str(Command.FIELD.command)
+		name = d.get(nameKey)
+		if name is not None:
+			name = EnumUtil.FromString(Command.NAME, name)
+			usedKeys.add(nameKey)
 
+		commandClass = CommandRegistry.get(name)
+		if commandClass:
+			c = commandClass(responseFrameId=frameId)
+		else:
+			c = Command(name, responseFrameId=frameId)
 
-	@staticmethod
-	def _CheckName(name):
-		if name not in Command.NAME:
-			raise ValueError(('Name "%s" not in the Command.NAME'
-				+ ' enum.') % name)
-
-
-	def put(self, name, commandClass):
-		"""
-		Register a command subclass to be autocreated for
-		a given command.
-		"""
-		if name in self.__registry:
-			raise RuntimeError(('Command registry already has an '
-				+ 'entry for %s: %s.')
-				% (name, self.__registry[name]))
-		self.__registry[name] = commandClass
-
-
-	def get(self, name):
-		self._CheckName(name)
-		return self.__registry.get(name)
+		return c
 
 
 
-CommandRegistry = _CommandRegistry()
+CommandRegistry = Registry(Command.NAME)
+CommandRegistry.__doc__ = ('Which Command.NAME is to be parsed '
+	+ 'by which Command subclass.')
+
+
+
+FrameRegistry.put(Frame.TYPE.at_response, Command)

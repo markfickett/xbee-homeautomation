@@ -1,4 +1,5 @@
 from ..deps import Enum
+from . import Registry
 
 
 
@@ -35,13 +36,41 @@ class Frame:
 		return self.__frameType
 
 
-	def mergeFrom(self, d):
+	@classmethod
+	def CreateFromDict(cls, d, usedKeys):
+		"""
+		Create a new instance of a Frame subclass. This calls protected
+		methods which subclasses should/may override.
+		@see _CreateFromDict, _updateFromDict
+		@param d an API dict from which to draw values
+		@param usedKeys a set to which to add the names of any used
+			keys, naming keys for values from the API dict
+		"""
+		frame = cls._CreateFromDict(d, usedKeys)
+		frame._updateFromDict(d, usedKeys)
+		return frame
+
+
+	@classmethod
+	def _CreateFromDict(cls, d, usedKeys):
+		"""
+		Create a new instance of a Frame subclass. Frame subclasses
+		must override this.
+		@param d an API dict from which to initialize the frame
+		@param usedKeys a set to which to add any keys used; key names
+			are those in the API dict which are read
+		"""
+		raise NotImplementedError()
+
+
+	def _updateFromDict(self, d, usedKeys):
 		"""
 		Update this Frame with any recognized data in an API dict.
+		Subclasses may override (and call) this.
 		@param d data from the xbee Python API, unprocessed
-		@return a set of all the keys from the dict that were used
+		@param usedKeys a set to update with any keys from the API dict
+			which were used
 		"""
-		return set()
 
 
 	@staticmethod
@@ -63,3 +92,7 @@ class Frame:
 			s = '%s %s=%s' % (s, k, formattedV)
 		return s
 
+
+
+FrameRegistry = Registry(Frame.TYPE)
+FrameRegistry.__doc__ = 'Which Frame.TYPE is to be parsed by which class.'
