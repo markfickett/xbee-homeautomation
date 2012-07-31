@@ -1,62 +1,20 @@
 from .. import Encoding
-from . import Command, CommandRegistry, DEVICE_TYPE
+from . import Command, CommandRegistry, DEVICE_TYPE, NodeId
 
 
 
 class NodeDiscover(Command):
 	def __init__(self, **kwargs):
 		Command.__init__(self, Command.NAME.ND, **kwargs)
-		self.__networkAddress = None
-		self.__serial = None
-		self.__nodeIdentifier = None
-		self.__parentNetworkAddress = None
-		self.__deviceType = None
-		self.__statusFromReserved = None
-		self.__profileId = None
-		self.__manufacturerId = None
+		self.__nodeId = NodeId()
 
 
-	def getNetworkAddress(self):
-		return self.__networkAddress
-
-
-	def getSerial(self):
-		return self.__serial
-
-
-	def getNodeIdentifier(self):
-		return self.__nodeIdentifier
-
-
-	def getParentNetworkAddress(self):
-		return self.__parentNetworkAddress
-
-
-	def getDeviceType(self):
-		return self.__deviceType
-
-
-	def getProfileId(self):
-		return self.__profileId
-
-
-	def getManufacturerId(self):
-		return self.__manufacturerId
+	def getNodeId(self):
+		return self.__nodeId
 
 
 	def _formatParameter(self):
-		name = self.getNodeIdentifier()
-		if name is not None:
-			name = repr(name)
-		return self._FormatNamedValues({
-			'MY': self.getNetworkAddress(),
-			'serial': self.getSerial(),
-			'NI': name,
-			'parentNetAddr': self.getParentNetworkAddress(),
-			'deviceType': self.getDeviceType(),
-			'profileId': self.getProfileId(),
-			'manufacturerId': self.getManufacturerId(),
-		})
+		return str(self.__nodeId)
 
 
 	def parseParameter(self, s):
@@ -66,11 +24,12 @@ class NodeDiscover(Command):
 		d = {}
 		i = 0
 		n = len(s)
+		id = self.__nodeId
 
 		# field (num bytes)
 
 		# network Address (2)
-		self.__networkAddress = Encoding.StringToNumber(s[i:i+2])
+		id.setNetworkAddress(Encoding.StringToNumber(s[i:i+2]))
 		i = i + 2
 
 		# serial high (4)
@@ -80,34 +39,34 @@ class NodeDiscover(Command):
 		serial = serial * Encoding.BYTE_BASE**4
 		serial = serial + Encoding.StringToNumber(s[i:i+4])
 		i = i + 4
-		self.__serial = serial
+		id.setSerial(serial)
 
 		# node identifier string (null-terminated)
 		nameEnd = i
 		while nameEnd < n and s[nameEnd] != chr(0):
 			nameEnd = nameEnd + 1
-		self.__nodeIdentifier = s[i:nameEnd]
+		id.setNodeIdentifier(s[i:nameEnd])
 		i = nameEnd + 1
 
 		# parent network address (2)
-		self.__parentNetworkAddress = Encoding.StringToNumber(s[i:i+2])
+		id.setParentNetworkAddress(Encoding.StringToNumber(s[i:i+2]))
 		i = i + 2
 
 		# device type (1)
 		deviceType = Encoding.StringToNumber(s[i:i+1])
-		self.__deviceType = DEVICE_TYPE[deviceType]
+		id.setDeviceType(DEVICE_TYPE[deviceType])
 		i = i + 1
 
 		# status, "Reserved" (1)
-		self.__statusFromReserved = Encoding.StringToNumber(s[i:i+1])
+		id.setStatusFromReserved(Encoding.StringToNumber(s[i:i+1]))
 		i = i + 1
 
 		# profile ID (2)
-		self.__profileId = Encoding.StringToNumber(s[i:i+2])
+		id.setProfileId(Encoding.StringToNumber(s[i:i+2]))
 		i = i + 2
 
 		# manufacturer ID (2)
-		self.__manufacturerId = Encoding.StringToNumber(s[i:i+2])
+		id.setManufacturerId(Encoding.StringToNumber(s[i:i+2]))
 		i = i + 2
 
 
