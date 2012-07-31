@@ -22,8 +22,10 @@ class EncryptionEnable(Command):
 		return self.__enabled
 
 
-	def _formatParameter(self):
-		return self._FormatNamedValues({'enabled': self.getEnabled()})
+	def getNamedValues(self):
+		d = Command.getNamedValues(self, includeParameter=False)
+		d.update({'enabled': self.getEnabled()})
+		return d
 
 
 	def parseParameter(self, p):

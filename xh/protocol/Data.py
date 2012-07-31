@@ -12,18 +12,7 @@ class Data(Frame):
 	FIELD = Enum(
 		'source_addr',
 		'source_addr_long',
-		'options',
 		'samples',
-	)
-
-
-	# receive options; about a sample packet's arrival
-	OPTIONS = Enum(
-		# was sent directly to us and was acknowledged
-		'ACKNOWLEDGED',
-
-		# was sent to everyone
-		'BROADCAST',
 	)
 
 
@@ -35,7 +24,6 @@ class Data(Frame):
 		Frame.__init__(self, frameType=Frame.TYPE.rx_io_data_long_addr)
 		self._sourceAddress = None
 		self._sourceAddressLong = None
-		self._options = None
 		self._samples = []
 		if setTimestampToNow:
 			self.setTimestampToNow()
@@ -67,30 +55,32 @@ class Data(Frame):
 		return self._sourceAddressLong
 
 
-	def getOptions(self):
-		return self._options
-
-
 	def getSamples(self):
 		return list(self._samples)
 
 
-	def __str__(self):
+	def getNamedValues(self):
+		d = Frame.getNamedValues(self)
 		samples = self.getSamples()
 		if not samples:
 			samples = None
+		d.update({
+			'sourceAddress': self.getSourceAddress(),
+			'sourceAddressLong': self.getSourceAddressLong(),
+			'samples': samples,
+		})
+		return d
+
+
+	def __str__(self):
 		s = 'data'
 		t = self.getTimestamp()
 		if t is None:
 			t = ''
 		else:
 			t = ' ' + self.formatTimestamp()
-		return '%s%s%s' % (s, t, self._FormatNamedValues({
-			'sourceAddress': self.getSourceAddress(),
-			'sourceAddressLong': self.getSourceAddressLong(),
-			'options': self.getOptions(),
-			'samples': samples,
-		}))
+		return '%s%s%s' % (s, t,
+			self._FormatNamedValues(self.getNamedValues()))
 
 
 	@classmethod
@@ -105,11 +95,6 @@ class Data(Frame):
 		data._sourceAddressLong = Encoding.StringToNumber(
 			d[sourceAddrLongKey])
 		usedKeys.add(sourceAddrLongKey)
-
-		optionsKey = str(cls.FIELD.options)
-		data._options = cls.OPTIONS[
-			Encoding.StringToNumber(d[optionsKey]) - 1]
-		usedKeys.add(optionsKey)
 
 		samplesKey = str(cls.FIELD.samples)
 		data._samples = []

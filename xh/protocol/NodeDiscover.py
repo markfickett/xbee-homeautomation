@@ -13,8 +13,10 @@ class NodeDiscover(Command):
 		return self.__nodeId
 
 
-	def _formatParameter(self):
-		return ' %s' % self.__nodeId
+	def getNamedValues(self):
+		d = Command.getNamedValues(self, includeParameter=False)
+		d.update(self.__nodeId.getNamedValues())
+		return d
 
 
 	def parseParameter(self, s):

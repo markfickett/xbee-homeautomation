@@ -23,12 +23,10 @@ class InputVolts(Command):
 		self.__volts = Encoding.StringToVolts(p)
 
 
-	def _formatParameter(self):
-		v = self.getVolts()
-		if v:
-			return ' volts=%.3fv' % v
-		else:
-			return ''
+	def getNamedValues(self):
+		d = Command.getNamedValues(self, includeParameter=False)
+		d.update({'volts': self.getVolts()})
+		return d
 
 
 

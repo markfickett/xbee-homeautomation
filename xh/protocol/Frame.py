@@ -1,4 +1,5 @@
 from ..deps import Enum
+from .. import Encoding
 from . import Registry
 
 
@@ -21,8 +22,23 @@ class Frame:
 	)
 
 
-	# Python API dict fields common to all frames: the frame type.
-	FIELD = Enum('id')
+	# Python API dict fields common to multiple frames
+	FIELD = Enum(
+		# the frame type
+		'id',
+
+		# bit field of receipt options (not always present)
+		'options',
+	)
+
+	# receive options; about a sample packet's arrival
+	OPTIONS = Enum(
+		# was sent directly to us and was acknowledged
+		'ACKNOWLEDGED',
+
+		# was sent to everyone
+		'BROADCAST',
+	)
 
 
 	def __init__(self, frameType=None):
@@ -30,10 +46,15 @@ class Frame:
 			raise ValueError(('Frame type %s is neither None nor '
 				+ 'one of the TYPE enum values.') % frameType)
 		self.__frameType = frameType
+		self.__options = None
 
 
 	def getFrameType(self):
 		return self.__frameType
+
+
+	def getOptions(self):
+		return self.__options
 
 
 	@classmethod
@@ -71,6 +92,24 @@ class Frame:
 		@param usedKeys a set to update with any keys from the API dict
 			which were used
 		"""
+		optionsKey = str(Frame.FIELD.options)
+		optionsStr = d.get(optionsKey)
+		if optionsStr is not None:
+			self.__options = Frame.OPTIONS[
+				Encoding.StringToNumber(optionsStr) - 1]
+			usedKeys.add(optionsKey)
+
+
+	def getNamedValues(self):
+		"""
+		@return a dict of string names to arbitrary (possibly None)
+			values, to be used in generating string representations
+			of Frames.
+		Subclasses should override this and add to the dict.
+		"""
+		return {
+			'options': self.getOptions(),
+		}
 
 
 	@staticmethod

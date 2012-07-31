@@ -107,23 +107,22 @@ class Command(Frame):
 		return self.__parameter
 
 
+	def getNamedValues(self, includeParameter=True):
+		d = Frame.getNamedValues(self)
+		if includeParameter:
+			d.update({'parameter': self.getParameter()})
+		return d
+
+
 	def __str__(self):
 		status = self.getStatus()
-		d = {
-			'name': self.getName(),
+		namedStrings = {
 			'id': self.getFrameId(),
+			'name': self.getName(),
 			'status': status and (' (%s)' % status) or '',
-			'param': self._formatParameter(),
+			'param': self._FormatNamedValues(self.getNamedValues()),
 		}
-		return '#%(id)d %(name)s%(status)s%(param)s' % d
-
-
-	def _formatParameter(self):
-		"""
-		Format the parameter (or its parsed value(s)) for __str__.
-		"""
-		return self._FormatNamedValues(
-			{'parameter': self.getParameter()})
+		return '#%(id)d %(name)s%(status)s%(param)s' % namedStrings
 
 
 	def _updateFromDict(self, d, usedKeys):

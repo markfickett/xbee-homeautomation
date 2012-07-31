@@ -16,11 +16,11 @@ class NodeId(Frame):
 		# number from DEVICE_TYPE
 		'device_type',
 
+		# number
 		'digi_profile_id',
 
+		# number
 		'manufacturer_id',
-
-		'options',
 
 		'source_event',
 
@@ -70,6 +70,14 @@ class NodeId(Frame):
 		self.setDeviceType(DEVICE_TYPE[
 			Encoding.StringToNumber(d[deviceTypeKey])])
 		usedKeys.add(deviceTypeKey)
+
+		profileKey = str(NodeId.FIELD.digi_profile_id)
+		self.setProfileId(Encoding.StringToNumber(d[profileKey]))
+		usedKeys.add(profileKey)
+
+		manuKey = str(NodeId.FIELD.manufacturer_id)
+		self.setManufacturerId(Encoding.StringToNumber(d[manuKey]))
+		usedKeys.add(manuKey)
 
 
 	def setNetworkAddress(self, networkAddress):
@@ -139,11 +147,12 @@ class NodeId(Frame):
 		return self.__manufacturerId
 
 
-	def __str__(self):
+	def getNamedValues(self):
+		d = Frame.getNamedValues(self)
 		name = self.getNodeIdentifier()
 		if name is not None:
 			name = repr(name)
-		values = self._FormatNamedValues({
+		d.update({
 			'MY': self.getNetworkAddress(),
 			'serial': self.getSerial(),
 			'NI': name,
@@ -153,6 +162,11 @@ class NodeId(Frame):
 			'profileId': self.getProfileId(),
 			'manufacturerId': self.getManufacturerId(),
 		})
+		return d
+
+
+	def __str__(self):
+		values = self._FormatNamedValues(self.getNamedValues())
 		return 'NodeId%s' % (values or ' (empty)')
 
 
