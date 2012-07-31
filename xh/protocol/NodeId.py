@@ -22,6 +22,7 @@ class NodeId(Frame):
 		# number
 		'manufacturer_id',
 
+		# cause for sending Node ID (1-indexed)
 		'source_event',
 
 		'source_addr',
@@ -30,10 +31,24 @@ class NodeId(Frame):
 		'sender_addr_long',
 	)
 
+	# causes for sending the Node ID; order is required
+	EVENT = Enum(
+		# node identification pushbutton event (see D0 command)
+		'BUTTON',	# 1
+
+		# after joining event occurred (see JN command)
+		'JOIN',		# 2
+
+		# after power cycle event occurred (see JN command)
+		'POWER_CYCLE',	# 3
+	)
+
 	"""
 	Identification information sent by a node. This is sent on various
 	occasions, including: when a node joins a network; when the commission
 	pin (20) is grounded; and as part of a node-discover response.
+
+	See page 117 of the XBee Series 2 datasheet.
 	"""
 	def __init__(self):
 		Frame.__init__(self, frameType=Frame.TYPE.node_id_indicator)
@@ -46,6 +61,9 @@ class NodeId(Frame):
 		self.__statusFromReserved = None
 		self.__profileId = None
 		self.__manufacturerId = None
+
+		# only set for a Node ID event, not as part of NodeDiscover
+		self.__sourceEvent = None
 
 
 	@classmethod
@@ -78,6 +96,11 @@ class NodeId(Frame):
 		manuKey = str(NodeId.FIELD.manufacturer_id)
 		self.setManufacturerId(Encoding.StringToNumber(d[manuKey]))
 		usedKeys.add(manuKey)
+
+		srcKey = str(NodeId.FIELD.source_event)
+		self.setSourceEvent(NodeId.EVENT[
+			Encoding.StringToNumber(d[srcKey]) - 1])
+		usedKeys.add(srcKey)
 
 
 	def setNetworkAddress(self, networkAddress):
@@ -147,6 +170,17 @@ class NodeId(Frame):
 		return self.__manufacturerId
 
 
+	def setSourceEvent(self, event):
+		if not (event is None or event in NodeId.EVENT):
+			raise ValueError('Source event %s is not in %s.' %
+				(event, NodeId.EVENT))
+		self.__sourceEvent = event
+
+
+	def getSourceEvent(self):
+		return self.__sourceEvent
+
+
 	def getNamedValues(self):
 		d = Frame.getNamedValues(self)
 		name = self.getNodeIdentifier()
@@ -161,6 +195,7 @@ class NodeId(Frame):
 			'status': self.getStatusFromReserved(),
 			'profileId': self.getProfileId(),
 			'manufacturerId': self.getManufacturerId(),
+			'sourceEvent': self.getSourceEvent(),
 		})
 		return d
 
