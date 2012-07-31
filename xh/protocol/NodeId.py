@@ -1,4 +1,5 @@
 from ..deps import Enum
+from .. import Encoding
 from . import DEVICE_TYPE, Frame, FrameRegistry
 
 
@@ -8,6 +9,25 @@ class NodeId(Frame):
 	FIELD = Enum(
 		# ASCII name
 		'node_id',
+
+		# network (short) address of the node's parent
+		'parent_source_addr',
+
+		# number from DEVICE_TYPE
+		'device_type',
+
+		'digi_profile_id',
+
+		'manufacturer_id',
+
+		'options',
+
+		'source_event',
+
+		'source_addr',
+		'source_addr_long',
+		'sender_addr',
+		'sender_addr_long',
 	)
 
 	"""
@@ -40,6 +60,16 @@ class NodeId(Frame):
 		nodeIdKey = str(NodeId.FIELD.node_id)
 		self.setNodeIdentifier(d[nodeIdKey])
 		usedKeys.add(nodeIdKey)
+
+		parentAddrKey = str(NodeId.FIELD.parent_source_addr)
+		self.setParentNetworkAddress(
+			Encoding.StringToNumber(d[parentAddrKey]))
+		usedKeys.add(parentAddrKey)
+
+		deviceTypeKey = str(NodeId.FIELD.device_type)
+		self.setDeviceType(DEVICE_TYPE[
+			Encoding.StringToNumber(d[deviceTypeKey])])
+		usedKeys.add(deviceTypeKey)
 
 
 	def setNetworkAddress(self, networkAddress):
