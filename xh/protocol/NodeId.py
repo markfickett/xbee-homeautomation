@@ -25,9 +25,16 @@ class NodeId(Frame):
 		# cause for sending Node ID (1-indexed)
 		'source_event',
 
+		# 16-bit address of remote module that transmitted ID frame
 		'source_addr',
+
+		# 64-bit
 		'source_addr_long',
+
+		# 16-bit address of sender
 		'sender_addr',
+
+		# 64-bit
 		'sender_addr_long',
 	)
 
@@ -64,6 +71,8 @@ class NodeId(Frame):
 
 		# only set for a Node ID event, not as part of NodeDiscover
 		self.__sourceEvent = None
+		self.__senderNetworkAddress = None
+		self.__senderSerial = None
 
 
 	@classmethod
@@ -102,12 +111,30 @@ class NodeId(Frame):
 			Encoding.StringToNumber(d[srcKey]) - 1])
 		usedKeys.add(srcKey)
 
+		addrKey = str(NodeId.FIELD.source_addr)
+		self.setNetworkAddress(Encoding.StringToNumber(d[addrKey]))
+		usedKeys.add(addrKey)
+
+		serKey = str(NodeId.FIELD.source_addr_long)
+		self.setSerial(Encoding.StringToNumber(d[serKey]))
+		usedKeys.add(serKey)
+
+		sAddrKey = str(NodeId.FIELD.sender_addr)
+		self.setSenderNetworkAddress(
+			Encoding.StringToNumber(d[sAddrKey]))
+		usedKeys.add(sAddrKey)
+
+		sSerKey = str(NodeId.FIELD.sender_addr_long)
+		self.setSenderSerial(Encoding.StringToNumber(d[sSerKey]))
+		usedKeys.add(sSerKey)
+
 
 	def setNetworkAddress(self, networkAddress):
 		self.__networkAddress = int(networkAddress)
 
 
 	def getNetworkAddress(self):
+		"""The (original transmitter's) 16-bit network address."""
 		return self.__networkAddress
 
 
@@ -116,7 +143,32 @@ class NodeId(Frame):
 
 
 	def getSerial(self):
+		"""
+		The (original transmitter's) 64-bit network address /
+		serial number.
+		"""
 		return self.__serial
+
+
+	def setSenderNetworkAddress(self, addr):
+		self.__senderNetworkAddress = int(addr)
+
+
+	def getSenderNetworkAddress(self):
+		"""The Node ID frame sender's 16-bit network address."""
+		return self.__senderNetworkAddress
+
+
+	def setSenderSerial(self, serial):
+		self.__senderSerial = int(serial)
+
+
+	def getSenderSerial(self):
+		"""
+		The Node ID frame sender's 64-bit network address /
+		serial number.
+		"""
+		return self.__senderSerial
 
 
 	def setNodeIdentifier(self, nodeIdentifier):
@@ -196,6 +248,8 @@ class NodeId(Frame):
 			'profileId': self.getProfileId(),
 			'manufacturerId': self.getManufacturerId(),
 			'sourceEvent': self.getSourceEvent(),
+			'senderMY': self.getSenderNetworkAddress(),
+			'senderSerial': self.getSenderSerial(),
 		})
 		return d
 
