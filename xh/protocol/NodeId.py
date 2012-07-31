@@ -4,6 +4,12 @@ from . import DEVICE_TYPE, Frame, FrameRegistry
 
 
 class NodeId(Frame):
+	# The fields expected to be in a node ID dict.
+	FIELD = Enum(
+		# ASCII name
+		'node_id',
+	)
+
 	"""
 	Identification information sent by a node. This is sent on various
 	occasions, including: when a node joins a network; when the commission
@@ -30,6 +36,10 @@ class NodeId(Frame):
 
 	def _updateFromDict(self, d, usedKeys):
 		Frame._updateFromDict(self, d, usedKeys)
+
+		nodeIdKey = str(NodeId.FIELD.node_id)
+		self.setNodeIdentifier(d[nodeIdKey])
+		usedKeys.add(nodeIdKey)
 
 
 	def setNetworkAddress(self, networkAddress):
@@ -103,7 +113,7 @@ class NodeId(Frame):
 		name = self.getNodeIdentifier()
 		if name is not None:
 			name = repr(name)
-		return self._FormatNamedValues({
+		values = self._FormatNamedValues({
 			'MY': self.getNetworkAddress(),
 			'serial': self.getSerial(),
 			'NI': name,
@@ -113,6 +123,7 @@ class NodeId(Frame):
 			'profileId': self.getProfileId(),
 			'manufacturerId': self.getManufacturerId(),
 		})
+		return 'NodeId%s' % (values or ' (empty)')
 
 
 FrameRegistry.put(Frame.TYPE.node_id_indicator, NodeId)

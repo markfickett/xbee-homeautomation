@@ -14,7 +14,7 @@ class NodeDiscover(Command):
 
 
 	def _formatParameter(self):
-		return str(self.__nodeId)
+		return ' %s' % self.__nodeId
 
 
 	def parseParameter(self, s):
