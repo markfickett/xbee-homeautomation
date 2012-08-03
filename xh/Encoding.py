@@ -38,11 +38,11 @@ def NumberToSerialString(n):
 
 def PrintedStringToNumber(s):
 	"""
-	Unpack a %s-formatted number. (Try to return an int, then a float.)
-	Example: '3' => 3 or '2.2' => 2.2
+	Unpack a %x or %s formatted number. (Try to return a hex int, then a
+	float.) Example: '3' => 3 or or 'a' => 10 or '2.2' => 2.2
 	"""
 	try:
-		return int(s)
+		return int(s, 16)
 	except ValueError, e:
 		return float(s)
 
