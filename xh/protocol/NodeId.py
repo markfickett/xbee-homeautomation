@@ -10,7 +10,7 @@ class NodeId(Frame):
 		# ASCII name
 		'node_id',
 
-		# network (short) address of the node's parent
+		# 16-bit network address of the node's parent
 		'parent_source_addr',
 
 		# number from DEVICE_TYPE
@@ -239,16 +239,16 @@ class NodeId(Frame):
 		if name is not None:
 			name = repr(name)
 		d.update({
-			'MY': self.getNetworkAddress(),
+			'addr': self.getNetworkAddress(),
 			'serial': self.getSerial(),
 			'NI': name,
-			'parentNetAddr': self.getParentNetworkAddress(),
+			'parentAddr': self.getParentNetworkAddress(),
 			'deviceType': self.getDeviceType(),
 			'status': self.getStatusFromReserved(),
 			'profileId': self.getProfileId(),
 			'manufacturerId': self.getManufacturerId(),
 			'sourceEvent': self.getSourceEvent(),
-			'senderMY': self.getSenderNetworkAddress(),
+			'senderAddr': self.getSenderNetworkAddress(),
 			'senderSerial': self.getSenderSerial(),
 		})
 		return d

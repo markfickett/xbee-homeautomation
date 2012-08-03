@@ -79,15 +79,15 @@ class Command(Frame):
 
 		Frame.__init__(self, frameType=frameType)
 
-		self.__remoteAddress = None
-		self.__remoteAddressLong = None
+		self.__remoteNetworkAddress = None
+		self.__remoteSerial = None
 
 		if responseFrameId is None:
 			with Command.__frameIdLock:
 				self.__frameId = Command.__sendingFrameId
 				Command.__sendingFrameId += 1
 			if dest is not None:
-				self.__remoteAddressLong = int(dest)
+				self.__remoteSerial = int(dest)
 		else:
 			self.__frameId = int(responseFrameId)
 
@@ -107,15 +107,15 @@ class Command(Frame):
 
 
 	def isRemote(self):
-		return self.getRemoteAddressLong() is not None
+		return self.getRemoteSerial() is not None
 
 
-	def getRemoteAddress(self):
-		return self.__remoteAddress
+	def getRemoteNetworkAddress(self):
+		return self.__remoteNetworkAddress
 
 
-	def getRemoteAddressLong(self):
-		return self.__remoteAddressLong
+	def getRemoteSerial(self):
+		return self.__remoteSerial
 
 
 	def setStatus(self, status):
@@ -141,8 +141,8 @@ class Command(Frame):
 	def getNamedValues(self, includeParameter=True):
 		d = Frame.getNamedValues(self)
 		d.update({
-			'remoteMY': self.getRemoteAddress(),
-			'remoteAddrLong': self.getRemoteAddressLong(),
+			'remoteAddr': self.getRemoteNetworkAddress(),
+			'remoteSerial': self.getRemoteSerial(),
 		})
 		if includeParameter:
 			d.update({'parameter': self.getParameter()})
@@ -184,11 +184,12 @@ class Command(Frame):
 		srcKey = str(Command.FIELD.source_addr)
 		src = d.get(srcKey)
 		if src is not None:
-			self.__remoteAddress = Encoding.StringToNumber(src)
+			self.__remoteNetworkAddress = (
+				Encoding.StringToNumber(src))
 			usedKeys.add(srcKey)
 
 			srcLongKey = str(Command.FIELD.source_addr_long)
-			self.__remoteAddressLong = Encoding.StringToNumber(
+			self.__remoteSerial = Encoding.StringToNumber(
 				d[srcLongKey])
 			usedKeys.add(srcLongKey)
 
@@ -230,7 +231,7 @@ class Command(Frame):
 		if self.isRemote():
 			kwargs['dest_addr_long'] = (
 				Encoding.NumberToSerialString(
-					self.getRemoteAddressLong()))
+					self.getRemoteSerial()))
 			xb.remote_at(**kwargs)
 		else:
 			xb.at(**kwargs)
