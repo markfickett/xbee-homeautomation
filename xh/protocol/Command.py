@@ -23,6 +23,12 @@ class Command(Frame):
 
 		# status code; packed number
 		'status',
+
+		# 16-bit network address of the responder for remote commands
+		'source_addr',
+
+		# 64-bit
+		'source_addr_long',
 	)
 
 
@@ -57,18 +63,31 @@ class Command(Frame):
 	__frameIdLock = threading.Lock()
 
 
-	def __init__(self, name, responseFrameId=None):
+	def __init__(self, name, responseFrameId=None, dest=None):
+		"""
+		@param dest 64-bit destination address. If given, this Command
+			will be sent to the given remote note.
+		"""
 		if responseFrameId is None:
 			frameType = Frame.TYPE.at
 		else:
 			frameType = Frame.TYPE.at_response
 
+		if dest is not None:
+			if frameType is not Frame.TYPE.at:
+				raise ValueError('cannot set dest for response')
+
 		Frame.__init__(self, frameType=frameType)
+
+		self.__remoteAddress = None
+		self.__remoteAddressLong = None
 
 		if responseFrameId is None:
 			with Command.__frameIdLock:
 				self.__frameId = Command.__sendingFrameId
 				Command.__sendingFrameId += 1
+			if dest is not None:
+				self.__remoteAddressLong = int(dest)
 		else:
 			self.__frameId = int(responseFrameId)
 
@@ -85,6 +104,18 @@ class Command(Frame):
 
 	def getName(self):
 		return self.__name
+
+
+	def isRemote(self):
+		return self.getRemoteAddressLong() is not None
+
+
+	def getRemoteAddress(self):
+		return self.__remoteAddress
+
+
+	def getRemoteAddressLong(self):
+		return self.__remoteAddressLong
 
 
 	def setStatus(self, status):
@@ -109,6 +140,10 @@ class Command(Frame):
 
 	def getNamedValues(self, includeParameter=True):
 		d = Frame.getNamedValues(self)
+		d.update({
+			'remoteMY': self.getRemoteAddress(),
+			'remoteAddrLong': self.getRemoteAddressLong(),
+		})
 		if includeParameter:
 			d.update({'parameter': self.getParameter()})
 		return d
@@ -122,7 +157,8 @@ class Command(Frame):
 			'status': status and (' (%s)' % status) or '',
 			'param': self._FormatNamedValues(self.getNamedValues()),
 		}
-		return '#%(id)d %(name)s%(status)s%(param)s' % namedStrings
+		return ('#%(id)d %(name)s%(status)s%(param)s'
+			% namedStrings)
 
 
 	def _updateFromDict(self, d, usedKeys):
@@ -144,6 +180,17 @@ class Command(Frame):
 		if parameter is not None:
 			self.parseParameter(parameter)
 			usedKeys.add(paramKey)
+
+		srcKey = str(Command.FIELD.source_addr)
+		src = d.get(srcKey)
+		if src is not None:
+			self.__remoteAddress = Encoding.StringToNumber(src)
+			usedKeys.add(srcKey)
+
+			srcLongKey = str(Command.FIELD.source_addr_long)
+			self.__remoteAddressLong = Encoding.StringToNumber(
+				d[srcLongKey])
+			usedKeys.add(srcLongKey)
 
 
 	def parseParameter(self, encoded):
@@ -175,9 +222,18 @@ class Command(Frame):
 
 	def send(self, xb):
 		log.info('sending %s' % self)
-		xb.at(command=str(self.getName()),
-			frame_id=self._encodedFrameId(),
-			parameter=self._encodedParameter())
+		kwargs = {
+			'command': str(self.getName()),
+			'frame_id': self._encodedFrameId(),
+			'parameter': self._encodedParameter(),
+		}
+		if self.isRemote():
+			kwargs['dest_addr_long'] = (
+				Encoding.NumberToSerialString(
+					self.getRemoteAddressLong()))
+			xb.remote_at(**kwargs)
+		else:
+			xb.at(**kwargs)
 
 
 	def _encodedFrameId(self):
@@ -218,3 +274,4 @@ CommandRegistry.__doc__ = ('Which Command.NAME is to be parsed '
 
 
 FrameRegistry.put(Frame.TYPE.at_response, Command)
+FrameRegistry.put(Frame.TYPE.remote_at_response, Command)
