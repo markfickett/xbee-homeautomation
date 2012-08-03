@@ -5,6 +5,7 @@ Conversion functions to pack/unpack values for XBee API communication.
 
 BYTE_BASE = 0x100
 MILLIVOLTS_PER_VOLT = 1e-3
+BYTES_PER_SERIAL = 8		# number of bytes in an XBee serial number
 
 
 def NumberToPrintedString(n):
@@ -14,9 +15,11 @@ def NumberToPrintedString(n):
 	return '%x' % n
 
 
-def NumberToString(n):
+def NumberToString(n, padToBytes=None):
 	"""
 	Pack a number of arbitrary size into (little-endian) a string.
+	@param padToBytes If given, left-pad the string with null bytes so that
+		it is at least the given number of bytes long.
 	Example: 0x3ef7 => '\x3e\xf7'
 	"""
 	s = ''
@@ -24,7 +27,13 @@ def NumberToString(n):
 		lowByte = n % BYTE_BASE
 		s = chr(lowByte) + s
 		n = n / BYTE_BASE
+	if padToBytes is not None and len(s) < padToBytes:
+		s = ('\x00'*(padToBytes - len(s))) + s
 	return s
+
+
+def NumberToSerialString(n):
+	return NumberToString(n, padToBytes=BYTES_PER_SERIAL)
 
 
 def PrintedStringToNumber(s):
