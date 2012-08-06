@@ -11,6 +11,7 @@ from EncryptionEnable import EncryptionEnable
 from InputVolts import InputVolts
 from NodeDiscover import NodeDiscover
 from PullUpResistor import PullUpResistor
+from SampleRate import SampleRate
 
 from Data import Data
 

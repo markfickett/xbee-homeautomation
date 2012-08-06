@@ -37,6 +37,7 @@ class Command(Frame):
 		'%V', # InputVolts (voltage level on Vcc pin)
 		'EE', # encryption enable (0 or 1)
 		'ID', # network id
+		'IR', # IO sample rate
 		'KY', # xh.Encoding.NumberToString(xh.Config.LINK_KEY)
 		'MY', # node's network ID (0 for coordinator)
 		'ND', # NodeDiscover
