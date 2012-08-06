@@ -42,6 +42,7 @@ class Command(Frame):
 		'ND', # NodeDiscover
 		'NI', # string node name
 		'NT', # discover timeout
+		'PR', # PullUpResistor (bit field for internal resistors)
 		'SH', # serial (high bits)
 		'SL', # serial (low bits)
 		'WR', # write configuration to non-volatile memory

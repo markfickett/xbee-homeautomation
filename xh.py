@@ -76,6 +76,8 @@ try:
 		Command(Command.NAME.__getattribute__('%V')),
 		Command(Command.NAME.NT),
 		NodeDiscover(),
+		Command(Command.NAME.__getattribute__('%V'),
+			dest=0x13a200408cca0e),
 	):
 		cmd.send(xb)
 	while True:
