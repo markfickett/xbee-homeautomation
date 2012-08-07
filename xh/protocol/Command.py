@@ -47,6 +47,7 @@ class Command(Frame):
 		'EE', # encryption enable (0 or 1)
 		'ID', # network id
 		'IR', # IO sample rate
+		'IS', # force sample on all digital, analog inputs
 		'KY', # xh.Encoding.NumberToString(xh.Config.LINK_KEY)
 		'MY', # node's network ID (0 for coordinator)
 		'ND', # NodeDiscover
@@ -261,7 +262,11 @@ class Command(Frame):
 
 
 	def _encodedParameter(self):
-		return Encoding.NumberToString(self.getParameter())
+		p = self.getParameter()
+		if p is None:
+			return None
+		else:
+			return Encoding.NumberToString(p)
 
 
 	@classmethod
