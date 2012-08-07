@@ -1,4 +1,4 @@
-from . import Command, CommandRegistry, PIN_NAMES_TO_NUMBERS
+from . import Command, CommandRegistry
 
 
 
