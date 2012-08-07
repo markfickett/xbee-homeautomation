@@ -108,13 +108,15 @@ class Data(Frame):
 
 class Sample:
 	PIN_TYPE = Enum(
-		'adc',		# Analog sample
+		'adc',		# analog sample
+		'dio',		# digital sample
 	)
 
-	def __init__(self, pinNum, pinType, volts=None):
+	def __init__(self, pinNum, pinType, volts=None, bit=None):
 		self.__pinNum = pinNum
 		self.__pinType = pinType
 		self.__volts = volts
+		self.__bit = bool(bit)
 
 
 	def getPinNumber(self):
@@ -129,12 +131,18 @@ class Sample:
 		return self.__volts
 
 
+	def getBit(self):
+		return self.__bit
+
+
 	def __str__(self):
 		valueStr = ','
-		if self.__volts is None:
-			valueStr = ''
-		else:
+		if self.__volts is not None:
 			valueStr = valueStr + ' volts=%.3f' % self.__volts
+		elif self.__bit is not None:
+			valueStr = valueStr + ' ' + str(self.__bit)
+		else:
+			valueStr = ''
 
 		return 'Sample(%d, %s%s)' % (
 			self.__pinNum,
@@ -153,6 +161,8 @@ class Sample:
 			if pinType == cls.PIN_TYPE.adc:
 				valueKwargs['volts'] = Encoding.NumberToVolts(
 					value)
+			elif pinType == cls.PIN_TYPE.dio:
+				valueKwargs['bit'] = value
 			else:
 				raise RuntimeError(('unprepared to convert '
 					+ 'value "%s" for pin %s-%d')
