@@ -15,10 +15,10 @@ def NumberToPrintedString(n):
 	return '%x' % n
 
 
-def NumberToString(n, padToBytes=None):
+def NumberToString(n, padToBytes=1):
 	"""
 	Pack a number of arbitrary size into (little-endian) a string.
-	@param padToBytes If given, left-pad the string with null bytes so that
+	@param padToBytes Left-pad the string with null bytes so that
 		it is at least the given number of bytes long.
 	Example: 0x3ef7 => '\x3e\xf7'
 	"""
