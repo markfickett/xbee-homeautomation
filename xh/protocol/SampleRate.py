@@ -12,17 +12,30 @@ class SampleRate(Command):
 	RATE_MAX = 0xFFFF
 
 
-	def __init__(self, **kwargs):
+	def __init__(self, sampleRateMillis=None, disableSampling=False,
+		**kwargs):
+		if disableSampling and (sampleRateMillis is not None):
+			raise ValueError(
+				'Cannot both disable and set sample rate.')
+
 		Command.__init__(self, Command.NAME.IR, **kwargs)
-		self.disableSampling()
+
+		self.__rate = None
+		self.__disabled = False
+		if disableSampling:
+			self.disableSampling()
+		elif sampleRateMillis is not None:
+			self.setSampleRateMillis(sampleRateMillis)
 
 
 	def disableSampling(self):
 		self.__rate = None
+		self.__disabled = True
+		self.setParameter(self.RATE_DISABLED)
 
 
 	def isSamplingDisabled(self):
-		return self.__rate is None
+		return self.__disabled
 
 
 	def setSampleRateMillis(self, rate):
@@ -36,6 +49,8 @@ class SampleRate(Command):
 				+ 'is more than maximum rate of %dms.')
 				% (rateNum, rate, self.RATE_MAX))
 		self.__rate = rateNum
+		self.__disabled = False
+		self.setParameter(self.__rate)
 
 
 	def getSampleRateMillis(self):
@@ -53,11 +68,9 @@ class SampleRate(Command):
 	def getNamedValues(self):
 		d = Command.getNamedValues(self, includeParameter=False)
 		rate = self.getSampleRateMillis()
-		if rate is None:
-			disabled = True
-		else:
-			disabled = None
+		if rate is not None:
 			rate = '%dms' % rate
+		disabled = self.isSamplingDisabled() or None
 		d.update({
 			'rate': rate,
 			'disabled': disabled,
