@@ -1,12 +1,13 @@
-
 __all__ = [
 	'DEVICE_TYPE',
 
-	'PINS',
-	'PIN_NAMES_TO_NUMBERS',
+	'PIN',
+	'PIN_NAME_TO_NUMBER',
+	'PIN_NUMBER_TO_NAMES',
 ]
 
 from ..deps import Enum
+from .. import Util
 
 
 DEVICE_TYPE = Enum(
@@ -17,7 +18,7 @@ DEVICE_TYPE = Enum(
 
 
 # See Xbee Series 2 datasheet page 13 for pin name/number table.
-PINS = Enum(
+PIN = Enum(
 	# Digital I/O Pins
 	'DIO0',
 	'DIO1',
@@ -46,7 +47,7 @@ PINS = Enum(
 	'CONFIG',
 	'RESET',
 	'RSSI',		# RX Signal Strength Indicator
-	'PWM',
+	'PWM0',
 	'DTR',
 	'SLEEP_RQ',	# Pin Sleep Control Line
 	'GND',
@@ -63,44 +64,48 @@ PINS = Enum(
 
 
 # pin 8 is reserved and not listed
-PIN_NAMES_TO_NUMBERS = {
+PIN_NAME_TO_NUMBER = {
 	# Digital I/O Pins
-	PINS.DIO0:	20,
-	PINS.DIO1:	19,
-	PINS.DIO2:	18,
-	PINS.DIO3:	17,
-	PINS.DIO4:	11,
-	PINS.DIO5:	15,
-	PINS.DIO6:	16,
-	PINS.DIO7:	12,
-	PINS.DIO8:	9,
-	PINS.DIO9:	13,
-	PINS.DIO10:	6,
-	PINS.DIO11:	7,
-	PINS.DIO12:	4,
+	PIN.DIO0:	20,
+	PIN.DIO1:	19,
+	PIN.DIO2:	18,
+	PIN.DIO3:	17,
+	PIN.DIO4:	11,
+	PIN.DIO5:	15,
+	PIN.DIO6:	16,
+	PIN.DIO7:	12,
+	PIN.DIO8:	9,
+	PIN.DIO9:	13,
+	PIN.DIO10:	6,
+	PIN.DIO11:	7,
+	PIN.DIO12:	4,
 
 	# Analog-to-Digital Input Pins
-	PINS.AD0:	20,
-	PINS.AD1:	19,
-	PINS.AD2:	18,
-	PINS.AD3:	17,
+	PIN.AD0:	20,
+	PIN.AD1:	19,
+	PIN.AD2:	18,
+	PIN.AD3:	17,
 
 	# Named Pins
-	PINS.VCC:	1,
-	PINS.DOUT:	2,
-	PINS.DIN:	3,
-	PINS.CONFIG:	3,
-	PINS.RESET:	5,
-	PINS.RSSI:	6,
-	PINS.PWM:	6,
-	PINS.DTR:	9,
-	PINS.SLEEP_RQ:	9,
-	PINS.GND:	10,
-	PINS.CTS:	12,
-	PINS.ON:	13,
-	PINS.SLEEP:	13,
-	PINS.VREF:	14,
-	PINS.ASSOC:	15,
-	PINS.RTS:	16,
-	PINS.COMM:	20,
+	PIN.VCC:	1,
+	PIN.DOUT:	2,
+	PIN.DIN:	3,
+	PIN.CONFIG:	3,
+	PIN.RESET:	5,
+	PIN.RSSI:	6,
+	PIN.PWM0:	6,
+	PIN.DTR:	9,
+	PIN.SLEEP_RQ:	9,
+	PIN.GND:	10,
+	PIN.CTS:	12,
+	PIN.ON:		13,
+	PIN.SLEEP:	13,
+	PIN.VREF:	14,
+	PIN.ASSOC:	15,
+	PIN.RTS:	16,
+	PIN.COMM:	20,
 }
+
+
+PIN_NUMBER_TO_NAMES = Util.InvertedDictWithRepeatedValues(PIN_NAME_TO_NUMBER)
+
