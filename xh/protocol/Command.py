@@ -35,6 +35,15 @@ class Command(Frame):
 	# Recognized command names (alphabetized).
 	NAME = Enum(
 		'%V', # InputVolts (voltage level on Vcc pin)
+		'D0', # configure IO pin DIO0 / AD0 / COMM
+		'D1', # configure IO pin DIO1 / AD1
+		'D2', # configure IO pin DIO2 / AD2
+		'D3', # configure IO pin DIO3 / AD3
+		'D4', # configure IO pin DIO4
+		'D5', # configure IO pin DIO5 / ASSOC
+		'D6', # configure IO pin DIO6 / RTS
+		'D7', # configure IO pin DIO7 / CTS
+		# 'D8', # configure IO pin DIO8: not yet supported acc. docs
 		'EE', # encryption enable (0 or 1)
 		'ID', # network id
 		'IR', # IO sample rate
@@ -43,6 +52,10 @@ class Command(Frame):
 		'ND', # NodeDiscover
 		'NI', # string node name
 		'NT', # discover timeout
+		'P0', # configure IO pin DIO10 / PWM / RSSI
+		'P1', # configure IO pin DIO11
+		'P2', # configure IO pin DIO12
+		# 'P3', # configure IO pin DIO13: not yet supported acc. docs
 		'PR', # PullUpResistor (bit field for internal resistors)
 		'SH', # serial (high bits)
 		'SL', # serial (low bits)
@@ -65,10 +78,14 @@ class Command(Frame):
 	__frameIdLock = threading.Lock()
 
 
-	def __init__(self, name, responseFrameId=None, dest=None):
+	def __init__(self, name, responseFrameId=None, dest=None,
+		fromCommandName=None):
 		"""
 		@param dest 64-bit destination address. If given, this Command
 			will be sent to the given remote note.
+		@param fromCommandName for subclasses: the Command.NAME value
+			parsed from the API dict (probably the same as @param
+			name)
 		"""
 		if responseFrameId is None:
 			frameType = Frame.TYPE.at
@@ -262,7 +279,8 @@ class Command(Frame):
 
 		commandClass = CommandRegistry.get(name)
 		if commandClass:
-			c = commandClass(responseFrameId=frameId)
+			c = commandClass(responseFrameId=frameId,
+				fromCommandName=name)
 		else:
 			c = Command(name, responseFrameId=frameId)
 

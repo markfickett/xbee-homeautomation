@@ -7,6 +7,7 @@ from Frame import Frame, FrameRegistry
 from NodeId import NodeId
 
 from Command import Command, CommandRegistry
+from ConfigureIoPin import ConfigureIoPin
 from EncryptionEnable import EncryptionEnable
 from InputVolts import InputVolts
 from NodeDiscover import NodeDiscover
