@@ -88,3 +88,10 @@ def StringToVolts(s):
 	"""
 	return NumberToVolts(StringToNumber(s))
 
+
+def VoltsToNumber(v):
+	"""
+	Convert from volts to internal / API units.
+	"""
+	return (v / MILLIVOLTS_PER_VOLT) * (1024.0 / 1200.0)
+
