@@ -95,9 +95,13 @@ class Frame:
 		optionsKey = str(Frame.FIELD.options)
 		optionsStr = d.get(optionsKey)
 		if optionsStr is not None:
-			self.__options = Frame.OPTIONS[
-				Encoding.StringToNumber(optionsStr) - 1]
+			self._parseOptions(optionsStr)
 			usedKeys.add(optionsKey)
+
+
+	def _parseOptions(self, encodedOptions):
+		self.__options = Frame.OPTIONS[
+			Encoding.StringToNumber(encodedOptions) - 1]
 
 
 	def getNamedValues(self):
