@@ -113,10 +113,22 @@ class Sample:
 	)
 
 	def __init__(self, pinNum, pinType, volts=None, bit=None):
-		self.__pinNum = pinNum
+		self.__pinNum = int(pinNum)
+
+		if pinType not in self.PIN_TYPE:
+			raise ValueError('Pin type %r not one of %r.'
+				% (pinType, self._PIN_TYPE))
 		self.__pinType = pinType
-		self.__volts = volts
-		self.__bit = bool(bit)
+
+		if volts is None:
+			self.__volts = None
+		else:
+			self.__volts = float(volts)
+
+		if bit is None:
+			self.__bit = None
+		else:
+			self.__bit = bool(bit)
 
 
 	def getPinNumber(self):
