@@ -1,3 +1,5 @@
 *.pyc
 *.swp
 SecretConfig.py
+data/
+tmp.txt
