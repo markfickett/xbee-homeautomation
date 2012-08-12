@@ -60,6 +60,7 @@ class Command(Frame):
 		'PR', # PullUpResistor (bit field for internal resistors)
 		'SH', # serial (high bits)
 		'SL', # serial (low bits)
+		'V+', # voltage supply monitoring (threshold for vcc sampling)
 		'WR', # write configuration to non-volatile memory
 	)
 
@@ -215,7 +216,11 @@ class Command(Frame):
 
 
 	def parseParameter(self, encoded):
-		n = self.getName()
+		"""
+		Parse the Command's response parameter into specific datum/data
+		for the Command subclass. By default, parsed as a single number.
+		@param encoded byte string from the API
+		"""
 		self.setParameter(self._parseParameterDefault(encoded))
 
 
