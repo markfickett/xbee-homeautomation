@@ -10,34 +10,40 @@ Examples:
 import logging
 log = logging.getLogger('xh')
 
-import sys, os, time, optparse
+import code, optparse, os, readline, sys, time
 import xh
 from xh.protocol import Command, NodeDiscover, Data
 from xh.deps import serial, xbee
 
-DATA_LOG_FILE = 'datalog.csv'
-log.info('also logging CSV to %s' % DATA_LOG_FILE)
+def runPythonStartup():
+	"""
+	Run the $PYTHONSTARTUP script, if available, to prepare for an
+	interactive prompt.
+	"""
+	startup = os.getenv('PYTHONSTARTUP')
+	if startup:
+		with open(startup) as startupFile:
+			exec(startupFile.read())
 
-log.info('started')
-log.info('Type control-C to exit.')
-
+global fr
+fr = []
+FRAME_HISTORY_LIMIT = 700
+FRAME_HISTORY_TRIM = 500
 def logData(rawData):
+	global fr
 	try:
 		frame = xh.protocol.ParseFromDict(rawData)
+		fr.append(frame)
 		log.info('received %s' % frame)
-		if isinstance(frame, Data):
-			with open(DATA_LOG_FILE, 'a') as dataFile:
-				fields = []
-				fields.append(frame.formatTimestamp())
-				for s in frame.getSamples():
-					fields.append(str(s.getVolts()))
-				dataFile.write(','.join(fields) + '\n')
-				
+		if len(fr) > FRAME_HISTORY_LIMIT:
+			fr = fr[:FRAME_HISTORY_TRIM]
 	except:
 		log.error('error handling data: %s' % rawData, exc_info=True)
+	readline.redisplay()
 
 
 with xh.Util.InitializedXbee(callback=logData) as xb:
+	log.info('started')
 	"""
 	for cmd in (
 		Command(Command.NAME.MY),
@@ -55,7 +61,12 @@ with xh.Util.InitializedXbee(callback=logData) as xb:
 	):
 		cmd.send(xb)
 	"""
-	while True:
-		time.sleep(0.02)
+	runPythonStartup()
+	namespace = locals()
+	namespace.update(globals())
+	code.interact(banner='The xbee object is available as "xb".'
+		+ ' A received frame list is available as "fr".'
+		+ ' Type control-D to exit.',
+		local=namespace)
 
 log.info('exiting')
