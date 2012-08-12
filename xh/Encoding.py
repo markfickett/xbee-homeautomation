@@ -95,3 +95,28 @@ def VoltsToNumber(v):
 	"""
 	return (v / MILLIVOLTS_PER_VOLT) * (1024.0 / 1200.0)
 
+
+def BitFieldToIndexSet(bitField):
+	"""
+	@param bitField encoded as a byte string
+	@return an set containing the indices of the bits which are set in the
+		given field.
+	Example: 0x43 == b0100 0011 => set([0, 1, 6])
+	"""
+	b = StringToNumber(bitField)
+	i = 0
+	indices = set()
+	while b > 0:
+		if b & 0x1:
+			indices.add(i)
+		b = b >> 1
+		i += 1
+	return indices
+
+
+def IndicesToBitField(indices):
+	bitField = 0x0
+	for i in indices:
+		bitField |= (1 << i)
+	return bitField
+
