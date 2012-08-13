@@ -1,7 +1,5 @@
 from .. import Encoding
 from . import Command, CommandRegistry, Sample
-import logging
-log = logging.getLogger('InputSample')
 
 
 
@@ -67,7 +65,6 @@ class InputSample(Command):
 
 		for analogPinNum, analogValue in zip(
 		analogPinNumbers, analogValues):
-			log.debug('appending analog value %r' % analogValue)
 			self.__samples.append(Sample(
 				analogPinNum,
 				Sample.PIN_TYPE.adc,
