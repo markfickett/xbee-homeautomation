@@ -26,7 +26,8 @@ class InputSample(Command):
 		"""
 		Parse the Command's response parameter into samples. The
 		expected format is like the IO Data Sample Rx Indicator frame
-		(see page 114 of the Xbee series 2 datasheet):
+		(see page 114 of the Xbee series 2 datasheet for the I/O frame
+		overview, and page 96 for the sample parameter details):
 			offset	description
 			0	receive options: 0x01 = ack, 0x02 = broadcast
 			1-2	digital channel mask (bit field)
