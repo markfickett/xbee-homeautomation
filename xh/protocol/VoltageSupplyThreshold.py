@@ -7,6 +7,10 @@ log = logging.getLogger('VoltageSupplyThreshold')
 
 class VoltageSupplyThreshold(Command):
 	"""
+	Not working as of 2012 Aug 12 (with Digi firmware ZNET 2.5 Router v.
+	1247 / Coordinator v. 1047. Coordinator respects threshold accurately
+	but sample (with IS) is always 0; router does not report supply voltage.
+
 	If the supply voltage falls <= this threshold, it will be included
 	in I/O samples.
 
