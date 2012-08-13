@@ -12,7 +12,7 @@ import threading
 class Command(Frame):
 	# The fields expected to be in a command dict.
 	FIELD = Enum(
-		# sequence; stringified number
+		# sequence; packed number
 		'frame_id',
 
 		# command name; ascii
@@ -263,7 +263,7 @@ class Command(Frame):
 
 
 	def _encodedFrameId(self):
-		return Encoding.NumberToPrintedString(self.getFrameId())
+		return Encoding.NumberToString(self.getFrameId())
 
 
 	def _encodedParameter(self):
@@ -278,7 +278,7 @@ class Command(Frame):
 	def _CreateFromDict(cls, d, usedKeys):
 		frameIdKey = str(Command.FIELD.frame_id)
 		frameId = d.get(frameIdKey)
-		frameId = Encoding.PrintedStringToNumber(d[frameIdKey])
+		frameId = Encoding.StringToNumber(d[frameIdKey])
 		usedKeys.add(frameIdKey)
 
 		nameKey = str(Command.FIELD.command)
