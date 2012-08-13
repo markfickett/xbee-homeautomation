@@ -33,6 +33,7 @@ class InputSample(Command):
 			4-5	digital samples (bit field, matching channels)
 			6-7+	optional analog samples (two bytes each)
 		"""
+		self.setParameter(encoded)
 		self.__samples = []
 		offset = 0
 
