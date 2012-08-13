@@ -74,6 +74,10 @@ def StringToBoolean(s):
 			+ 'boolean value, should be 0 or 1.') % s)
 
 
+def BooleanToString(b):
+	return NumberToString(b and 1 or 0)
+
+
 def NumberToVolts(n):
 	"""
 	Convert a number to volts on an analog input pin.
