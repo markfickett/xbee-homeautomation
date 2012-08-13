@@ -160,6 +160,7 @@ class ConfigureIoPin(Command):
 
 	def parseParameter(self, p):
 		functionNum = Encoding.StringToNumber(p)
+		self.setParameter(functionNum)
 
 		interpretations = set(self.VALUE_TO_FUNCTIONS[functionNum])
 		available = set(self.PIN_NUMBER_TO_FUNCTIONS[
