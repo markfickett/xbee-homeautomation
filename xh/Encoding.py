@@ -8,13 +8,6 @@ MILLIVOLTS_PER_VOLT = 1e-3
 BYTES_PER_SERIAL = 8		# number of bytes in an XBee serial number
 
 
-def NumberToPrintedString(n):
-	"""
-	Pack a number as a printed, hex-formatted string.
-	"""
-	return '%x' % n
-
-
 def NumberToString(n, padToBytes=1):
 	"""
 	Pack a number of arbitrary size into (little-endian) a string.
@@ -34,17 +27,6 @@ def NumberToString(n, padToBytes=1):
 
 def NumberToSerialString(n):
 	return NumberToString(n, padToBytes=BYTES_PER_SERIAL)
-
-
-def PrintedStringToNumber(s):
-	"""
-	Unpack a %x or %s formatted number. (Try to return a hex int, then a
-	float.) Example: '3' => 3 or or 'a' => 10 or '2.2' => 2.2
-	"""
-	try:
-		return int(s, 16)
-	except ValueError, e:
-		return float(s)
 
 
 def StringToNumber(s):
