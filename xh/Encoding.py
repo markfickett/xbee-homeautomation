@@ -26,6 +26,9 @@ def NumberToString(n, padToBytes=1):
 
 
 def NumberToSerialString(n):
+	"""
+	Pack a number for use as an Xbee module serial number (must be 8 bytes).
+	"""
 	return NumberToString(n, padToBytes=BYTES_PER_SERIAL)
 
 
@@ -62,14 +65,15 @@ def BooleanToString(b):
 
 def NumberToVolts(n):
 	"""
-	Convert a number to volts on an analog input pin.
+	Convert a number (in internal / API units) to volts read from an analog
+	input pin.
 	"""
 	return n * (1200.0 / 1024.0) * MILLIVOLTS_PER_VOLT
 
 
 def StringToVolts(s):
 	"""
-	Unpack a string to a number, and convert that number to volts on
+	Unpack a string to a number, and convert that number to volts read from
 	an analog input pin.
 	"""
 	return NumberToVolts(StringToNumber(s))
@@ -101,6 +105,11 @@ def BitFieldToIndexSet(bitField):
 
 
 def IndicesToBitField(indices):
+	"""
+	Create and return a bit field (as a number) which has the bits with the
+	given indices set.
+	Example: set([0, 1, 6]) => b0100 0011 == 0x43
+	"""
 	bitField = 0x0
 	for i in indices:
 		bitField |= (1 << i)
