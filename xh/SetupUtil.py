@@ -1,3 +1,8 @@
+"""
+methods to be used in setting up Xbee communication or user interaction
+"""
+
+
 import logging, os
 from contextlib import contextmanager
 from .deps import serial, xbee
