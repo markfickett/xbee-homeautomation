@@ -1,8 +1,8 @@
-import logging
+import logging, os
+from contextlib import contextmanager
 from .deps import serial, xbee
 from serial.tools import list_ports
 from . import Config
-from contextlib import contextmanager
 
 log = logging.getLogger('xh.Util')
 
@@ -67,4 +67,14 @@ def InitializedXbee(serialDevice=None, callback=None):
 	finally:
 		xb.halt()
 		serialObj.close()
+
+
+def RunPythonStartup():
+	"""
+	Run the $PYTHONSTARTUP script, if available, to prepare for an
+	interactive prompt.
+	"""
+	startup = os.getenv('PYTHONSTARTUP')
+	if startup:
+		execfile(startup)
 
