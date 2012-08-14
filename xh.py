@@ -10,60 +10,44 @@ Examples:
 import logging
 log = logging.getLogger('xh')
 
-import code, optparse, os, readline, sys, time
+import code, readline, time, os
 import xh
-from xh.protocol import Command, NodeDiscover, Data
 from xh.deps import serial, xbee
+from xh.protocol import *
 
-def runPythonStartup():
-	"""
-	Run the $PYTHONSTARTUP script, if available, to prepare for an
-	interactive prompt.
-	"""
-	startup = os.getenv('PYTHONSTARTUP')
-	if startup:
-		with open(startup) as startupFile:
-			exec(startupFile.read())
+FRAME_HISTORY_LIMIT = 700
+FRAME_HISTORY_TRIM = 500
+LOCAL_SCRIPT = os.path.join(os.path.dirname(__file__), 'xh.local.py')
 
 global fr
 fr = []
-FRAME_HISTORY_LIMIT = 700
-FRAME_HISTORY_TRIM = 500
-def logData(rawData):
+def logFrame(frame):
 	global fr
-	try:
-		frame = xh.protocol.ParseFromDict(rawData)
-		fr.append(frame)
-		log.info('received %s' % frame)
-		if len(fr) > FRAME_HISTORY_LIMIT:
-			fr = fr[:FRAME_HISTORY_TRIM]
-	except:
-		log.error('error handling data: %s' % rawData, exc_info=True)
+
+	log.info('received %s' % frame)
 	readline.redisplay()
 
+	fr.insert(0, frame)
+	if len(fr) > FRAME_HISTORY_LIMIT:
+		fr = fr[:FRAME_HISTORY_TRIM]
 
-with xh.Util.InitializedXbee(callback=logData) as xb:
+
+def runLocalScript():
+	if os.path.isfile(LOCAL_SCRIPT):
+		log.info('running %s' % LOCAL_SCRIPT)
+		execfile(LOCAL_SCRIPT)
+	else:
+		log.info('no local script to run at %s' % LOCAL_SCRIPT)
+
+
+with xh.SetupUtil.InitializedXbee(callback=logFrame) as xb:
 	log.info('started')
-	"""
-	for cmd in (
-		Command(Command.NAME.MY),
-		Command(Command.NAME.ID),
-		Command(Command.NAME.KY),
-		Command(Command.NAME.EE),
-		Command(Command.NAME.SH),
-		Command(Command.NAME.SL),
-		Command(Command.NAME.NI),
-		Command(Command.NAME.__getattribute__('%V')),
-		Command(Command.NAME.NT),
-		NodeDiscover(),
-		Command(Command.NAME.__getattribute__('%V'),
-			dest=0x13a200408cca0e),
-	):
-		cmd.send(xb)
-	"""
-	runPythonStartup()
-	namespace = locals()
-	namespace.update(globals())
+
+	runLocalScript()
+
+	xh.SetupUtil.RunPythonStartup()
+	namespace = globals()
+	namespace.update(locals())
 	code.interact(banner='The xbee object is available as "xb".'
 		+ ' A received frame list is available as "fr".'
 		+ ' Type control-D to exit.',

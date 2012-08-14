@@ -1,5 +1,7 @@
 *.pyc
 *.swp
-SecretConfig.py
 data/
 tmp.txt
+
+SecretConfig.py
+xh.local.py
