@@ -5,6 +5,19 @@ from .. import Encoding, EnumUtil
 from . import Command, CommandRegistry, Data, Frame, FrameRegistry, NodeId
 
 
+def ParseFromDictSafe(d):
+	"""
+	Call ParseFromDict to create a Frame from an API response dict,
+	converting any errors to logged errors.
+	@return a Frame (subclass) on successful parsing or None on error
+	"""
+	try:
+		return ParseFromDict(d)
+	except:
+		log.error('error handling data: %s' % d, exc_info=True)
+		return None
+
+
 def ParseFromDict(d):
 	"""
 	Parse common fields from a response dict and create a Frame of the

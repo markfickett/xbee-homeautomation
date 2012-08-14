@@ -18,4 +18,4 @@ from PullUpResistor import PullUpResistor
 from SampleRate import SampleRate
 from VoltageSupplyThreshold import VoltageSupplyThreshold
 
-from Parse import ParseFromDict
+from Parse import ParseFromDict, ParseFromDictSafe
