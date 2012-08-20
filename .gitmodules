@@ -1,0 +1,3 @@
+[submodule "xh/deps/pysignals"]
+	path = xh/deps/pysignals
+	url = git://github.com/theojulienne/PySignals.git
