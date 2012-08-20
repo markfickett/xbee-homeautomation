@@ -12,7 +12,7 @@ log = logging.getLogger('xh')
 
 import code, readline, time, os
 import xh
-from xh.deps import serial, xbee
+from xh.deps import serial, xbee, pysignals
 from xh.protocol import *
 
 FRAME_HISTORY_LIMIT = 700
@@ -21,7 +21,8 @@ LOCAL_SCRIPT = os.path.join(os.path.dirname(__file__), 'xh.local.py')
 
 global fr
 fr = []
-def logFrame(frame):
+@pysignals.receiver(xh.Signals.FrameReceived)
+def logFrame(sender=None, signal=None, frame=None):
 	global fr
 
 	log.info('received %s' % frame)
@@ -40,7 +41,7 @@ def runLocalScript():
 		log.info('no local script to run at %s' % LOCAL_SCRIPT)
 
 
-with xh.SetupUtil.InitializedXbee(callback=logFrame) as xb:
+with xh.SetupUtil.InitializedXbee() as xb:
 	log.info('started')
 
 	runLocalScript()

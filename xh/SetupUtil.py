@@ -3,11 +3,11 @@ methods to be used in setting up Xbee communication or user interaction
 """
 
 
-import logging, os
+import logging, os, traceback
 from contextlib import contextmanager
 from .deps import serial, xbee
 from serial.tools import list_ports
-from . import Config, protocol
+from . import Config, Signals, protocol
 
 log = logging.getLogger('xh.SetupUtil')
 
@@ -40,26 +40,38 @@ def PickSerialDevice():
 	return serialDevices[i]
 
 
+def _IsErrorTuple(o):
+	return (isinstance(o, tuple)
+		and len(o) == 3
+		and type(o[0]) == type)
+
+
 @contextmanager
-def InitializedXbee(serialDevice=None, callback=None):
+def InitializedXbee(serialDevice=None):
 	"""
-	@param callback called with parsed response/data frames
+	Open a serial connection to the locally attached Xbee return an xbee API
+	object representing the module, for sending frames.
+
+	A Signals.FRAME_RECEIVED signal will be sent when a frame is received.
 	"""
 	device = serialDevice or PickSerialDevice()
 	serialObj = serial.Serial(device, Config.SERIAL_BAUD)
 
-	def parseFrame(rawData):
+	def parseFrameAndSendSignal(rawData):
 		frame = protocol.ParseFromDictSafe(rawData)
-		if frame and callback:
-			try:
-				callback(frame)
-			except:
-				log.error(('error in callback %s handling %s '
-				+ '(parsed successfully from %s)')
-				% (callback, frame, rawData),
-				exc_info=True)
+		if frame:
+			responses = Signals.FrameReceived.send_robust(
+					sender=None, frame=frame)
+			for receiver, responseOrErr in responses:
+				if not _IsErrorTuple(responseOrErr):
+					continue
+				formatted = ''.join(traceback.
+					format_exception(*responseOrErr))
+				log.error(('error in receiver %s handling %s '
+				+ '(parsed successfully from %s):\n%s')
+				% (receiver, frame, rawData, formatted))
 
-	xb = xbee.ZigBee(serialObj, callback=parseFrame)
+	xb = xbee.ZigBee(serialObj, callback=parseFrameAndSendSignal)
 
 	try:
 		yield xb

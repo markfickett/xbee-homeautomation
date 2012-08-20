@@ -2,7 +2,7 @@
 Verify and import third-party dependencies.
 """
 
-import logging
+import logging, os, sys
 log = logging.getLogger('xh.deps')
 
 failedImports = []
@@ -30,4 +30,8 @@ if failedImports:
 		msg += '\n\t%s: requires %s' % (e.message, description)
 	log.error(msg)
 	raise e
+
+PYSIGNALS_PATH = os.path.join(os.path.dirname(__file__), 'pysignals')
+sys.path.append(PYSIGNALS_PATH)
+import pysignals
 
