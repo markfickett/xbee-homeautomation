@@ -15,4 +15,7 @@ Dependencies
 
 * [pySerial](http://pyserial.sourceforge.net/) >= 2.6
 * [python-xbee](http://code.google.com/p/python-xbee/downloads/list) (version 2.0.0)
-* [protobuf](http://code.google.com/p/protobuf/)
+
+Related Work
+------------
+* [Home Automation project by Arvis Cimermanis](http://www.arvisc.info/)
