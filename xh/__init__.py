@@ -9,6 +9,7 @@ import Config, EnumUtil
 import Signals
 import Encoding
 import Util
+from Plugin import Plugin
 
 import protocol
 
