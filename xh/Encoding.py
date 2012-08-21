@@ -49,14 +49,20 @@ def StringToBoolean(s):
 	Unpack a string to boolean. The string is expected to be a packed
 	number, where 0 is False and 1 is True.
 	"""
-	n = StringToNumber(s)
+	return NumberToBoolean(StringToNumber(s))
+
+
+def NumberToBoolean(n):
+	"""
+	Unpack a number to boolean. The number must be 0 (False) or 1 (True).
+	"""
 	if n == 0:
 		return False
 	elif n == 1:
 		return True
 	else:
 		raise ValueError(('Encoded value "%s" is not an expected '
-			+ 'boolean value, should be 0 or 1.') % s)
+			+ 'boolean value, should be 0 or 1.') % n)
 
 
 def BooleanToString(b):
