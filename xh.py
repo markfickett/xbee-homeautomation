@@ -10,27 +10,14 @@ Examples:
 import logging
 log = logging.getLogger('xh')
 
-import code, readline, time, os
+import code, time, os
 import xh
-from xh.deps import serial, xbee, pysignals
+from xh.deps import serial, xbee
 from xh.protocol import *
+from yapsy.PluginManager import PluginManagerSingleton
 
-FRAME_HISTORY_LIMIT = 700
-FRAME_HISTORY_TRIM = 500
 LOCAL_SCRIPT = os.path.join(os.path.dirname(__file__), 'xh.local.py')
-
-global fr
-fr = []
-@pysignals.receiver(xh.Signals.FrameReceived)
-def logFrame(sender=None, signal=None, frame=None):
-	global fr
-
-	log.info('received %s' % frame)
-	readline.redisplay()
-
-	fr.insert(0, frame)
-	if len(fr) > FRAME_HISTORY_LIMIT:
-		fr = fr[:FRAME_HISTORY_TRIM]
+FRAME_LOGGER_NAME = 'Frame Logger'
 
 
 def runLocalScript():
@@ -41,6 +28,15 @@ def runLocalScript():
 		log.info('no local script to run at %s' % LOCAL_SCRIPT)
 
 
+def getFrameLoggerPlugin():
+	pm = PluginManagerSingleton.get()
+	p = pm.getPluginByName(FRAME_LOGGER_NAME)
+	return p.plugin_object
+
+
+xh.SetupUtil.CollectPlugins()
+fl = getFrameLoggerPlugin()
+xh.SetupUtil.SetLoggerRedisplayAfterEmit(logging.getLogger())
 with xh.SetupUtil.InitializedXbee() as xb:
 	log.info('started')
 
@@ -50,7 +46,8 @@ with xh.SetupUtil.InitializedXbee() as xb:
 	namespace = globals()
 	namespace.update(locals())
 	code.interact(banner='The xbee object is available as "xb".'
-		+ ' A received frame list is available as "fr".'
+		+ ' A received frame list is available'
+		+	' from the Frame Logger plugin, available as "fl".'
 		+ ' Type control-D to exit.',
 		local=namespace)
 
