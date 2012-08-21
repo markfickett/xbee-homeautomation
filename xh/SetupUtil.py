@@ -3,11 +3,12 @@ methods to be used in setting up Xbee communication or user interaction
 """
 
 
-import logging, os, traceback
+import logging, os, readline, traceback
 from contextlib import contextmanager
 from .deps import serial, xbee
 from serial.tools import list_ports
 from . import Config, Signals, protocol
+from yapsy.PluginManager import PluginManagerSingleton
 
 log = logging.getLogger('xh.SetupUtil')
 
@@ -38,6 +39,18 @@ def PickSerialDevice():
 	else:
 		i = 0
 	return serialDevices[i]
+
+
+global PluginsCollected
+PluginsCollected = False
+def CollectPlugins():
+	global PluginsCollected
+	if not PluginsCollected:
+		PluginsCollected = True
+		pm = PluginManagerSingleton.get()
+		pm.setPluginPlaces([Config.PLUGIN_DIR])
+		pm.setPluginInfoExtension(Config.PLUGIN_INFO_EXTENSION)
+		pm.collectPlugins()
 
 
 def _IsErrorTuple(o):
@@ -92,4 +105,19 @@ def RunPythonStartup():
 	startup = os.getenv('PYTHONSTARTUP')
 	if startup:
 		execfile(startup)
+
+
+def SetLoggerRedisplayAfterEmit(loggerInst):
+	"""
+	Make the given logger('s last Handler) call readline.redisplay() after
+	every emit() call, so that logging plays (sort of) nicely with an
+	interactive prompt.
+	"""
+	handler = loggerInst.handlers[-1]
+	oldEmitFn = handler.emit
+	def newEmitFn(*args, **kwargs):
+		oldEmitFn(*args, **kwargs)
+		readline.redisplay()
+	handler.emit = newEmitFn
+
 
