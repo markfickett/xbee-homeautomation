@@ -24,6 +24,12 @@ try:
 except ImportError as e:
 	failedImports.append(('enum from http://pypi.python.org/pypi/enum/', e))
 
+try:
+	import yapsy
+except ImportError as e:
+	failedImports.append(
+		('yapsy from http://sourceforge.net/projects/yapsy/', e))
+
 if failedImports:
 	msg = 'Unable to import required dependencies:'
 	for description, e in failedImports:
