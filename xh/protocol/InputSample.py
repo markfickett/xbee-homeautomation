@@ -1,5 +1,5 @@
 from .. import Encoding
-from . import Command, CommandRegistry, Sample
+from . import AnalogSample, Command, CommandRegistry, DigitalSample
 
 
 
@@ -53,23 +53,19 @@ class InputSample(Command):
 
 		analogValues = []
 		while offset + 1 < len(encoded):
-			analogValues.append(Encoding.StringToVolts(
+			analogValues.append(Encoding.StringToNumber(
 				encoded[offset:offset+1]))
 			offset += 1
 
 		for digitalPinNum in digitalPinNumbers:
 			digitalValue = digitalPinNum in digitalOnValues
-			self.__samples.append(Sample(
-				digitalPinNum,
-				Sample.PIN_TYPE.dio,
-				bit=digitalValue))
+			self.__samples.append(DigitalSample.CreateFromRawValues(
+				digitalPinNum, digitalValue))
 
-		for analogPinNum, analogValue in zip(
+		for analogPinNum, analogValueNum in zip(
 		analogPinNumbers, analogValues):
-			self.__samples.append(Sample(
-				analogPinNum,
-				Sample.PIN_TYPE.adc,
-				volts=analogValue))
+			self.__samples.append(AnalogSample.CreateFromRawValues(
+				analogPinNum, analogValueNum))
 
 
 	def getNamedValues(self):

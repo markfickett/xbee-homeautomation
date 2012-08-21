@@ -4,7 +4,7 @@ from Registry import Registry
 
 from Frame import Frame, FrameRegistry
 
-from Data import Data, Sample
+from Data import Data, Sample, AnalogSample, DigitalSample
 
 from NodeId import NodeId
 

@@ -1,9 +1,17 @@
+__all__ = [
+	'Data',
+
+	'Sample',
+	'AnalogSample',
+	'DigitalSample',
+]
+
 import logging
 log = logging.getLogger('xh.protocol.Data')
 
 from ..deps import Enum
 from .. import Encoding, EnumUtil
-from . import Frame, FrameRegistry
+from . import Frame, FrameRegistry, PIN, Registry
 import datetime
 
 
@@ -111,75 +119,101 @@ class Sample:
 		'adc',		# analog sample
 		'dio',		# digital sample
 	)
-
-	def __init__(self, pinNum, pinType, volts=None, bit=None):
-		self.__pinNum = int(pinNum)
-
-		if pinType not in self.PIN_TYPE:
-			raise ValueError('Pin type %r not one of %r.'
-				% (pinType, self._PIN_TYPE))
-		self.__pinType = pinType
-
-		if volts is None:
-			self.__volts = None
-		else:
-			self.__volts = float(volts)
-
-		if bit is None:
-			self.__bit = None
-		else:
-			self.__bit = bool(bit)
+	_Registry = Registry(PIN_TYPE)
 
 
-	def getPinNumber(self):
-		return self.__pinNum
+	def __init__(self, pinName):
+		if pinName not in PIN:
+			raise ValueError('Pin %r not in Constants.PIN Enum.'
+				% pinName)
+		self.__pinName = pinName
 
 
-	def getPinType(self):
-		return self.__pinType
-
-
-	def getVolts(self):
-		return self.__volts
-
-
-	def getBit(self):
-		return self.__bit
+	def getPinName(self):
+		return self.__pinName
 
 
 	def __str__(self):
-		valueStr = ','
-		if self.__volts is not None:
-			valueStr = valueStr + ' volts=%.3f' % self.__volts
-		elif self.__bit is not None:
-			valueStr = valueStr + ' ' + str(self.__bit)
-		else:
-			valueStr = ''
-
-		return 'Sample(%d, %s%s)' % (
-			self.__pinNum,
-			self.__pinType,
-			valueStr,
+		return '%s(%s, %s)' % (
+			self.__class__.__name__,
+			self.getPinName(),
+			self._formatValue(),
 		)
 
 
 	@classmethod
 	def CreateFromDict(cls, d):
-		for key, value in d.iteritems():
-			pinType, pinNum = key.split('-')
+		for key, numericValue in d.iteritems():
+			pinTypeStr, pinNum = key.split('-')
 			pinNum = int(pinNum)
-			pinType = EnumUtil.FromString(cls.PIN_TYPE, pinType)
-			valueKwargs = {}
-			if pinType == cls.PIN_TYPE.adc:
-				valueKwargs['volts'] = Encoding.NumberToVolts(
-					value)
-			elif pinType == cls.PIN_TYPE.dio:
-				valueKwargs['bit'] = value
-			else:
-				raise RuntimeError(('unprepared to convert '
-					+ 'value "%s" for pin %s-%d')
-					% (value, pinType, pinNum))
-			yield Sample(pinNum, pinType, **valueKwargs)
+			pinType = EnumUtil.FromString(cls.PIN_TYPE, pinTypeStr)
+
+			concreteClass = cls._Registry.get(pinType)
+			yield concreteClass.CreateFromRawValues(
+				pinNum, numericValue)
+
+
+
+class AnalogSample(Sample):
+	_PIN_NUM_VCC = 7
+
+
+	def __init__(self, pinName, volts):
+		Sample.__init__(self, pinName)
+		self.__volts = float(volts)
+
+
+	def getVolts(self):
+		"""
+		Get the voltage measured on the sampled analog pin. Note that
+		with the exception of VCC, the maximum value ADC pins can sense
+		is 1.2v.
+		"""
+		return self.__volts
+
+
+	def _formatValue(self):
+		return 'volts=%.3f' % self.getVolts()
+
+
+	@classmethod
+	def CreateFromRawValues(cls, pinNum, numericValue):
+		if pinNum == cls._PIN_NUM_VCC:
+			pinName = PIN.VCC
+		else:
+			pinName = EnumUtil.FromString(PIN, 'AD%d' % pinNum)
+		return cls(pinName, Encoding.NumberToVolts(numericValue))
+
+
+Sample._Registry.put(Sample.PIN_TYPE.adc, AnalogSample)
+
+
+
+class DigitalSample(Sample):
+	def __init__(self, pinName, isSet):
+		Sample.__init__(self, pinName)
+		self.__isSet = bool(isSet)
+
+
+	def getIsSet(self):
+		return self.__isSet
+
+
+	def _formatValue(self):
+		return str(self.getIsSet())
+
+
+	@classmethod
+	def CreateFromRawValues(cls, pinNum, numericValue):
+		pinName = EnumUtil.FromString(PIN, 'DIO%d' % pinNum)
+		if numericValue in (True, False):
+			bit = numericValue
+		else:
+			bit = Encoding.NumberToBoolean(numericValue)
+		return cls(pinName, bit)
+
+
+Sample._Registry.put(Sample.PIN_TYPE.dio, DigitalSample)
 
 
 
