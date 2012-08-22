@@ -1,7 +1,7 @@
 import logging
 import xh
 
-log = logging.getLogger('plugin FrameLogger')
+log = logging.getLogger('FrameLogger')
 
 
 
