@@ -79,6 +79,10 @@ class Command(Frame):
 	__sendingFrameId = 0
 	__frameIdLock = threading.Lock()
 
+	# For sending, keep an Xbee object singleton and make thread-safe.
+	_XbeeSingleton = None
+	__xbeeSingletonLock = threading.Lock()
+
 
 	def __init__(self, name, responseFrameId=None, dest=None,
 		fromCommandName=None):
@@ -246,8 +250,32 @@ class Command(Frame):
 		return parameter
 
 
-	def send(self, xb):
+	@classmethod
+	def setXbeeSingleton(cls, xb):
+		cls._XbeeSingleton = xb
+
+
+	def send(self, xb=None):
+		"""
+		Send this Command.
+		@param xb The Xbee API object to use to send the Command. If not
+			provided, tries to send using the Xbee singleton.
+		To use the Xbee singleton, it must have been set using
+		setXbeeSingleton. If the singleton is used, a lock is acquired
+		around sending (and this method is thread-safe), otherwise the
+		caller is responsible for thread safety.
+		"""
 		log.info('sending %s' % self)
+
+		if xb is None:
+			if Command._XbeeSingleton is None:
+				raise RuntimeError('No xb kwarg provided to '
+					+ 'send and Xbee singleton not set '
+					+ '(see setXbeeSingleton).')
+			senderXbee = Command._XbeeSingleton
+		else:
+			senderXbee = xb
+
 		kwargs = {
 			'command': str(self.getName()),
 			'frame_id': self._encodedFrameId(),
@@ -257,9 +285,15 @@ class Command(Frame):
 			kwargs['dest_addr_long'] = (
 				Encoding.NumberToSerialString(
 					self.getRemoteSerial()))
-			xb.remote_at(**kwargs)
+			sendFn = senderXbee.remote_at
 		else:
-			xb.at(**kwargs)
+			sendFn = senderXbee.at
+
+		if senderXbee is Command._XbeeSingleton:
+			with Command.__xbeeSingletonLock:
+				sendFn(**kwargs)
+		else:
+			sendFn(**kwargs)
 
 
 	def _encodedFrameId(self):
