@@ -14,6 +14,7 @@ from EncryptionEnable import EncryptionEnable
 from InputSample import InputSample
 from InputVolts import InputVolts
 from NodeDiscover import NodeDiscover
+from NodeDiscoveryTimeout import NodeDiscoveryTimeout
 from PullUpResistor import PullUpResistor
 from SampleRate import SampleRate
 from VoltageSupplyThreshold import VoltageSupplyThreshold
