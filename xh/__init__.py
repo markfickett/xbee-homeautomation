@@ -5,7 +5,8 @@ logging.basicConfig(
 
 import deps
 
-import Config, EnumUtil
+from Config import Config
+import EnumUtil
 import Signals
 import Encoding
 import Util

@@ -2,9 +2,9 @@
 """%prog command [options]
 Issue commands to or read data from the XBee Home Automation system.
 Examples:
- $ xh info # print information about a physically connected XBee
- $ xh init # initialize network PANID and encryption key
- $ xh setup --name 'Living Room' # set up and name a new sensor/control
+ $ xh # defualt: attach to the pysically connected Xbee and run plugins
+ $ xh list # list information about available Xbees and plugins
+ $ xh setup --plugin 'Temperature Logger' --serial 0x1a23
 """
 
 import logging
@@ -34,21 +34,27 @@ def getFrameLoggerPlugin():
 	return p.plugin_object
 
 
-xh.SetupUtil.CollectPlugins()
-fl = getFrameLoggerPlugin()
-xh.SetupUtil.SetLoggerRedisplayAfterEmit(logging.getLogger())
-with xh.SetupUtil.InitializedXbee() as xb:
-	log.info('started')
+log.debug('opened config')
+INTERACT_BANNER = ('The xbee object is available as "xb". A received frame list'
+	+ ' is available from the Frame Logger plugin, available as "fl".'
+	+ ' Type control-D to exit.')
 
-	runLocalScript()
+with xh.Config():
+	log.debug('collecting plugins')
+	xh.SetupUtil.CollectPlugins()
+	fl = getFrameLoggerPlugin()
+	xh.SetupUtil.SetLoggerRedisplayAfterEmit(logging.getLogger())
+	with xh.SetupUtil.InitializedXbee() as xb:
+		log.info('connected to locally attached Xbee')
+		xh.protocol.Command.setXbeeSingleton(xb)
+		with xh.SetupUtil.ActivatedPlugins():
+			log.info('started')
 
-	xh.SetupUtil.RunPythonStartup()
-	namespace = globals()
-	namespace.update(locals())
-	code.interact(banner='The xbee object is available as "xb".'
-		+ ' A received frame list is available'
-		+	' from the Frame Logger plugin, available as "fl".'
-		+ ' Type control-D to exit.',
-		local=namespace)
+			runLocalScript()
+
+			xh.SetupUtil.RunPythonStartup()
+			namespace = globals()
+			namespace.update(locals())
+			code.interact(banner=INTERACT_BANNER, local=namespace)
 
 log.info('exiting')

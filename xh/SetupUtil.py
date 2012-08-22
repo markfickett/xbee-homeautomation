@@ -53,6 +53,33 @@ def CollectPlugins():
 		pm.collectPlugins()
 
 
+@contextmanager
+def ActivatedPlugins():
+	"""
+	Activate and deactivate all the plugins.
+	"""
+	pm = PluginManagerSingleton.get()
+	activatedPlugins = []
+	for pluginInfo in pm.getAllPlugins():
+		try:
+			pluginInfo.plugin_object.activate()
+			activatedPlugins.append(pluginInfo)
+		except:
+			log.error(('Exception activating plugin "%s". (Will not'
+				+ ' deactivate.)') % pluginInfo.name,
+				exc_info=True)
+
+	try:
+		yield activatedPlugins
+	finally:
+		for pluginInfo in activatedPlugins:
+			try:
+				pluginInfo.plugin_object.deactivate()
+			except:
+				log.error('Exception deactivating plugin "%s".'
+				% pluginInfo.name, exc_info=True)
+
+
 def _IsErrorTuple(o):
 	return (isinstance(o, tuple)
 		and len(o) == 3
