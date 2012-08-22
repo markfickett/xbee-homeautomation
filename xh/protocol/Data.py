@@ -50,9 +50,10 @@ class Data(Frame):
 		return self._timestamp
 
 
-	def formatTimestamp(self):
+	@classmethod
+	def FormatTimestamp(cls, timestamp):
 		return datetime.datetime.strftime(
-			self.getTimestamp(), self.DATETIME_FORMAT)
+			timestamp, cls.DATETIME_FORMAT)
 
 
 	def getSourceAddress(self):
@@ -86,7 +87,7 @@ class Data(Frame):
 		if t is None:
 			t = ''
 		else:
-			t = ' ' + self.formatTimestamp()
+			t = ' ' + self.FormatTimestamp(t)
 		return '%s%s%s' % (s, t,
 			self._FormatNamedValues(self.getNamedValues()))
 
