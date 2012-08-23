@@ -7,8 +7,6 @@ log = logging.getLogger('TemperatureLogger')
 
 
 class TemperatureLogger(xh.Plugin):
-	_CONFIG_SECTION = 'xh.plugins.TemperatureLogger'
-	_CONFIG_NAME_SERIAL = 'serial'
 	_INPUT_VOLTS_QUERY_INTERVAL_SEC = 5 * 60.0
 
 
