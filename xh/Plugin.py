@@ -20,11 +20,7 @@ class Plugin(IPlugin):
 		"""
 		IPlugin.__init__(self)
 
-		if receiveFrames:
-			def handleFrameCb(sender=None, signal=None, frame=None):
-				self._frameReceived(frame)
-			Signals.FrameReceived.connect(handleFrameCb)
-			self.__handleFrameCb = handleFrameCb
+		self.__receiveFrames = bool(receiveFrames)
 
 		self.__serials = set()
 		c = Config.get()
@@ -34,6 +30,15 @@ class Plugin(IPlugin):
 			for i in xrange(n):
 				s = c.getint(sec, self.__CONFIG_SERIAL_T % i)
 				self.__serials.add(s)
+
+
+	def activate(self):
+		IPlugin.activate(self)
+		if self.__receiveFrames:
+			def handleFrameCb(sender=None, signal=None, frame=None):
+				self._frameReceived(frame)
+			Signals.FrameReceived.connect(handleFrameCb)
+			self.__handleFrameCb = handleFrameCb
 
 
 	def _getConfigSection(self):
