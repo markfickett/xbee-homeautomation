@@ -29,6 +29,8 @@ COMMAND = Enum(
 	'run',
 	'setup',
 )
+parser.add_argument('--verbose', '-v', action='count')
+parser.add_argument('--quiet', '-q', action='count')
 parser.add_argument('command', choices=[str(c) for c in COMMAND])
 
 
@@ -132,8 +134,34 @@ COMMAND_TO_FN = {
 }
 
 
+LOG_LEVELS = [
+	logging.FATAL,
+	logging.CRITICAL,
+	logging.ERROR,
+	logging.WARNING,	# -q hides info (but still shows WARNING)
+	logging.INFO,		# default
+	logging.DEBUG,		# -v also shows debug
+]
+
+
+def setVerbosity(verbose, quiet):
+	if verbose is not None and quiet is not None:
+		parser.error(
+			'Come now, verbose and quiet are mutually exclusive!')
+	base = LOG_LEVELS.index(logging.INFO)
+	verbosity = base + (verbose or 0) - (quiet or 0)
+	if verbosity < 0:
+		parser.error('%d Qs is all there is.' % base)
+	elif verbosity >= len(LOG_LEVELS):
+		maxVs = (len(LOG_LEVELS) - 1) - base
+		parser.error('%d V%s is all the more verbose one can be.'
+			% (maxVs, '' if maxVs == 1 else 's'))
+	logging.getLogger().setLevel(LOG_LEVELS[verbosity])
+
+
 def main():
 	args = parser.parse_args()
+	setVerbosity(args.verbose, args.quiet)
 	command = xh.EnumUtil.FromString(COMMAND, args.command)
 	with xh.Config():
 		log.debug('opened config')
