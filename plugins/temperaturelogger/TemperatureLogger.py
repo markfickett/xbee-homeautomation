@@ -81,14 +81,14 @@ class TemperatureLogger(xh.Plugin):
 		else:
 			raise RuntimeError(
 				('%s plugin not configured to handle pin %s '
-					+ 'from module 0x%X.'),
+					+ 'from module 0x%x.'),
 				(self.__class__.__name__,
 					p, sourceSerial))
 		self.__recordValue(sourceSerial, timestamp, name, value)
 
 
 	def __recordValue(self, sourceSerial, timestamp, textName, value):
-		name = '0x%X %s' % (sourceSerial, textName)
+		name = '0x%x %s' % (sourceSerial, textName)
 		log.debug('%s\t%s\t%.3f'
 			% (xh.protocol.Data.FormatTimestamp(timestamp),
 				name, value))
