@@ -251,7 +251,7 @@ class Command(Frame):
 
 
 	@classmethod
-	def setXbeeSingleton(cls, xb):
+	def SetXbeeSingleton(cls, xb):
 		cls._XbeeSingleton = xb
 
 
