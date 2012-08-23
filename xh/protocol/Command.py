@@ -76,7 +76,7 @@ class Command(Frame):
 
 
 	# Next unclaimed frame ID for a command to send.
-	__sendingFrameId = 0
+	__sendingFrameId = 1
 	__frameIdLock = threading.Lock()
 
 	# For sending, keep an Xbee object singleton and make thread-safe.
