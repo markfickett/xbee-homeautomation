@@ -15,3 +15,4 @@ from Plugin import Plugin
 import protocol
 
 import SetupUtil
+import Synchronous
