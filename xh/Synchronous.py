@@ -1,3 +1,9 @@
+__all__ = [
+	'SendAndWait',
+	'SendAndAccumulate',
+]
+
+
 """
 Functions for synchronously sending Commands and waiting for responses.
 """
@@ -11,7 +17,7 @@ TimeoutError = multiprocessing.TimeoutError
 
 
 
-class Response:
+class __Response:
 	def __init__(self):
 		self.__value = None
 
@@ -32,7 +38,7 @@ def SendAndWait(command, xb=None):
 	@raise TimeoutError if no response is received
 		within a short timeout
 	"""
-	r = Response()
+	r = __Response()
 	id = command.getFrameId()
 	def recordSingleResponseCb(sender=None, signal=None, frame=None):
 		if hasattr(frame, 'getFrameId') and frame.getFrameId() == id:
@@ -57,7 +63,7 @@ def SendAndAccumulate(command, timeoutSeconds, xb=None):
 	Send a Command and wait to accumulate multiple responses.
 	@return a list of Frames received in response
 	"""
-	r = Response()
+	r = __Response()
 	r.set([])
 
 	id = command.getFrameId()
