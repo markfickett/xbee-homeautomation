@@ -265,7 +265,7 @@ class Command(Frame):
 		around sending (and this method is thread-safe), otherwise the
 		caller is responsible for thread safety.
 		"""
-		log.info('sending %s' % self)
+		log.debug('sending %s' % self)
 
 		if xb is None:
 			if Command._XbeeSingleton is None:
