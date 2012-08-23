@@ -58,7 +58,7 @@ def run():
 	xh.SetupUtil.SetLoggerRedisplayAfterEmit(logging.getLogger())
 	with xh.SetupUtil.InitializedXbee() as xb:
 		log.info('connected to locally attached Xbee')
-		xh.protocol.Command.setXbeeSingleton(xb)
+		xh.protocol.Command.SetXbeeSingleton(xb)
 		with xh.SetupUtil.ActivatedPlugins():
 			log.info('started')
 
@@ -73,7 +73,46 @@ def run():
 
 
 def list():
-	raise NotImplementedError()
+	with xh.SetupUtil.InitializedXbee() as xb:
+		xh.protocol.Command.SetXbeeSingleton(xb)
+
+		global nTimeoutMillis
+		nTimeoutMillis = None
+		nt = xh.protocol.NodeDiscoveryTimeout()
+		id = nt.getFrameId()
+		def recordNtCb(sender=None, signal=None, frame=None):
+			global nTimeoutMillis
+			if (hasattr(frame, 'getFrameId')
+			and frame.getFrameId() == id):
+				nTimeoutMillis = frame.getTimeoutMillis()
+		xh.Signals.FrameReceived.connect(recordNtCb)
+		nt.send()
+		maxWaits = 20
+		waitNum = 0
+		while nTimeoutMillis is None:
+			waitNum += 1
+			if waitNum > maxWaits:
+				log.error('timed out waiting for NT')
+				return
+			time.sleep(0.1)
+		xh.Signals.FrameReceived.disconnect(recordNtCb)
+		log.debug('Node discovery timeout is %dms.' % nTimeoutMillis)
+
+		global nodeInfoList
+		nodeInfoList = []
+		nd = xh.protocol.NodeDiscover()
+		id = nd.getFrameId()
+		def recordNdCb(sender=None, signal=None, frame=None):
+			global nodeInfoList
+			if (hasattr(frame, 'getFrameId')
+			and frame.getFrameId() == id):
+				nodeInfoList.append(frame.getNodeId())
+		xh.Signals.FrameReceived.connect(recordNdCb)
+		nd.send()
+		time.sleep(nTimeoutMillis/1000.0)
+		xh.Signals.FrameReceived.disconnect(recordNdCb)
+		log.info('Nodes:\n%s' %
+			'\n'.join(['\t%s' % n for n in nodeInfoList]))
 
 
 def setup():
