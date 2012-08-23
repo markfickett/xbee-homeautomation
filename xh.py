@@ -72,7 +72,7 @@ def run():
 	log.info('exiting')
 
 
-def list():
+def listNodeIds():
 	with xh.SetupUtil.InitializedXbee() as xb:
 		xh.protocol.Command.SetXbeeSingleton(xb)
 
@@ -93,7 +93,7 @@ def list():
 			waitNum += 1
 			if waitNum > maxWaits:
 				log.error('timed out waiting for NT')
-				return
+				return []
 			time.sleep(0.1)
 		xh.Signals.FrameReceived.disconnect(recordNtCb)
 		log.debug('Node discovery timeout is %dms.' % nTimeoutMillis)
@@ -111,8 +111,39 @@ def list():
 		nd.send()
 		time.sleep(nTimeoutMillis/1000.0)
 		xh.Signals.FrameReceived.disconnect(recordNdCb)
-		log.info('Nodes:\n%s' %
-			'\n'.join(['\t%s' % n for n in nodeInfoList]))
+
+		return nodeInfoList
+
+
+def list():
+	xh.SetupUtil.CollectPlugins()
+	pm = PluginManagerSingleton.get()
+	pluginInfoStr = 'Plugins:'
+	for p in pm.getAllPlugins():
+		infos = ['%s (%s%s)'
+			% (p.name, os.path.basename(p.path), os.path.sep)]
+		if '?' not in p.version:
+			infos.append('v' + p.version)
+		if p.description is not None:
+			infos.append(p.description)
+		serials = p.plugin_object.getSerials()
+		if serials:
+			infos.append('Xbee'
+				+ ('' if len(serials) is 1 else 's'))
+			infos.append(', '.join(['0x%x' % s for s in serials]))
+		pluginInfoStr += '\n\t' + ' '.join(infos)
+	log.info(pluginInfoStr)
+
+	try:
+		nodeInfoList = listNodeIds()
+	except:
+		nodeInfoList = []
+
+	nodeInfoStr = 'Xbees:'
+	for n in nodeInfoList:
+		lineStr = str(n)
+		nodeInfoStr += '\n\t' + lineStr
+	log.info(nodeInfoStr)
 
 
 def setup():
