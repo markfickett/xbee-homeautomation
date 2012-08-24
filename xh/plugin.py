@@ -40,7 +40,7 @@ class Plugin(IPlugin):
 		if self.__receiveFrames:
 			def handleFrameCb(sender=None, signal=None, frame=None):
 				self._frameReceived(frame)
-			signals.FrameReceived.connect(handleFrameCb)
+			signals.FRAME_RECEIVED.connect(handleFrameCb)
 			self.__handleFrameCb = handleFrameCb
 
 

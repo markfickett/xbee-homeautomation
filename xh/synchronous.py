@@ -49,14 +49,14 @@ def SendAndWait(command, xb=None):
 	def recordSingleResponseCb(sender=None, signal=None, frame=None):
 		if hasattr(frame, 'getFrameId') and frame.getFrameId() == id:
 			r.set(frame)
-	signals.FrameReceived.connect(recordSingleResponseCb)
+	signals.FRAME_RECEIVED.connect(recordSingleResponseCb)
 	command.send(xb=xb)
 
 	elapsed = 0
 	while r.get() is None and elapsed <= TIMEOUT_SECONDS:
 		time.sleep(CHECK_INTERVAL_SECONDS)
 		elapsed += CHECK_INTERVAL_SECONDS
-	signals.FrameReceived.disconnect(recordSingleResponseCb)
+	signals.FRAME_RECEIVED.disconnect(recordSingleResponseCb)
 	if r.get() is None:
 		raise TimeoutError('No response after %.3fs waiting for %s'
 			% (TIMEOUT_SECONDS, command))
@@ -76,10 +76,10 @@ def SendAndAccumulate(command, timeoutSeconds, xb=None):
 	def accumulateMultipleCallback(sender=None, signal=None, frame=None):
 		if hasattr(frame, 'getFrameId') and frame.getFrameId() == id:
 			r.get().append(frame)
-	signals.FrameReceived.connect(accumulateMultipleCallback)
+	signals.FRAME_RECEIVED.connect(accumulateMultipleCallback)
 	command.send(xb=xb)
 	time.sleep(timeoutSeconds)
-	signals.FrameReceived.disconnect(accumulateMultipleCallback)
+	signals.FRAME_RECEIVED.disconnect(accumulateMultipleCallback)
 
 	return r.get()
 

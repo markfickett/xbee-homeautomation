@@ -106,7 +106,7 @@ def InitializedXbee(serialDevice=None):
 	def parseFrameAndSendSignal(rawData):
 		frame = protocol.ParseFromDictSafe(rawData)
 		if frame:
-			responses = signals.FrameReceived.send_robust(
+			responses = signals.FRAME_RECEIVED.send_robust(
 					sender=None, frame=frame)
 			for receiver, responseOrErr in responses:
 				if not _IsErrorTuple(responseOrErr):
