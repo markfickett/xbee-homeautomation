@@ -1,3 +1,6 @@
+from ..deps import Enum
+from .. import Util
+
 __all__ = [
 	'DEVICE_TYPE',
 
@@ -5,9 +8,6 @@ __all__ = [
 	'PIN_NAME_TO_NUMBER',
 	'PIN_NUMBER_TO_NAMES',
 ]
-
-from ..deps import Enum
-from .. import Util
 
 
 DEVICE_TYPE = Enum(

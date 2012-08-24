@@ -1,11 +1,3 @@
-__all__ = [
-	'Data',
-
-	'Sample',
-	'AnalogSample',
-	'DigitalSample',
-]
-
 import logging
 log = logging.getLogger('xh.protocol.Data')
 
@@ -13,6 +5,14 @@ from ..deps import Enum
 from .. import Encoding, EnumUtil
 from . import Frame, FrameRegistry, PIN, Registry
 import datetime
+
+__all__ = [
+	'Data',
+
+	'Sample',
+	'AnalogSample',
+	'DigitalSample',
+]
 
 
 
