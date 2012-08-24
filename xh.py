@@ -1,9 +1,5 @@
 #!/usr/bin/python
-import argparse
-
-parser = argparse.ArgumentParser(
-formatter_class=argparse.RawDescriptionHelpFormatter,
-description="""Run or query the Xbee Home Automation system.
+"""Run or query the Xbee Home Automation system.
 
 Examples:
 Attach to the pysically connected Xbee, run plugins and a Python interpreter.
@@ -13,19 +9,26 @@ Print information about available Xbees and plugins.
 Associate an Xbee (by serial number) with a plugin.
  $ %(prog)s setup --plugin 'Temperature Logger' --serial 0x0013a200abcd1234
 """
-)
 
+import argparse
+import code
 import logging
-log = logging.getLogger('xh')
+import os
+import time
 
-import code, time, os
 import xh
 from xh.deps import Enum, serial, xbee
-from xh.protocol import *
 from yapsy.PluginManager import PluginManagerSingleton
+
 
 LOCAL_SCRIPT = os.path.join(os.path.dirname(__file__), 'xh.local.py')
 FRAME_LOGGER_NAME = 'Frame Logger'
+
+log = logging.getLogger('xh')
+
+parser = argparse.ArgumentParser(
+	formatter_class=argparse.RawDescriptionHelpFormatter,
+	description=__doc__)
 
 
 def runLocalScript():
