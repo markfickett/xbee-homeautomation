@@ -1,6 +1,6 @@
 [Core]
 Name = Frame Logger
-Module = FrameLogger
+Module = framelogger
 
 [Documentation]
 Description = Log all received frames using the Python logging module.
