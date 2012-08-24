@@ -82,11 +82,9 @@ class TemperatureLogger(xh.Plugin):
 			name = 'Light'
 			value = self.__voltsToPercentOfMax(sample.getVolts())
 		else:
-			raise RuntimeError(
-				('%s plugin not configured to handle pin %s '
-					+ 'from module 0x%x.'),
-				(self.__class__.__name__,
-					p, sourceSerial))
+			raise RuntimeError(('%s plugin not configured to handle'
+				+ ' pin %s from module 0x%x.')
+				% (self.__class__.__name__, p, sourceSerial))
 		self.__recordValue(sourceSerial, timestamp, name, value)
 
 

@@ -1,1 +1,1 @@
-from TemperatureLogger import TemperatureLogger
+from temperaturelogger import TemperatureLogger
