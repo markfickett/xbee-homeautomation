@@ -151,9 +151,6 @@ LOG_LEVELS = [
 
 
 def setVerbosity(verbose, quiet):
-	if verbose is not None and quiet is not None:
-		parser.error(
-			'Come now, verbose and quiet are mutually exclusive!')
 	base = LOG_LEVELS.index(logging.INFO)
 	verbosity = base + (verbose or 0) - (quiet or 0)
 	if verbosity < 0:
@@ -180,8 +177,10 @@ def dec_or_hex_int(string):
 		return int(string, 16)
 
 
-parser.add_argument('--verbose', '-v', action='count')
-parser.add_argument('--quiet', '-q', action='count')
+verbosityGroup = parser.add_mutually_exclusive_group()
+verbosityGroup.add_argument('--verbose', '-v', action='count')
+verbosityGroup.add_argument('--quiet', '-q', action='count')
+
 subparsers = parser.add_subparsers(title='commands')
 
 runParser = subparsers.add_parser('run')
