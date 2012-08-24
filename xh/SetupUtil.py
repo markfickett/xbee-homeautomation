@@ -3,12 +3,18 @@ methods to be used in setting up Xbee communication or user interaction
 """
 
 
-import logging, os, readline, traceback
-from contextlib import contextmanager
-from .deps import serial, xbee
-from serial.tools import list_ports
-from . import Config, Signals, protocol
+import contextlib
+import logging
+import os
+import readline
+import serial.tools.list_ports
+import traceback
+
 from yapsy.PluginManager import PluginManagerSingleton
+
+from .deps import serial, xbee
+from . import Config, Signals, protocol
+
 
 log = logging.getLogger('xh.SetupUtil')
 
@@ -20,7 +26,7 @@ EXCLUDE_DEVICES = set([
 	'-COM',
 ])
 def GetSerialCandidates(excludeDevices=EXCLUDE_DEVICES):
-	candidates = [d[0] for d in list_ports.comports()
+	candidates = [d[0] for d in serial.tools.list_ports.comports()
 		if all([e not in d[0] for e in excludeDevices])]
 	if not candidates:
 		raise RuntimeError('No candidates for serial devices found.')
@@ -53,7 +59,7 @@ def CollectPlugins():
 		pm.collectPlugins()
 
 
-@contextmanager
+@contextlib.contextmanager
 def ActivatedPlugins():
 	"""
 	Activate and deactivate all the plugins.
@@ -86,7 +92,7 @@ def _IsErrorTuple(o):
 		and type(o[0]) == type)
 
 
-@contextmanager
+@contextlib.contextmanager
 def InitializedXbee(serialDevice=None):
 	"""
 	Open a serial connection to the locally attached Xbee return an xbee API

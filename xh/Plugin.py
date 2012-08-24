@@ -1,6 +1,9 @@
-from yapsy.IPlugin import IPlugin
-from . import Config, Signals
 import logging
+
+from yapsy.IPlugin import IPlugin
+
+from . import Config, Signals
+
 log = logging.getLogger('Plugin')
 
 

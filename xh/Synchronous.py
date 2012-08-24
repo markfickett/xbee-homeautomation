@@ -1,14 +1,21 @@
 """
 Functions for synchronously sending Commands and waiting for responses.
 """
-import logging, multiprocessing, time
-log = logging.getLogger('Synchronous')
+
+import logging
+import multiprocessing
+import time
+
 from . import Signals
+
 
 __all__ = [
 	'SendAndWait',
 	'SendAndAccumulate',
 ]
+
+
+log = logging.getLogger('Synchronous')
 
 TIMEOUT_SECONDS = 0.2
 CHECK_INTERVAL_SECONDS = 0.01
