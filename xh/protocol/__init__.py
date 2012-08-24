@@ -1,5 +1,4 @@
 from Constants import *
-import Pins
 from Registry import Registry
 
 from Frame import Frame, FrameRegistry
