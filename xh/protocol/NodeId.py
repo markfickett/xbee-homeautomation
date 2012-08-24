@@ -1,5 +1,5 @@
-from ..deps import Enum
 from .. import Encoding
+from ..deps import Enum
 from . import DEVICE_TYPE, Frame, FrameRegistry
 
 

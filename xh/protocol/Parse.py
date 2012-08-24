@@ -1,8 +1,10 @@
 import logging
-log = logging.getLogger('ParsedFromDict')
 
 from .. import Encoding, EnumUtil
 from . import Command, CommandRegistry, Data, Frame, FrameRegistry, NodeId
+
+
+log = logging.getLogger('ParsedFromDict')
 
 
 def ParseFromDictSafe(d):

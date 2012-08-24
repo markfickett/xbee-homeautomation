@@ -1,11 +1,12 @@
 import logging
-log = logging.getLogger('xh.protocol.Command')
-
-from ..deps import Enum
-from .. import Encoding, EnumUtil
-from . import Frame, FrameRegistry, Registry
-import xh.protocol
 import threading
+
+from .. import Encoding, EnumUtil
+from ..deps import Enum
+from . import Frame, FrameRegistry, Registry
+
+
+log = logging.getLogger('Command')
 
 
 

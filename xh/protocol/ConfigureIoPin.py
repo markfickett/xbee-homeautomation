@@ -1,5 +1,5 @@
-from ..deps import Enum
 from .. import Encoding, Util
+from ..deps import Enum
 from . import Command, CommandRegistry, PIN, PIN_NAME_TO_NUMBER
 
 

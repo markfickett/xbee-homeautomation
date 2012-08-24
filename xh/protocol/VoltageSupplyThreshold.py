@@ -1,6 +1,9 @@
+import logging
+
 from .. import Encoding
 from . import Command, CommandRegistry
-import logging
+
+
 log = logging.getLogger('VoltageSupplyThreshold')
 
 

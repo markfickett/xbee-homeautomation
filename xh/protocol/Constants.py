@@ -1,5 +1,6 @@
-from ..deps import Enum
 from .. import Util
+from ..deps import Enum
+
 
 __all__ = [
 	'DEVICE_TYPE',
