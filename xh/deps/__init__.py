@@ -2,7 +2,11 @@
 Verify and import third-party dependencies.
 """
 
-import logging, os, sys
+import logging
+import os
+import sys
+
+
 log = logging.getLogger('xh.deps')
 
 failedImports = []
