@@ -1,6 +1,6 @@
 import logging
 
-from .. import Encoding, EnumUtil
+from .. import encoding, enumutil
 from . import Command, CommandRegistry, Data, Frame, FrameRegistry, NodeId
 
 
@@ -28,7 +28,7 @@ def ParseFromDict(d):
 	usedKeys = set()
 
 	frameTypeKey = str(Frame.FIELD.id)
-	frameType = EnumUtil.FromString(Frame.TYPE, d[frameTypeKey])
+	frameType = enumutil.FromString(Frame.TYPE, d[frameTypeKey])
 	usedKeys.add(frameTypeKey)
 
 	frameClass = FrameRegistry.get(frameType)

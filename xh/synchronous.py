@@ -6,7 +6,7 @@ import logging
 import multiprocessing
 import time
 
-from . import Signals
+from . import signals
 
 
 __all__ = [
@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-log = logging.getLogger('Synchronous')
+log = logging.getLogger('synchronous')
 
 TIMEOUT_SECONDS = 0.2
 CHECK_INTERVAL_SECONDS = 0.01
@@ -49,14 +49,14 @@ def SendAndWait(command, xb=None):
 	def recordSingleResponseCb(sender=None, signal=None, frame=None):
 		if hasattr(frame, 'getFrameId') and frame.getFrameId() == id:
 			r.set(frame)
-	Signals.FrameReceived.connect(recordSingleResponseCb)
+	signals.FrameReceived.connect(recordSingleResponseCb)
 	command.send(xb=xb)
 
 	elapsed = 0
 	while r.get() is None and elapsed <= TIMEOUT_SECONDS:
 		time.sleep(CHECK_INTERVAL_SECONDS)
 		elapsed += CHECK_INTERVAL_SECONDS
-	Signals.FrameReceived.disconnect(recordSingleResponseCb)
+	signals.FrameReceived.disconnect(recordSingleResponseCb)
 	if r.get() is None:
 		raise TimeoutError('No response after %.3fs waiting for %s'
 			% (TIMEOUT_SECONDS, command))
@@ -76,10 +76,10 @@ def SendAndAccumulate(command, timeoutSeconds, xb=None):
 	def accumulateMultipleCallback(sender=None, signal=None, frame=None):
 		if hasattr(frame, 'getFrameId') and frame.getFrameId() == id:
 			r.get().append(frame)
-	Signals.FrameReceived.connect(accumulateMultipleCallback)
+	signals.FrameReceived.connect(accumulateMultipleCallback)
 	command.send(xb=xb)
 	time.sleep(timeoutSeconds)
-	Signals.FrameReceived.disconnect(accumulateMultipleCallback)
+	signals.FrameReceived.disconnect(accumulateMultipleCallback)
 
 	return r.get()
 

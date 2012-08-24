@@ -7,14 +7,14 @@ logging.basicConfig(
 
 import deps
 
-from Config import Config
-import EnumUtil
-import Signals
-import Encoding
-import Util
-from Plugin import Plugin
+from config import Config
+import enumutil
+import signals
+import encoding
+import util
+from plugin import Plugin
 
 import protocol
 
-import SetupUtil
-import Synchronous
+import setuputil
+import synchronous

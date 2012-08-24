@@ -1,4 +1,4 @@
-from .. import Encoding
+from .. import encoding
 from . import AnalogSample, Command, CommandRegistry, DigitalSample
 
 
@@ -40,20 +40,20 @@ class InputSample(Command):
 		self._parseOptions(encoded[offset:offset+1])
 		offset += 1
 
-		digitalPinNumbers = Encoding.BitFieldToIndexSet(
-			encoded[offset:offset+2])
+		digitalPinNumbers = encoding.BitFieldToIndexSet(
+			encoding.StringToNumber(encoded[offset:offset+2]))
 		offset += 2
 
-		analogPinNumbers = sorted(Encoding.BitFieldToIndexSet(
-			encoded[offset:offset+1]))
+		analogPinNumbers = sorted(encoding.BitFieldToIndexSet(
+			encoding.StringToNumber(encoded[offset:offset+1])))
 		offset += 1
 
-		digitalOnValues = Encoding.BitFieldToIndexSet(
-			encoded[offset:offset+2])
+		digitalOnValues = encoding.BitFieldToIndexSet(
+			encoding.StringToNumber(encoded[offset:offset+2]))
 
 		analogValues = []
 		while offset + 1 < len(encoded):
-			analogValues.append(Encoding.StringToNumber(
+			analogValues.append(encoding.StringToNumber(
 				encoded[offset:offset+1]))
 			offset += 1
 

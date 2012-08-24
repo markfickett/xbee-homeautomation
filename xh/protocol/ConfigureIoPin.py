@@ -1,4 +1,4 @@
-from .. import Encoding, Util
+from .. import encoding, util
 from ..deps import Enum
 from . import Command, CommandRegistry, PIN, PIN_NAME_TO_NUMBER
 
@@ -60,7 +60,7 @@ class ConfigureIoPin(Command):
 
 		FUNCTION.RS485_TX_ENABLE_HIGH:	7,
 	}
-	VALUE_TO_FUNCTIONS = Util.InvertedDictWithRepeatedValues(
+	VALUE_TO_FUNCTIONS = util.InvertedDictWithRepeatedValues(
 		FUNCTION_TO_VALUE)
 
 
@@ -81,7 +81,7 @@ class ConfigureIoPin(Command):
 	COMMAND_NAME_TO_PIN_NUMBER = {}
 	for cmd, pin in _COMMAND_NAME_TO_A_PIN_NAME.iteritems():
 		COMMAND_NAME_TO_PIN_NUMBER[cmd] = PIN_NAME_TO_NUMBER[pin]
-	PIN_NUMBER_TO_COMMAND_NAME = Util.InvertedDict(
+	PIN_NUMBER_TO_COMMAND_NAME = util.InvertedDict(
 		COMMAND_NAME_TO_PIN_NUMBER)
 
 
@@ -159,7 +159,7 @@ class ConfigureIoPin(Command):
 
 
 	def parseParameter(self, p):
-		functionNum = Encoding.StringToNumber(p)
+		functionNum = encoding.StringToNumber(p)
 		self.setParameter(functionNum)
 
 		interpretations = set(self.VALUE_TO_FUNCTIONS[functionNum])

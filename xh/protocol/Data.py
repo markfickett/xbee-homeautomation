@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from .. import Encoding, EnumUtil
+from .. import encoding, enumutil
 from ..deps import Enum
 from . import Frame, FrameRegistry, PIN, Registry
 
@@ -99,11 +99,11 @@ class Data(Frame):
 		data = cls()
 
 		sourceAddrKey = str(cls.FIELD.source_addr)
-		data._sourceAddress = Encoding.StringToNumber(d[sourceAddrKey])
+		data._sourceAddress = encoding.StringToNumber(d[sourceAddrKey])
 		usedKeys.add(sourceAddrKey)
 
 		sourceAddrLongKey = str(cls.FIELD.source_addr_long)
-		data._sourceAddressLong = Encoding.StringToNumber(
+		data._sourceAddressLong = encoding.StringToNumber(
 			d[sourceAddrLongKey])
 		usedKeys.add(sourceAddrLongKey)
 
@@ -149,7 +149,7 @@ class Sample:
 		for key, numericValue in d.iteritems():
 			pinTypeStr, pinNum = key.split('-')
 			pinNum = int(pinNum)
-			pinType = EnumUtil.FromString(cls.PIN_TYPE, pinTypeStr)
+			pinType = enumutil.FromString(cls.PIN_TYPE, pinTypeStr)
 
 			concreteClass = cls._Registry.get(pinType)
 			yield concreteClass.CreateFromRawValues(
@@ -184,8 +184,8 @@ class AnalogSample(Sample):
 		if pinNum == cls._PIN_NUM_VCC:
 			pinName = PIN.VCC
 		else:
-			pinName = EnumUtil.FromString(PIN, 'AD%d' % pinNum)
-		return cls(pinName, Encoding.NumberToVolts(numericValue))
+			pinName = enumutil.FromString(PIN, 'AD%d' % pinNum)
+		return cls(pinName, encoding.NumberToVolts(numericValue))
 
 
 Sample._Registry.put(Sample.PIN_TYPE.adc, AnalogSample)
@@ -208,11 +208,11 @@ class DigitalSample(Sample):
 
 	@classmethod
 	def CreateFromRawValues(cls, pinNum, numericValue):
-		pinName = EnumUtil.FromString(PIN, 'DIO%d' % pinNum)
+		pinName = enumutil.FromString(PIN, 'DIO%d' % pinNum)
 		if numericValue in (True, False):
 			bit = numericValue
 		else:
-			bit = Encoding.NumberToBoolean(numericValue)
+			bit = encoding.NumberToBoolean(numericValue)
 		return cls(pinName, bit)
 
 

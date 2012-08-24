@@ -3,5 +3,5 @@
 data/
 tmp.txt
 
-SecretConfig.py
+secretconfig.py
 xh.local.py

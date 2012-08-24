@@ -13,10 +13,10 @@ import traceback
 from yapsy.PluginManager import PluginManagerSingleton
 
 from .deps import serial, xbee
-from . import Config, Signals, protocol
+from . import Config, signals, protocol
 
 
-log = logging.getLogger('xh.SetupUtil')
+log = logging.getLogger('xh.setuputil')
 
 
 
@@ -98,7 +98,7 @@ def InitializedXbee(serialDevice=None):
 	Open a serial connection to the locally attached Xbee return an xbee API
 	object representing the module, for sending frames.
 
-	A Signals.FRAME_RECEIVED signal will be sent when a frame is received.
+	A signals.FRAME_RECEIVED signal will be sent when a frame is received.
 	"""
 	device = serialDevice or PickSerialDevice()
 	serialObj = serial.Serial(device, Config.SERIAL_BAUD)
@@ -106,7 +106,7 @@ def InitializedXbee(serialDevice=None):
 	def parseFrameAndSendSignal(rawData):
 		frame = protocol.ParseFromDictSafe(rawData)
 		if frame:
-			responses = Signals.FrameReceived.send_robust(
+			responses = signals.FrameReceived.send_robust(
 					sender=None, frame=frame)
 			for receiver, responseOrErr in responses:
 				if not _IsErrorTuple(responseOrErr):

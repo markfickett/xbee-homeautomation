@@ -94,12 +94,12 @@ def VoltsToNumber(v):
 
 def BitFieldToIndexSet(bitField):
 	"""
-	@param bitField encoded as a byte string
+	@param bitField encoded as an int
 	@return an set containing the indices of the bits which are set in the
 		given field.
 	Example: 0x43 == b0100 0011 => set([0, 1, 6])
 	"""
-	b = StringToNumber(bitField)
+	b = bitField
 	i = 0
 	indices = set()
 	while b > 0:

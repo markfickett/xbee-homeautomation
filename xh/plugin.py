@@ -2,7 +2,7 @@ import logging
 
 from yapsy.IPlugin import IPlugin
 
-from . import Config, Signals
+from . import Config, signals
 
 log = logging.getLogger('Plugin')
 
@@ -40,7 +40,7 @@ class Plugin(IPlugin):
 		if self.__receiveFrames:
 			def handleFrameCb(sender=None, signal=None, frame=None):
 				self._frameReceived(frame)
-			Signals.FrameReceived.connect(handleFrameCb)
+			signals.FrameReceived.connect(handleFrameCb)
 			self.__handleFrameCb = handleFrameCb
 
 

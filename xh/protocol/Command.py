@@ -1,7 +1,7 @@
 import logging
 import threading
 
-from .. import Encoding, EnumUtil
+from .. import encoding, enumutil
 from ..deps import Enum
 from . import Frame, FrameRegistry, Registry
 
@@ -49,7 +49,7 @@ class Command(Frame):
 		'ID', # network id
 		'IR', # IO sample rate
 		'IS', # force sample on all digital, analog inputs
-		'KY', # xh.Encoding.NumberToString(xh.Config.LINK_KEY)
+		'KY', # xh.encoding.NumberToString(xh.Config.LINK_KEY)
 		'MY', # node's network ID (0 for coordinator)
 		'ND', # NodeDiscover
 		'NI', # string node name
@@ -197,7 +197,7 @@ class Command(Frame):
 		statusKey = str(Command.FIELD.status)
 		status = d.get(statusKey)
 		if status is not None:
-			status = Command.STATUS[Encoding.StringToNumber(status)]
+			status = Command.STATUS[encoding.StringToNumber(status)]
 			self.setStatus(status)
 			usedKeys.add(statusKey)
 
@@ -211,11 +211,11 @@ class Command(Frame):
 		src = d.get(srcKey)
 		if src is not None:
 			self.__remoteNetworkAddress = (
-				Encoding.StringToNumber(src))
+				encoding.StringToNumber(src))
 			usedKeys.add(srcKey)
 
 			srcLongKey = str(Command.FIELD.source_addr_long)
-			self.__remoteSerial = Encoding.StringToNumber(
+			self.__remoteSerial = encoding.StringToNumber(
 				d[srcLongKey])
 			usedKeys.add(srcLongKey)
 
@@ -235,7 +235,7 @@ class Command(Frame):
 		command may not actually have a numeric parameter.
 		@return The parameter parsed as a number.
 		"""
-		parameter = Encoding.StringToNumber(encoded)
+		parameter = encoding.StringToNumber(encoded)
 		if self.getName() not in (
 			Command.NAME.__getattribute__('%V'),
 			Command.NAME.ID,
@@ -284,7 +284,7 @@ class Command(Frame):
 		}
 		if self.isRemote():
 			kwargs['dest_addr_long'] = (
-				Encoding.NumberToSerialString(
+				encoding.NumberToSerialString(
 					self.getRemoteSerial()))
 			sendFn = senderXbee.remote_at
 		else:
@@ -298,7 +298,7 @@ class Command(Frame):
 
 
 	def _encodedFrameId(self):
-		return Encoding.NumberToString(self.getFrameId())
+		return encoding.NumberToString(self.getFrameId())
 
 
 	def _encodedParameter(self):
@@ -306,20 +306,20 @@ class Command(Frame):
 		if p is None:
 			return None
 		else:
-			return Encoding.NumberToString(p)
+			return encoding.NumberToString(p)
 
 
 	@classmethod
 	def _CreateFromDict(cls, d, usedKeys):
 		frameIdKey = str(Command.FIELD.frame_id)
 		frameId = d.get(frameIdKey)
-		frameId = Encoding.StringToNumber(d[frameIdKey])
+		frameId = encoding.StringToNumber(d[frameIdKey])
 		usedKeys.add(frameIdKey)
 
 		nameKey = str(Command.FIELD.command)
 		name = d.get(nameKey)
 		if name is not None:
-			name = EnumUtil.FromString(Command.NAME, name)
+			name = enumutil.FromString(Command.NAME, name)
 			usedKeys.add(nameKey)
 
 		commandClass = CommandRegistry.get(name)

@@ -1,4 +1,4 @@
-from .. import Encoding
+from .. import encoding
 from . import Command, CommandRegistry
 
 
@@ -16,7 +16,7 @@ class EncryptionEnable(Command):
 
 	def setEnabled(self, enabled):
 		self.__enabled = bool(enabled)
-		self.setParameter(Encoding.BooleanToString(self.__enabled))
+		self.setParameter(encoding.BooleanToString(self.__enabled))
 
 
 	def getEnabled(self):
@@ -31,7 +31,7 @@ class EncryptionEnable(Command):
 
 	def parseParameter(self, p):
 		self.setParameter(p)
-		self.__enabled = Encoding.StringToBoolean(p)
+		self.__enabled = encoding.StringToBoolean(p)
 
 
 

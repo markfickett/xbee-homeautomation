@@ -52,18 +52,18 @@ INTERACT_BANNER = ('The xbee object is available as "xb". A received frame list'
 
 def run(args):
 	log.debug('collecting plugins')
-	xh.SetupUtil.CollectPlugins()
+	xh.setuputil.CollectPlugins()
 	fl = getFrameLoggerPlugin()
-	xh.SetupUtil.SetLoggerRedisplayAfterEmit(logging.getLogger())
-	with xh.SetupUtil.InitializedXbee() as xb:
+	xh.setuputil.SetLoggerRedisplayAfterEmit(logging.getLogger())
+	with xh.setuputil.InitializedXbee() as xb:
 		log.info('connected to locally attached Xbee')
 		xh.protocol.Command.SetXbeeSingleton(xb)
-		with xh.SetupUtil.ActivatedPlugins():
+		with xh.setuputil.ActivatedPlugins():
 			log.info('started')
 
 			runLocalScript()
 
-			xh.SetupUtil.RunPythonStartup()
+			xh.setuputil.RunPythonStartup()
 			namespace = globals()
 			namespace.update(locals())
 			code.interact(banner=INTERACT_BANNER, local=namespace)
@@ -72,25 +72,25 @@ def run(args):
 
 
 def listNodeIds():
-	with xh.SetupUtil.InitializedXbee() as xb:
+	with xh.setuputil.InitializedXbee() as xb:
 		xh.protocol.Command.SetXbeeSingleton(xb)
 
 		try:
-			nTimeoutResponse = xh.Synchronous.SendAndWait(
+			nTimeoutResponse = xh.synchronous.SendAndWait(
 				xh.protocol.NodeDiscoveryTimeout())
-		except xh.Synchronous.TimeoutError, e:
+		except xh.synchronous.TimeoutError, e:
 			log.error(str(e))
 			return []
 		nTimeoutMillis = nTimeoutResponse.getTimeoutMillis()
 
-		nodeInfoResponses = xh.Synchronous.SendAndAccumulate(
+		nodeInfoResponses = xh.synchronous.SendAndAccumulate(
 			xh.protocol.NodeDiscover(),
 			nTimeoutMillis / 1000.0)
 		return [r.getNodeId() for r in nodeInfoResponses]
 
 
 def list(args):
-	xh.SetupUtil.CollectPlugins()
+	xh.setuputil.CollectPlugins()
 	pm = PluginManagerSingleton.get()
 	pluginInfoStr = 'Plugins:'
 	for p in pm.getAllPlugins():
@@ -127,7 +127,7 @@ def setup(args):
 		parser.error(
 			'Must either clear or supply serial numbers for setup.')
 
-	xh.SetupUtil.CollectPlugins()
+	xh.setuputil.CollectPlugins()
 	pm = PluginManagerSingleton.get()
 	pluginInfo = pm.getPluginByName(args.plugin)
 	if pluginInfo is None:

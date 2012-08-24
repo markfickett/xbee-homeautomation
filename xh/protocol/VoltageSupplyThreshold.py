@@ -1,6 +1,6 @@
 import logging
 
-from .. import Encoding
+from .. import encoding
 from . import Command, CommandRegistry
 
 
@@ -19,7 +19,7 @@ class VoltageSupplyThreshold(Command):
 
 	See page 135 of the Xbee Series 2 datasheet.
 	"""
-	__THRESHOLD_MAX = Encoding.NumberToVolts(0xFFFF)
+	__THRESHOLD_MAX = encoding.NumberToVolts(0xFFFF)
 
 	# recommended useful extrema from Xbee Series 2 datasheet,
 	# which are also more extreme than pro or S2B models
@@ -51,7 +51,7 @@ class VoltageSupplyThreshold(Command):
 		self.__threshold = min(threshold, self.__THRESHOLD_MAX)
 
 		self.setParameter(
-			int(Encoding.VoltsToNumber(self.__threshold)))
+			int(encoding.VoltsToNumber(self.__threshold)))
 
 
 	def getThresholdVolts(self):
@@ -59,7 +59,7 @@ class VoltageSupplyThreshold(Command):
 
 
 	def parseParameter(self, p):
-		self.__threshold = Encoding.StringToVolts(p)
+		self.__threshold = encoding.StringToVolts(p)
 
 
 	def getNamedValues(self):

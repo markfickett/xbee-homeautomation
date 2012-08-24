@@ -1,4 +1,4 @@
-from .. import Encoding
+from .. import encoding
 from . import Command, CommandRegistry
 
 
@@ -41,7 +41,7 @@ class NodeDiscoveryTimeout(Command):
 
 
 	def parseParameter(self, p):
-		n = Encoding.StringToNumber(p)
+		n = encoding.StringToNumber(p)
 		self.__timeoutMillis = n * self._MS_PER_PARAM_UNIT
 
 

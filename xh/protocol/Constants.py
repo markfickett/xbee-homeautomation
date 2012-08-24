@@ -1,4 +1,4 @@
-from .. import Util
+from .. import util
 from ..deps import Enum
 
 
@@ -108,5 +108,5 @@ PIN_NAME_TO_NUMBER = {
 }
 
 
-PIN_NUMBER_TO_NAMES = Util.InvertedDictWithRepeatedValues(PIN_NAME_TO_NUMBER)
+PIN_NUMBER_TO_NAMES = util.InvertedDictWithRepeatedValues(PIN_NAME_TO_NUMBER)
 

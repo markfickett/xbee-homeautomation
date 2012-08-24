@@ -1,3 +1,4 @@
+from .. import encoding
 from . import Command, CommandRegistry
 
 
@@ -64,7 +65,7 @@ class PullUpResistor(Command):
 
 
 	def setBitFieldFromPinNumbers(self, pinNumbers):
-		self.setBitField(Encoding.IndicesToBitField([
+		self.setBitField(encoding.IndicesToBitField([
 			self._PinNumberToBitFieldIndex(p) for p in pinNumbers]))
 
 
@@ -73,11 +74,11 @@ class PullUpResistor(Command):
 		if b is None:
 			return None
 		return set([self._PIN_NUMBER_ORDER[i] for i in
-			Encoding.BitFieldToIndexSet(b)])
+			encoding.BitFieldToIndexSet(b)])
 
 
 	def parseParameter(self, p):
-		self.setBitField(Encoding.StringToNumber(p))
+		self.setBitField(encoding.StringToNumber(p))
 
 
 	def getNamedValues(self):

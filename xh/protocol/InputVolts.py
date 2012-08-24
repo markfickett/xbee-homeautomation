@@ -1,4 +1,4 @@
-from .. import Encoding
+from .. import encoding
 from . import Command, CommandRegistry
 
 
@@ -20,7 +20,7 @@ class InputVolts(Command):
 
 
 	def parseParameter(self, p):
-		self.__volts = Encoding.StringToVolts(p)
+		self.__volts = encoding.StringToVolts(p)
 
 
 	def getNamedValues(self):

@@ -1,4 +1,4 @@
-from .. import Encoding
+from .. import encoding
 from ..deps import Enum
 from . import Registry
 
@@ -101,7 +101,7 @@ class Frame:
 
 	def _parseOptions(self, encodedOptions):
 		self.__options = Frame.OPTIONS[
-			Encoding.StringToNumber(encodedOptions) - 1]
+			encoding.StringToNumber(encodedOptions) - 1]
 
 
 	def getNamedValues(self):

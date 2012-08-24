@@ -1,4 +1,4 @@
-from .. import Encoding
+from .. import encoding
 from . import Command, CommandRegistry
 
 
@@ -58,7 +58,7 @@ class SampleRate(Command):
 
 
 	def parseParameter(self, p):
-		rateValue = Encoding.StringToNumber(p)
+		rateValue = encoding.StringToNumber(p)
 		if rateValue == self.RATE_DISABLED:
 			self.disableSampling()
 		else:
