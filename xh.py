@@ -130,7 +130,6 @@ def setup(args):
 	if pluginInfo is None:
 		parser.error('No plugin named %r.' % args.plugin)
 	pluginObj = pluginInfo.plugin_object
-	log.debug('%s has %s' % (pluginObj, pluginObj.getSerials()))
 	if args.clear:
 		pluginObj.clearSerials()
 	else:
@@ -191,8 +190,7 @@ listParser.set_defaults(func=list)
 
 setupParser = subparsers.add_parser('setup')
 setupParser.set_defaults(func=setup)
-setupParser.add_argument('--plugin', '-p',
-	help='The name of a plugin.')
+setupParser.add_argument('plugin', help='The name of a plugin.')
 setupParser.add_argument('--clear', '-c', action='store_true',
 	help='Clear all Xbee-plugin associations.')
 setupParser.add_argument('--serial', '-s', type=dec_or_hex_int, action='append',
