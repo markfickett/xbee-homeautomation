@@ -1,12 +1,12 @@
 #!/usr/bin/python
-"""Run or query the Xbee Home Automation system.
+"""Run or query the XBee Home Automation system.
 
 Examples:
-Attach to the pysically connected Xbee, run plugins and a Python interpreter.
+Attach to the pysically connected XBee, run plugins and a Python interpreter.
  $ %(prog)s run
-Print information about available Xbees and plugins.
+Print information about available XBees and plugins.
  $ %(prog)s list
-Associate an Xbee (by serial number) with a plugin.
+Associate an XBee (by serial number) with a plugin.
  $ %(prog)s setup --plugin 'Temperature Logger' --serial 0x0013a200abcd1234
 """
 
@@ -56,7 +56,7 @@ def run(args):
 	fl = getFrameLoggerPlugin()
 	xh.setuputil.SetLoggerRedisplayAfterEmit(logging.getLogger())
 	with xh.setuputil.InitializedXbee() as xb:
-		log.info('connected to locally attached Xbee')
+		log.info('connected to locally attached XBee')
 		xh.protocol.Command.SetXbeeSingleton(xb)
 		with xh.setuputil.ActivatedPlugins():
 			log.info('started')
@@ -102,7 +102,7 @@ def list(args):
 			infos.append(p.description)
 		serials = p.plugin_object.getSerials()
 		if serials:
-			infos.append('Xbee'
+			infos.append('XBee'
 				+ ('' if len(serials) is 1 else 's'))
 			infos.append(', '.join(['0x%x' % s for s in serials]))
 		pluginInfoStr += '\n\t' + ' '.join(infos)
@@ -113,7 +113,7 @@ def list(args):
 	except:
 		nodeInfoList = []
 
-	nodeInfoStr = 'Xbees:'
+	nodeInfoStr = 'XBees:'
 	for n in nodeInfoList:
 		lineStr = str(n)
 		nodeInfoStr += '\n\t' + lineStr
@@ -195,12 +195,12 @@ setupParser = subparsers.add_parser('setup')
 setupParser.set_defaults(func=setup)
 setupParser.add_argument('plugin', help='The name of a plugin.')
 setupParser.add_argument('--clear', '-c', action='store_true',
-	help='Clear all Xbee-plugin associations.')
+	help='Clear all XBee-plugin associations.')
 setupParser.add_argument('--serial', '-s', type=dec_or_hex_int, action='append',
-	help='The serial number (hex or decimal) of an Xbee module.'
+	help='The serial number (hex or decimal) of an XBee module.'
 	+ ' May be repated.')
 setupParser.add_argument('--replace', '-r', action='store_true',
-	help='Replace all existing Xbee-plugin associations.'
+	help='Replace all existing XBee-plugin associations.'
 	+ 'By default, adds a new association.')
 
 
