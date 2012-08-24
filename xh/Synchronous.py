@@ -23,7 +23,7 @@ TimeoutError = multiprocessing.TimeoutError
 
 
 
-class __Response:
+class _Response:
 	def __init__(self):
 		self.__value = None
 
@@ -44,7 +44,7 @@ def SendAndWait(command, xb=None):
 	@raise TimeoutError if no response is received
 		within a short timeout
 	"""
-	r = __Response()
+	r = _Response()
 	id = command.getFrameId()
 	def recordSingleResponseCb(sender=None, signal=None, frame=None):
 		if hasattr(frame, 'getFrameId') and frame.getFrameId() == id:
@@ -69,7 +69,7 @@ def SendAndAccumulate(command, timeoutSeconds, xb=None):
 	Send a Command and wait to accumulate multiple responses.
 	@return a list of Frames received in response
 	"""
-	r = __Response()
+	r = _Response()
 	r.set([])
 
 	id = command.getFrameId()
