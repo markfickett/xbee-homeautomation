@@ -22,7 +22,7 @@ class Plugin(IPlugin):
 
 		self.__receiveFrames = bool(receiveFrames)
 
-		self.__serials = set()
+		self.clearSerials()
 		c = Config.get()
 		sec = self._getConfigSection()
 		if c.has_section(sec):
@@ -63,6 +63,10 @@ class Plugin(IPlugin):
 
 	def getSerials(self):
 		return set(self.__serials)
+
+
+	def clearSerials(self):
+		self.__serials = set()
 
 
 	def _frameReceived(self, frame):
