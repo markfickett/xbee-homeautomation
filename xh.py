@@ -6,8 +6,11 @@ formatter_class=argparse.RawDescriptionHelpFormatter,
 description="""
 Issue commands to or read data from the XBee Home Automation system.
 Examples:
- $ %(prog)s run # attach to the pysically connected Xbee and run plugins
- $ %(prog)s list # list information about available Xbees and plugins
+ # Attach to the pysically connected Xbee and run plugins.
+ $ %(prog)s run
+ # Print information about available Xbees and plugins.
+ $ %(prog)s list
+ # Associate an Xbee (by serial number) with a plugin.
  $ %(prog)s setup --plugin 'Temperature Logger' --serial 0x1a23
 """
 )
@@ -23,15 +26,6 @@ from yapsy.PluginManager import PluginManagerSingleton
 
 LOCAL_SCRIPT = os.path.join(os.path.dirname(__file__), 'xh.local.py')
 FRAME_LOGGER_NAME = 'Frame Logger'
-
-COMMAND = Enum(
-	'list',
-	'run',
-	'setup',
-)
-parser.add_argument('--verbose', '-v', action='count')
-parser.add_argument('--quiet', '-q', action='count')
-parser.add_argument('command', choices=[str(c) for c in COMMAND])
 
 
 def runLocalScript():
@@ -53,7 +47,7 @@ INTERACT_BANNER = ('The xbee object is available as "xb". A received frame list'
 	+ ' Type control-D to exit.')
 
 
-def run():
+def run(args):
 	log.debug('collecting plugins')
 	xh.SetupUtil.CollectPlugins()
 	fl = getFrameLoggerPlugin()
@@ -92,7 +86,7 @@ def listNodeIds():
 		return [r.getNodeId() for r in nodeInfoResponses]
 
 
-def list():
+def list(args):
 	xh.SetupUtil.CollectPlugins()
 	pm = PluginManagerSingleton.get()
 	pluginInfoStr = 'Plugins:'
@@ -123,15 +117,27 @@ def list():
 	log.info(nodeInfoStr)
 
 
-def setup():
-	raise NotImplementedError()
+def setup(args):
+	if args.plugin is None:
+		parser.error('Must specify plugin for setup.')
+	if args.clear == bool(args.serial):
+		parser.error(
+			'Must either clear or supply serial numbers for setup.')
 
-
-COMMAND_TO_FN = {
-	COMMAND.run: run,
-	COMMAND.list: list,
-	COMMAND.setup: setup,
-}
+	xh.SetupUtil.CollectPlugins()
+	pm = PluginManagerSingleton.get()
+	pluginInfo = pm.getPluginByName(args.plugin)
+	if pluginInfo is None:
+		parser.error('No plugin named %r.' % args.plugin)
+	pluginObj = pluginInfo.plugin_object
+	log.debug('%s has %s' % (pluginObj, pluginObj.getSerials()))
+	if args.clear:
+		pluginObj.clearSerials()
+	else:
+		serials = set(args.serial)
+		if not args.replace:
+			serials = serials.union(pluginObj.getSerials())
+		pluginObj.setSerials(serials)
 
 
 LOG_LEVELS = [
@@ -162,10 +168,40 @@ def setVerbosity(verbose, quiet):
 def main():
 	args = parser.parse_args()
 	setVerbosity(args.verbose, args.quiet)
-	command = xh.EnumUtil.FromString(COMMAND, args.command)
 	with xh.Config():
 		log.debug('opened config')
-		COMMAND_TO_FN[command]()
+		args.func(args)
+
+
+def dec_or_hex_int(string):
+	if string.isdigit():
+		return int(string)
+	else:
+		return int(string, 16)
+
+
+parser.add_argument('--verbose', '-v', action='count')
+parser.add_argument('--quiet', '-q', action='count')
+subparsers = parser.add_subparsers(title='commands')
+
+runParser = subparsers.add_parser('run')
+runParser.set_defaults(func=run)
+
+listParser = subparsers.add_parser('list')
+listParser.set_defaults(func=list)
+
+setupParser = subparsers.add_parser('setup')
+setupParser.set_defaults(func=setup)
+setupParser.add_argument('--plugin', '-p',
+	help='The name of a plugin.')
+setupParser.add_argument('--clear', '-c', action='store_true',
+	help='Clear all Xbee-plugin associations.')
+setupParser.add_argument('--serial', '-s', type=dec_or_hex_int, action='append',
+	help='The serial number (hex or decimal) of an Xbee module.'
+	+ ' May be repated.')
+setupParser.add_argument('--replace', '-r', action='store_true',
+	help='Replace all existing Xbee-plugin associations.'
+	+ 'By default, adds a new association.')
 
 
 main()
