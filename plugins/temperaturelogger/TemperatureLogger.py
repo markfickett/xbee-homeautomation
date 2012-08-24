@@ -1,5 +1,8 @@
+import datetime
+import logging
+import threading
+
 import xh
-import datetime, threading, logging
 from xh.protocol import PIN
 
 log = logging.getLogger('TemperatureLogger')
