@@ -3,15 +3,15 @@ import argparse
 
 parser = argparse.ArgumentParser(
 formatter_class=argparse.RawDescriptionHelpFormatter,
-description="""
-Issue commands to or read data from the XBee Home Automation system.
+description="""Run or query the Xbee Home Automation system.
+
 Examples:
- # Attach to the pysically connected Xbee and run plugins.
+Attach to the pysically connected Xbee, run plugins and a Python interpreter.
  $ %(prog)s run
- # Print information about available Xbees and plugins.
+Print information about available Xbees and plugins.
  $ %(prog)s list
- # Associate an Xbee (by serial number) with a plugin.
- $ %(prog)s setup --plugin 'Temperature Logger' --serial 0x1a23
+Associate an Xbee (by serial number) with a plugin.
+ $ %(prog)s setup --plugin 'Temperature Logger' --serial 0x0013a200abcd1234
 """
 )
 
