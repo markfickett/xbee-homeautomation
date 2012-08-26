@@ -1,3 +1,7 @@
+import contextlib
+
+
+
 def InvertedDict(d):
 	return dict([(v, k) for k, v in d.iteritems()])
 
@@ -13,3 +17,9 @@ def InvertedDictWithRepeatedValues(d):
 		keys = keys + (k,)
 		o[v] = keys
 	return o
+
+
+@contextlib.contextmanager
+def NoopContext():
+	yield None
+
