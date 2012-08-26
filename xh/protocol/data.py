@@ -6,6 +6,7 @@ from ..deps import Enum
 from . import Frame, FrameRegistry, PIN, Registry
 
 log = logging.getLogger('xh.protocol.Data')
+VCC_BUG_URL = 'http://code.google.com/p/python-xbee/issues/detail?id=35'
 
 
 __all__ = [
@@ -19,6 +20,16 @@ __all__ = [
 
 
 class Data(Frame):
+	"""
+	Automatically sampled values. See SampleRate.
+
+	V+ (Vcc level; see VoltageSupplyThreshold) samples are incorrect, due
+	to a bug in xbee-python (analog values are clamped to 0x3FF, see
+	%s ). However,
+	values returned for other analog pins, and for InputSample, are correct.
+	"""
+
+
 	FIELD = Enum(
 		'source_addr',
 		'source_addr_long',
@@ -116,6 +127,9 @@ class Data(Frame):
 		return data
 
 
+Data.__doc__ = Data.__doc__ % VCC_BUG_URL
+
+
 
 class Sample:
 	PIN_TYPE = Enum(
@@ -146,6 +160,13 @@ class Sample:
 
 	@classmethod
 	def CreateFromDict(cls, d):
+		"""
+		Determine whether a samples are analog or digital, then dispatch
+		parsing to the appropriate Sample subclass.
+		@param d a map of XBee API sample keys (ex: "dio-5") to sample
+			values (numeric for analog pins; numeric or boolean for
+			digital pins)
+		"""
 		for key, numericValue in d.iteritems():
 			pinTypeStr, pinNum = key.split('-')
 			pinNum = int(pinNum)
@@ -181,11 +202,15 @@ class AnalogSample(Sample):
 
 	@classmethod
 	def CreateFromRawValues(cls, pinNum, numericValue):
+		v = encoding.NumberToVolts(numericValue)
 		if pinNum == cls._PIN_NUM_VCC:
 			pinName = PIN.VCC
+			log.warning(('Value %.3fv for %s is probably incorrect!'
+			+ ' See %s.')
+			% (v, pinName, VCC_BUG_URL))
 		else:
 			pinName = enumutil.FromString(PIN, 'AD%d' % pinNum)
-		return cls(pinName, encoding.NumberToVolts(numericValue))
+		return cls(pinName, v)
 
 
 Sample._Registry.put(Sample.PIN_TYPE.adc, AnalogSample)

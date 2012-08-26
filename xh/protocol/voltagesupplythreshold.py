@@ -14,6 +14,10 @@ class VoltageSupplyThreshold(Command):
 	in I/O samples.
 
 	See page 135 of the Xbee Series 2 datasheet.
+
+	Vcc samples returned via automatic sampling are incorrect due to a
+	bug in xbee-python (see Data), however those returned from
+	InputSample are correct.
 	"""
 	__THRESHOLD_MAX = encoding.NumberToVolts(0xFFFF)
 
