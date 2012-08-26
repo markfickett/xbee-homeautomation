@@ -1,5 +1,9 @@
+import logging
+
 from .. import encoding
-from . import Command, CommandRegistry
+from . import Command, CommandRegistry, PIN_NAME_TO_NUMBER, PIN_NUMBER_TO_NAMES
+
+log = logging.getLogger('PullUpResistor')
 
 
 
@@ -69,6 +73,11 @@ class PullUpResistor(Command):
 			self._PinNumberToBitFieldIndex(p) for p in pinNumbers]))
 
 
+	def setBitFieldFromPinNames(self, pinNames):
+		self.setBitFieldFromPinNumbers(self,
+			[PIN_NAME_TO_NUMBER[n] for n in pinNames])
+
+
 	def getPinNumbersFromBitField(self):
 		b = self.getBitField()
 		if b is None:
@@ -77,15 +86,25 @@ class PullUpResistor(Command):
 			encoding.BitFieldToIndexSet(b)])
 
 
+	def getPinNamesFromBitField(self):
+		nums = self.getPinNumbersFromBitField()
+		if nums is None:
+			return None
+		return set([iter(PIN_NUMBER_TO_NAMES[n]).next() for n in nums])
+
+
 	def parseParameter(self, p):
 		self.setBitField(encoding.StringToNumber(p))
 
 
 	def getNamedValues(self):
 		d = Command.getNamedValues(self, includeParameter=False)
+		pins = self.getPinNamesFromBitField()
+		if pins is not None:
+			pins = [str(p) for p in pins]
 		d.update({
 			'bitField': self.getBitField(),
-			'enabledPins': self.getPinNumbersFromBitField(),
+			'enabledPins': pins,
 		})
 		return d
 
