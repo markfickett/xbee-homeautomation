@@ -42,7 +42,7 @@ def runLocalScript():
 def getFrameLoggerPlugin():
 	pm = PluginManagerSingleton.get()
 	p = pm.getPluginByName(FRAME_LOGGER_NAME)
-	return p.plugin_object
+	return p and p.plugin_object
 
 
 INTERACT_BANNER = ('The xbee object is available as "xb". A received frame list'
@@ -52,13 +52,15 @@ INTERACT_BANNER = ('The xbee object is available as "xb". A received frame list'
 
 def run(args):
 	log.debug('collecting plugins')
-	xh.setuputil.CollectPlugins()
+	if not args.noplugins:
+		xh.setuputil.CollectPlugins()
 	fl = getFrameLoggerPlugin()
 	xh.setuputil.SetLoggerRedisplayAfterEmit(logging.getLogger())
 	with xh.setuputil.InitializedXbee() as xb:
 		log.info('connected to locally attached XBee')
 		xh.protocol.Command.SetXbeeSingleton(xb)
-		with xh.setuputil.ActivatedPlugins():
+		with (xh.util.NoopContext() if args.noplugins
+				else xh.setuputil.ActivatedPlugins()):
 			log.info('started')
 
 			runLocalScript()
@@ -187,6 +189,8 @@ subparsers = parser.add_subparsers(title='commands')
 
 runParser = subparsers.add_parser('run')
 runParser.set_defaults(func=run)
+runParser.add_argument('--no-plugins', action='store_true', dest='noplugins',
+	help='Do not load or activate any plugins.')
 
 listParser = subparsers.add_parser('list')
 listParser.set_defaults(func=list)
