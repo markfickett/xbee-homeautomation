@@ -1,5 +1,9 @@
+import logging
+
 from .. import encoding
 from . import AnalogSample, Command, CommandRegistry, DigitalSample
+
+log = logging.getLogger('InputSample')
 
 
 
@@ -9,6 +13,7 @@ class InputSample(Command):
 	are sent in the IS response frame. A module with no pins configured as
 	input will respond with an error.
 	"""
+	_EXPECTED_NUM_SETS = 1
 
 
 	def __init__(self, **kwargs):
@@ -30,14 +35,20 @@ class InputSample(Command):
 			0	receive options: 0x01 = ack, 0x02 = broadcast
 			1-2	digital channel mask (bit field)
 			3	analog channel mask
-			4-5	digital samples (bit field, matching channels)
+			?4-5	digital samples (bit field, matching channels,
+				only present if any digital channels are on)
 			6-7+	optional analog samples (two bytes each)
 		"""
 		self.setParameter(encoded)
 		self.__samples = []
 		offset = 0
 
-		self._parseOptions(encoded[offset:offset+1])
+		# The number of sample sets is expected to always be 1.
+		numSets = encoding.StringToNumber(encoded[offset:offset+1])
+		if numSets != self._EXPECTED_NUM_SETS:
+			raise RuntimeError(('Number of sample sets is expected '
+			+ 'to always be %d, but is %d.')
+			% (self._EXPECTED_NUM_SETS, numSets))
 		offset += 1
 
 		digitalPinNumbers = encoding.BitFieldToIndexSet(
@@ -48,14 +59,19 @@ class InputSample(Command):
 			encoding.StringToNumber(encoded[offset:offset+1])))
 		offset += 1
 
-		digitalOnValues = encoding.BitFieldToIndexSet(
-			encoding.StringToNumber(encoded[offset:offset+2]))
+		if digitalPinNumbers:
+			digitalOnValues = encoding.BitFieldToIndexSet(
+				encoding.StringToNumber(
+					encoded[offset:offset+2]))
+			offset += 2
+		else:
+			digitalOnValues = set()
 
 		analogValues = []
-		while offset + 1 < len(encoded):
+		while offset + 2 <= len(encoded):
 			analogValues.append(encoding.StringToNumber(
-				encoded[offset:offset+1]))
-			offset += 1
+				encoded[offset:offset+2]))
+			offset += 2
 
 		for digitalPinNum in digitalPinNumbers:
 			digitalValue = digitalPinNum in digitalOnValues
@@ -63,9 +79,10 @@ class InputSample(Command):
 				digitalPinNum, digitalValue))
 
 		for analogPinNum, analogValueNum in zip(
-		analogPinNumbers, analogValues):
-			self.__samples.append(AnalogSample.CreateFromRawValues(
-				analogPinNum, analogValueNum))
+				analogPinNumbers, analogValues):
+			analogSample = AnalogSample.CreateFromRawValues(
+				analogPinNum, analogValueNum)
+			self.__samples.append(analogSample)
 
 
 	def getNamedValues(self):
