@@ -76,8 +76,11 @@ class Command(Frame):
 	)
 
 
-	# Next unclaimed frame ID for a command to send.
-	__sendingFrameId = 1
+	# max frame ID (must fit in 1 byte)
+	_MAX_FRAME_ID = 255
+	_MIN_FRAME_ID = 1
+	# next unclaimed frame ID for a command to send
+	__sendingFrameId = _MIN_FRAME_ID
 	__frameIdLock = threading.Lock()
 
 	# For sending, keep an Xbee object singleton and make thread-safe.
@@ -110,8 +113,12 @@ class Command(Frame):
 
 		if responseFrameId is None:
 			with Command.__frameIdLock:
-				self.__frameId = Command.__sendingFrameId
-				Command.__sendingFrameId += 1
+				next = Command.__sendingFrameId
+				self.__frameId = next
+				next += 1
+				if (next > Command._MAX_FRAME_ID):
+					next = Command._MIN_FRAME_ID
+				Command.__sendingFrameId = next
 			if dest is not None:
 				self.__remoteSerial = int(dest)
 		else:
