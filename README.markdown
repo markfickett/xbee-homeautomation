@@ -67,5 +67,9 @@ Related Work
 ------------
 * [Indigo](http://www.perceptiveautomation.com/indigo/index.html) home automation server for Mac/iOS with Python plugins
 * [INSTEON](http://www.insteon.net/products-home.html) home automation devices
-* Digi [XBee project gallery](http://www.idigi.com/blog/community/xbee-project-gallery/) and [XBee examples and guides](http://examples.digi.com/) and [Digi sensor modules](http://www.digi.com/wiki/developer/index.php/XBee_Sensors)
+* Digi
+    * [XBee project gallery](http://www.idigi.com/blog/community/xbee-project-gallery/)
+    * [XBee examples and guides](http://examples.digi.com/)
+    * [Digi sensor modules](http://www.digi.com/wiki/developer/index.php/XBee_Sensors)
+    * [iDigi Dia](http://www.digi.com/wiki/developer/index.php/IDigi_Dia_Wiki), a Python-based control / data-collection framework to run on Digi gateways ([example code](http://www.digi.com/wiki/developer/index.php/Google_Gadget_LTH_Sensor_Example))
 * [Home Automation project by Arvis Cimermanis](http://www.arvisc.info/) using XBee
