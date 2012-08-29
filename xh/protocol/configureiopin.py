@@ -106,7 +106,14 @@ class ConfigureIoPin(Command):
 		PIN.PWM0: (FUNCTION.RSSI,) + __D_OR_DISABLED,
 		PIN.DIO11: __D_OR_UNMONITORED,
 		PIN.DIO12: __D_OR_UNMONITORED,
-		PIN.AD0: __D + (FUNCTION.COMM, FUNCTION.ANALOG_INPUT),
+
+		# COMM is documented as having no DISABLED function (see p.134
+		# of the XBee series 2 datasheet), but setting function=0 via
+		# API produces no error, and with function=1 (COMM) the pin's
+		# value is still included in the sample set.
+		PIN.AD0: __D_OR_DISABLED + (FUNCTION.COMM,
+			FUNCTION.ANALOG_INPUT),
+
 		PIN.AD1: __A_OR_D_OR_DISABLED,
 		PIN.AD2: __A_OR_D_OR_DISABLED,
 		PIN.AD3: __A_OR_D_OR_DISABLED,
