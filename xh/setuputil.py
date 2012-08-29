@@ -140,6 +140,11 @@ def RunPythonStartup():
 		execfile(startup)
 
 
+# If readline.redisplay is called more than ten times in a row without the line
+# buffer contents changing (and for each call thereafter), readline rings the
+# terminal bell. Avoid repeat calling without terminal interaction.
+global _previousReadlineBufferContents
+_previousReadlineBufferContents = None
 def SetLoggerRedisplayAfterEmit(loggerInst):
 	"""
 	Make the given logger('s last Handler) call readline.redisplay() after
@@ -150,7 +155,11 @@ def SetLoggerRedisplayAfterEmit(loggerInst):
 	oldEmitFn = handler.emit
 	def newEmitFn(*args, **kwargs):
 		oldEmitFn(*args, **kwargs)
-		readline.redisplay()
+		global _previousReadlineBufferContents
+		b = readline.get_line_buffer()
+		if b != _previousReadlineBufferContents:
+			readline.redisplay()
+			_previousReadlineBufferContents = b
 	handler.emit = newEmitFn
 
 
