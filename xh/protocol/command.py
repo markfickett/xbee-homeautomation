@@ -47,7 +47,7 @@ class Command(Frame):
 		# 'D8', # configure IO pin DIO8: not yet supported acc. docs
 		'EE', # encryption enable (0 or 1)
 		'ID', # network id
-		'IR', # IO sample rate
+		'IR', # IO sample rate (see SampleRate)
 		'IS', # force sample on all digital, analog inputs
 		'KY', # xh.encoding.NumberToString(xh.Config.LINK_KEY)
 		'MY', # node's network ID (0 for coordinator)
@@ -58,10 +58,18 @@ class Command(Frame):
 		'P1', # configure IO pin DIO11
 		'P2', # configure IO pin DIO12
 		# 'P3', # configure IO pin DIO13: not yet supported acc. docs
+		'PO', # polling rate
 		'PR', # PullUpResistor (bit field for internal resistors)
 		'SH', # serial (high bits)
+		'SI', # sleep immediately
 		'SL', # serial (low bits)
+		'SM', # SleepMode
+		'SN', # NumberOfSleepPeriods
+		'SO', # sleep options
+		'SP', # SleepPeriod
+		'ST', # TimeBeforeSleep
 		'V+', # voltage supply monitoring (threshold for vcc sampling)
+		'WH', # WakeHostTimer
 		'WR', # write configuration to non-volatile memory
 	)
 
