@@ -4,10 +4,12 @@ from . import Command, CommandRegistry, NumberCommand
 
 class SleepPeriod(NumberCommand):
 	"""
-	In cyclic sleep, how long the device will sleep at a time. Rounded to
-	10ms increments.
+	In cyclic sleep, how long the device will sleep at a time. Valid values
+	are 320ms (the default) to 28s, rounded to 10s increments.
 
-	On a parent device, how long to buffer messages for sleepers.
+	On a parent device, this specifies how long to buffer messages for
+	sleepers. (The actual timeout is 1.2x the specified value, so the
+	maximum is 30s.)
 
 	See pages 85 (sleep details) and 137 (command listing) of the XBee
 	series 2 datasheet.
