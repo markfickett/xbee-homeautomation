@@ -89,7 +89,7 @@ class TemperatureLogger(xh.Plugin):
 	def __logSample(self, sourceSerial, timestamp, sample):
 		p = sample.getPinName()
 		name = str(p)
-		if p in (PIN.AD0, PIN.AD1, PIN.AD2):
+		if p in (PIN.AD0, PIN.AD1, PIN.AD2, PIN.AD3):
 			value = self.__voltsToF(sample.getVolts())
 			name = name + '-F'
 		elif p is PIN.VCC:
@@ -103,7 +103,7 @@ class TemperatureLogger(xh.Plugin):
 
 	def __recordValue(self, sourceSerial, timestamp, textName, value):
 		name = '0x%x-%s' % (sourceSerial, textName)
-		log.info('%s\t%s\t%.3f'
+		log.debug('%s\t%s\t%.3f'
 			% (xh.protocol.Data.FormatTimestamp(timestamp),
 				name, value))
 		self.__dataLogger.recordValue(name, timestamp, value)
