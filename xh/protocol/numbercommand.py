@@ -38,6 +38,7 @@ class NumberCommand(Command):
 				self._MIN * self._EXTERNAL_PER_INTERNAL, u,
 				self._MAX * self._EXTERNAL_PER_INTERNAL, u))
 			self.__num = iNum
+			self.setParameter(self.__num)
 
 
 	def __getattr__(self, name):
