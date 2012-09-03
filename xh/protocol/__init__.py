@@ -24,5 +24,6 @@ from sleepperiod import SleepPeriod
 from timebeforesleep import TimeBeforeSleep
 from voltagesupplythreshold import VoltageSupplyThreshold
 from wakehosttimer import WakeHostTimer
+from write import Write
 
 from parse import ParseFromDict, ParseFromDictSafe
