@@ -6,7 +6,6 @@ from ..deps import Enum
 from . import Frame, FrameRegistry, PIN, Registry
 
 log = logging.getLogger('xh.protocol.Data')
-VCC_BUG_URL = 'http://code.google.com/p/python-xbee/issues/detail?id=35'
 
 
 __all__ = [
@@ -21,12 +20,7 @@ __all__ = [
 
 class Data(Frame):
 	"""
-	Automatically sampled values. See SampleRate.
-
-	V+ (Vcc level; see VoltageSupplyThreshold) samples are incorrect, due
-	to a bug in xbee-python (analog values are clamped to 0x3FF, see
-	%s ). However,
-	values returned for other analog pins, and for InputSample, are correct.
+	Automatically sampled values. See SampleRate and VoltageSupplyThreshold.
 	"""
 
 
@@ -127,9 +121,6 @@ class Data(Frame):
 		return data
 
 
-Data.__doc__ = Data.__doc__ % VCC_BUG_URL
-
-
 
 class Sample:
 	PIN_TYPE = Enum(
@@ -205,9 +196,6 @@ class AnalogSample(Sample):
 		v = encoding.NumberToVolts(numericValue)
 		if pinNum == cls._PIN_NUM_VCC:
 			pinName = PIN.VCC
-			log.warning(('Value %.3fv for %s is probably incorrect!'
-			+ ' See %s.')
-			% (v, pinName, VCC_BUG_URL))
 		else:
 			pinName = enumutil.FromString(PIN, 'AD%d' % pinNum)
 		return cls(pinName, v)
