@@ -50,6 +50,7 @@ class SleepMode(Command):
 					'Given mode %s not one of %s.'
 					% (mode, self.MODE))
 			self.__mode = mode
+			self.setParameter(self._MODE_TO_NUM[self.__mode])
 
 
 	def getMode(self):
