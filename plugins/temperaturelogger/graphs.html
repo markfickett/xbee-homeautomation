@@ -1,0 +1,127 @@
+<html>
+<head>
+<title>Graphs!</title>
+<script type="text/javascript"
+	src="http://dygraphs.com/dygraph-combined.js"></script>
+
+<style type="text/css">
+.chart {
+	width: 1000px;
+	height: 600px;
+	border-left: 4px solid #ccc;
+	margin-top: 4ex;
+}
+p {
+	max-width: 100ex;
+}
+</style>
+
+</head>
+
+<body>
+	<p>Temperature (and battery/supply voltage) data from two <a href="http://en.wikipedia.org/wiki/XBee">XBee</a>s in my apartment. Temperature from three <a href="http://learn.adafruit.com/tmp36-temperature-sensor">TEMP36 sensors</a> which claim &plusmn;1&deg;C accuracy typical (which maps to 1&frac12;&deg;F).</p>
+	<p>Mouse over to see values; hover over annotations for details. Drag to zoom, double-click to zoom back out. Rendered by <a href="http://dygraphs.com/">Dygraphs</a>. (By default, graphs are zoomed to the last 3 days.)</p>
+
+	<p>See also: <a href="http://weatherspark.com/#!dashboard;q=Cambridge%2C%20MA%2C%20USA">weather graphs for Cambridge, MA</a>.</p>
+
+	<div id="temperatureGraph" class="chart"></div>
+	<div id="voltageGraph" class="chart"></div>
+</body>
+
+<script type="text/javascript">
+var DEFAULT_WINDOW_MILLIS = 3 * 24 * 60 * 60 * 1000;
+var TZ_OFFSET_MILLIS = 1000 * 60 * new Date().getTimezoneOffset();
+var NOW = new Date().valueOf() + TZ_OFFSET_MILLIS;
+var HTTP_OK = 200;
+var HTTP_CHROME_LOCAL_OK = 0;
+var XHR_STATE_READY = 4;
+
+function drawGraph(elementId, graphData, titleHtml, annotations) {
+	var g = new Dygraph(
+		document.getElementById(elementId),
+		graphData,
+		{
+			title: titleHtml,
+			connectSeparatedPoints: true,
+			drawGapEdgePoints: true,
+			dateWindow:
+				[NOW - DEFAULT_WINDOW_MILLIS, NOW],
+		});
+	if (annotations) {
+		g.setAnnotations(annotations);
+	}
+}
+
+function fetchAndDrawGraph(eid, fileName, title, ann) {
+	var req = new XMLHttpRequest();
+	req.onreadystatechange = function() {
+		if (req.readyState == XHR_STATE_READY &&
+				(req.status == HTTP_OK ||
+				req.status == HTTP_CHROME_LOCAL_OK)) {
+			drawGraph(eid, req.responseText, title, ann);
+		}
+	};
+	req.open('GET', fileName, true);
+	req.send(null);
+}
+
+var temperatureAnnotations = [
+	{	series: 'Bathroom a',
+		x: '2012/08/27 22:54:44',
+		shortText: 'X',
+		text: 'no reverse-voltage protection (sensor fried)',
+	},
+	{	series: 'Bedroom',
+		x: '2012/08/28 04:20:51',
+		shortText: 'AC',
+		text: 'turn on air conditioning (central air)',
+	},
+	{	series: 'Outdoor',
+		x: '2012/08/28 14:26:02',
+		shortText: 'R',
+		text: 'rain ends mid-morning',
+	},
+];
+
+var voltageAnnotations = [
+	{	series: 'Bedroom',
+		x: '2012/08/28 01:01:34',
+		shortText: '3v',
+		text: '3.3v regulated from FTDI USB adapter'
+			+ ' attached to A/C adapter',
+	},
+	{	series: 'Bathroom',
+		x: '2012/08/29 10:51:44',
+		shortText: 'Ni',
+		text: 'fresh 3xNiMH charge, no sleeping',
+	},
+	{	series: 'Bathroom',
+		x: '2012/08/31 12:08:14',
+		shortText: 'LP',
+		text: 'fresh LiPo charge, no sleeping',
+	},
+	{	series: 'Bathroom',
+		x: '2012/09/03 02:36:12',
+		shortText: 'LP',
+		text: 'fresh LiPo charge, with 28s sleep cycle'
+			+ ' and 5 minute sampling cycle',
+	},
+	{	series: 'Bedroom',
+		x: '2012/09/03 13:35:09',
+		shortText: 'Ni',
+		text: 'fresh 3xNiMH charge, with 28s sleep cycle'
+			+ ' and 5 minute sampling cycle',
+	},
+];
+
+fetchAndDrawGraph('temperatureGraph',
+	'combined-temperature.csv',
+	'Temperature (&deg;F)',
+	temperatureAnnotations);
+fetchAndDrawGraph('voltageGraph',
+	'combined-voltage.csv',
+	'Voltage',
+	voltageAnnotations);
+</script>
+
+</html>
