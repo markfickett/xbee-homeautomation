@@ -1,7 +1,7 @@
 import logging
+import os
 
 import xh
-import locations
 
 
 log = logging.getLogger('DataLogger')
