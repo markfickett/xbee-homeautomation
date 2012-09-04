@@ -3,13 +3,21 @@ Generate a combined CSV for graphing via dygraph.
 """
 
 import datetime
+import logging
 import os
+import sys
 
-from locations import DATA_DIR
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+import xh
 
-OUT_FILE_NAME_TEMPLATE = 'combined-%s.csv'
+log = logging.getLogger('combine')
+log.setLevel(logging.WARNING)
+
+DATA_DIR = xh.Config.DATA_DIR
+
+OUT_FILE_NAME_TEMPLATE = os.path.join(DATA_DIR, 'combined-%s.csv')
 TIMESTAMP_COLUMN_HEADER = 'Timestamp'
-DATETIME_FORMAT = '%Y %b %d %H:%M:%S UTC' # xh.protocol.Date.DATETIME_FORMAT
+DATETIME_FORMAT = xh.protocol.Data.DATETIME_FORMAT
 DYGRAPH_FORMAT = '%Y/%m/%d %H:%M:%S'
 GAP_DT = datetime.timedelta(minutes=10)
 GAP_VALUE = 'NaN'
@@ -52,9 +60,9 @@ def writeCombinedCsv(outFileName, inNameMap):
 	nColumns = len(columnNames)
 	for inFileLocalName, columnName in inNameMap.iteritems():
 		inFileName = os.path.join(DATA_DIR, inFileLocalName)
-		print 'Processing %s' % inFileName
+		log.debug('Processing %s' % inFileName)
 		if not os.path.isfile(inFileName):
-			print 'Not a file, skipping: %s' % inFileName
+			log.info('Not a file, skipping: %s' % inFileName)
 			continue
 		columnIndex = columnNames.index(columnName)
 		with open(inFileName) as inFile:
