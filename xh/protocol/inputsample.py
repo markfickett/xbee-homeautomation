@@ -12,6 +12,9 @@ class InputSample(Command):
 	Force samples to be taken of all the configured input pins. The samples
 	are sent in the IS response frame. A module with no pins configured as
 	input will respond with an error.
+
+	Note that sleeping devices will not wait before sampling upon receipt of
+	this command (see also NumberOfSleepPeriods and WakeHostTimer).
 	"""
 	_EXPECTED_NUM_SETS = 1
 
