@@ -5,6 +5,7 @@ Generate a combined CSV for graphing via dygraph.
 import datetime
 import logging
 import os
+import subprocess
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -14,6 +15,10 @@ log = logging.getLogger('combine')
 log.setLevel(logging.WARNING)
 
 DATA_DIR = xh.Config.DATA_DIR
+def getUploadTarget():
+	name = 'DATA_UPLOAD_TARGET'
+	return getattr(xh.Config, name) if hasattr(xh.Config, name) else None
+DATA_UPLOAD_TARGET = getUploadTarget()
 
 OUT_FILE_NAME_TEMPLATE = os.path.join(DATA_DIR, 'combined-%s.csv')
 TIMESTAMP_COLUMN_HEADER = 'Timestamp'
@@ -89,3 +94,20 @@ def writeCombinedCsv(outFileName, inNameMap):
 
 writeCombinedCsv(OUT_TEMPERATURE_FILE_NAME, TEMPERATURE_NAMES)
 writeCombinedCsv(OUT_VOLTAGE_FILE_NAME, VOLTAGE_NAMES)
+
+if DATA_UPLOAD_TARGET:
+	uploadCommand = [
+		'rsync',
+		'-rv',
+		DATA_DIR + os.path.sep,
+		DATA_UPLOAD_TARGET,
+		'--include=combined-*',
+		'--exclude=*',
+	]
+	log.debug('running %s' % uploadCommand)
+	result = subprocess.call(uploadCommand)
+	log.info('%s exited with status %d' % (uploadCommand[0], result))
+else:
+	log.warning('No xh.Config.DATA_UPLOAD_TARGET found (expected to be in'
+			+ ' SecretConfig), skipping upload.')
+
