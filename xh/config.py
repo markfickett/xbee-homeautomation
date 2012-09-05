@@ -1,5 +1,8 @@
 import ConfigParser
+import logging
 import os
+
+log = logging.getLogger('Config')
 
 
 
@@ -53,4 +56,13 @@ class Config:
 		with open(self._processConfigFileName(), 'w') as configFile:
 			Config.__ConfigParser.write(configFile)
 		Config.__ConfigParser = None
+
+
+try:
+	import secretconfig
+	for name in dir(secretconfig):
+		if not name.startswith('__'):
+			setattr(Config, name, getattr(secretconfig, name))
+except ImportError:
+	log.info('No secretconfig found, skipping import.')
 
