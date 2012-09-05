@@ -23,7 +23,9 @@ DATA_UPLOAD_TARGET = getUploadTarget()
 OUT_FILE_NAME_TEMPLATE = os.path.join(DATA_DIR, 'combined-%s.csv')
 TIMESTAMP_COLUMN_HEADER = 'Timestamp'
 DATETIME_FORMAT = xh.protocol.Data.DATETIME_FORMAT
-DYGRAPH_FORMAT = '%Y/%m/%d %H:%M:%S'
+# See Dygraph.dateParser:
+# https://github.com/danvk/dygraphs/blob/master/dygraph-utils.js#L517
+DYGRAPH_FORMAT = '%Y-%m-%d %H:%M:%S UTC'
 GAP_DT = datetime.timedelta(minutes=10)
 GAP_VALUE = 'NaN'
 
