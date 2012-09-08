@@ -73,3 +73,4 @@ Related Work
     * [Digi sensor modules](http://www.digi.com/wiki/developer/index.php/XBee_Sensors)
     * [iDigi Dia](http://www.digi.com/wiki/developer/index.php/IDigi_Dia_Wiki), a Python-based control / data-collection framework to run on Digi gateways ([example code](http://www.digi.com/wiki/developer/index.php/Google_Gadget_LTH_Sensor_Example))
 * [Home Automation project by Arvis Cimermanis](http://www.arvisc.info/) using XBee
+* [KillerBee](http://code.google.com/p/killerbee/) framework for expliting/attacking ZigBee networks
