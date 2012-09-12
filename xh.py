@@ -190,11 +190,11 @@ def readable_device_name(string):
 				pass
 		except IOError, e:
 			raise argparse.ArgumentTypeError(('%s cannot be opened'
-			+ 'for reading, but must be a readable device: %s'
+			+ 'for reading, but must be a readable device: %s')
 			% (string, e))
 	else:
 		raise argparse.ArgumentTypeError(('%s is not a file, but must'
-			+ ' be a readable device' % string)
+			+ ' be a readable device') % string)
 	return string
 
 
