@@ -53,6 +53,7 @@ Associate an XBee with a plugin; the plugin can then know to send the XBee comma
 External Dependencies
 ---------------------
 
+* Python >= 2.7 (uses argparse, introduced in 2.7)
 * [pySerial](http://pyserial.sourceforge.net/) >= 2.6
 * [python-xbee](http://code.google.com/p/python-xbee/downloads/list) (developed with version 2.0.0)
 * [Enum](http://pypi.python.org/pypi/enum/) for enumerations
