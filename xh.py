@@ -54,12 +54,9 @@ def run(args):
 	log.debug('collecting plugins')
 	if not args.noplugins:
 		xh.setuputil.CollectPlugins()
-	xbeeKwargs = {}
-	if args.serialDevice:
-		xbeeKwargs['serialDevice'] = args.serialDevice
 	fl = getFrameLoggerPlugin()
 	xh.setuputil.SetLoggerRedisplayAfterEmit(logging.getLogger())
-	with xh.setuputil.InitializedXbee(**xbeeKwargs) as xb:
+	with xh.setuputil.InitializedXbee(serialDevice=args.serialDevice) as xb:
 		log.info('connected to locally attached XBee')
 		xh.protocol.Command.SetXbeeSingleton(xb)
 		with (xh.util.NoopContext() if args.noplugins
@@ -76,21 +73,23 @@ def run(args):
 	log.info('exiting')
 
 
-def listNodeIds():
-	with xh.setuputil.InitializedXbee() as xb:
+def listNodeIds(serialDevice=None, timeout=None):
+	with xh.setuputil.InitializedXbee(serialDevice=serialDevice) as xb:
 		xh.protocol.Command.SetXbeeSingleton(xb)
 
-		try:
-			nTimeoutResponse = xh.synchronous.SendAndWait(
-				xh.protocol.NodeDiscoveryTimeout())
-		except xh.synchronous.TimeoutError, e:
-			log.error(str(e))
-			return []
-		nTimeoutMillis = nTimeoutResponse.getTimeoutMillis()
+		if timeout is None:
+			try:
+				nTimeoutResponse = xh.synchronous.SendAndWait(
+					xh.protocol.NodeDiscoveryTimeout())
+			except xh.synchronous.TimeoutError, e:
+				log.error(str(e))
+				return []
+			nTimeoutMillis = nTimeoutResponse.getTimeoutMillis()
+			timeout = nTimeoutMillis / 1000.0
 
 		nodeInfoResponses = xh.synchronous.SendAndAccumulate(
 			xh.protocol.NodeDiscover(),
-			nTimeoutMillis / 1000.0)
+			timeout)
 		return [r.getNodeId() for r in nodeInfoResponses]
 
 
@@ -114,8 +113,11 @@ def list(args):
 	log.info(pluginInfoStr)
 
 	try:
-		nodeInfoList = listNodeIds()
+		nodeInfoList = listNodeIds(
+			serialDevice=args.serialDevice,
+			timeout=args.timeout)
 	except:
+		log.debug('error listing available XBees', exc_info=True)
 		nodeInfoList = []
 
 	nodeInfoStr = 'XBees:'
@@ -183,10 +185,22 @@ def dec_or_hex_int(string):
 	else:
 		return int(string, 16)
 
+def addCommonArguments(*subparsers):
+	"""
+	Add common options to all subparsers.
 
-verbosityGroup = parser.add_mutually_exclusive_group()
-verbosityGroup.add_argument('--verbose', '-v', action='count')
-verbosityGroup.add_argument('--quiet', '-q', action='count')
+	This avoids the standard subcommand outcome, where some options have to
+	go before the subcommand and some after (xh -v list --timeout 30), and
+	instead allows all options to follow the subcommands
+	(xh list -v --timeout 30).
+	"""
+	for subparser in subparsers:
+		commonGroup = subparser.add_argument_group('common arguments')
+		verbosityGroup = commonGroup.add_mutually_exclusive_group()
+		verbosityGroup.add_argument('--verbose', '-v', action='count')
+		verbosityGroup.add_argument('--quiet', '-q', action='count')
+		commonGroup.add_argument('--serial-device', dest='serialDevice',
+			help='Device to use for local XBee communication.')
 
 subparsers = parser.add_subparsers(title='commands')
 
@@ -194,11 +208,13 @@ runParser = subparsers.add_parser('run')
 runParser.set_defaults(func=run)
 runParser.add_argument('--no-plugins', action='store_true', dest='noplugins',
 	help='Do not load or activate any plugins.')
-runParser.add_argument('--serial-device', dest='serialDevice',
-	help='Device to connect to for local XBee communication.')
 
 listParser = subparsers.add_parser('list')
 listParser.set_defaults(func=list)
+listParser.add_argument('--timeout', '-t', type=float,
+	help='Timeout (in seconds, fractional ok) to wait for XBee responses. '
+		'Useful if sleeping nodes will not respond within the default '
+		'ND timeout, NT.')
 
 setupParser = subparsers.add_parser('setup')
 setupParser.set_defaults(func=setup)
@@ -211,6 +227,8 @@ setupParser.add_argument('--serial', '-s', type=dec_or_hex_int, action='append',
 setupParser.add_argument('--replace', '-r', action='store_true',
 	help='Replace all existing XBee-plugin associations.'
 	+ 'By default, adds a new association.')
+
+addCommonArguments(runParser, listParser, setupParser)
 
 
 main()
