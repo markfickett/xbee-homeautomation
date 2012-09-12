@@ -37,6 +37,14 @@ except ImportError as e:
 	failedImports.append(
 		('yapsy from http://sourceforge.net/projects/yapsy/', e))
 
+PYSIGNALS_PATH = os.path.join(os.path.dirname(__file__), 'pysignals')
+sys.path.append(PYSIGNALS_PATH)
+try:
+	import pysignals
+except ImportError as e:
+	failedImports.append(
+		('submodule pysignals. Try: git submodule update --init', e))
+
 if failedImports:
 	msg = 'Unable to import required dependencies:'
 	for description, e in failedImports:
@@ -44,7 +52,4 @@ if failedImports:
 	log.error(msg)
 	raise e
 
-PYSIGNALS_PATH = os.path.join(os.path.dirname(__file__), 'pysignals')
-sys.path.append(PYSIGNALS_PATH)
-import pysignals
 
