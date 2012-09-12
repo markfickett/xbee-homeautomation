@@ -54,9 +54,12 @@ def run(args):
 	log.debug('collecting plugins')
 	if not args.noplugins:
 		xh.setuputil.CollectPlugins()
+	xbeeKwargs = {}
+	if args.serialDevice:
+		xbeeKwargs['serialDevice'] = args.serialDevice
 	fl = getFrameLoggerPlugin()
 	xh.setuputil.SetLoggerRedisplayAfterEmit(logging.getLogger())
-	with xh.setuputil.InitializedXbee() as xb:
+	with xh.setuputil.InitializedXbee(**xbeeKwargs) as xb:
 		log.info('connected to locally attached XBee')
 		xh.protocol.Command.SetXbeeSingleton(xb)
 		with (xh.util.NoopContext() if args.noplugins
@@ -180,6 +183,20 @@ def dec_or_hex_int(string):
 	else:
 		return int(string, 16)
 
+def readable_device_name(string):
+	if os.path.isfile(string):
+		try:
+			with open(string):
+				pass
+		except IOError, e:
+			raise argparse.ArgumentTypeError(('%s cannot be opened'
+			+ 'for reading, but must be a readable device: %s'
+			% (string, e))
+	else:
+		raise argparse.ArgumentTypeError(('%s is not a file, but must'
+			+ ' be a readable device' % string)
+	return string
+
 
 verbosityGroup = parser.add_mutually_exclusive_group()
 verbosityGroup.add_argument('--verbose', '-v', action='count')
@@ -191,6 +208,9 @@ runParser = subparsers.add_parser('run')
 runParser.set_defaults(func=run)
 runParser.add_argument('--no-plugins', action='store_true', dest='noplugins',
 	help='Do not load or activate any plugins.')
+runParser.add_argument('--serial-device', dest='serialDevice',
+	type=readable_device_name,
+	help='Device to connect to for local XBee communication.')
 
 listParser = subparsers.add_parser('list')
 listParser.set_defaults(func=list)
