@@ -58,6 +58,7 @@ External Dependencies
 * [python-xbee](http://code.google.com/p/python-xbee/downloads/list) (developed with version 2.0.0)
 * [Enum](http://pypi.python.org/pypi/enum/) for enumerations
 * [Yapsy](http://sourceforge.net/projects/yapsy/) for plugin loading
+* [setuptools](pypi.python.org/pypi/setuptools) used by the installation scripts of some other packages
 
 Included Dependencies
 ---------------------
