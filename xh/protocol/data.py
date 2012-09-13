@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from .. import datalogging, encoding, enumutil
+from .. import encoding, enumutil
 from ..deps import Enum
 from . import Frame, FrameRegistry, PIN, Registry
 
@@ -84,7 +84,7 @@ class Data(Frame):
 		if t is None:
 			t = ''
 		else:
-			t = ' ' + datalogging.formatTimestamp(t)
+			t = ' ' + str(t)
 		return '%s%s%s' % (s, t,
 			self._FormatNamedValues(self.getNamedValues()))
 
