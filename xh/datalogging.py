@@ -5,6 +5,7 @@ import datetime
 import logging
 import os
 
+from .protocol import PIN
 from . import Config
 
 
@@ -12,6 +13,16 @@ statusLog = logging.getLogger('DataLogging')
 
 # Ex: '2012 Jun 17 23:24:18 UTC'
 DATETIME_FORMAT = '%Y %b %d %H:%M:%S UTC'
+
+
+def logPinValue(serial, pinName, value, timestamp=None):
+	"""
+	Log a pin's sample value.
+	"""
+	serialStr = formatSerial(serial)
+	if pinName not in PIN:
+		raise ValueError()
+	log('%s-%s' % (serialStr, str(pinName)), value, timestamp=timestamp)
 
 
 def log(name, value, timestamp=None):
@@ -24,6 +35,13 @@ def log(name, value, timestamp=None):
 
 def formatTimestamp(timestamp):
 	return datetime.datetime.strftime(timestamp, DATETIME_FORMAT)
+
+
+def formatSerial(serial):
+	"""
+	Pretty-print an XBee serial number as a 16-character hex string.
+	"""
+	return '0x%016x' % serial
 
 
 global _dataLoggerSingleton
@@ -68,4 +86,5 @@ class _DataLogger:
 		formattedTime = formatTimestamp(
 			timestamp or datetime.datetime.utcnow())
 		self._getLogger(name).info('%s,%s', formattedTime, value)
+		statusLog.debug('%s %s %s', name, formattedTime, value)
 
