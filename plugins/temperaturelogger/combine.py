@@ -22,7 +22,7 @@ DATA_UPLOAD_TARGET = getUploadTarget()
 
 OUT_FILE_NAME_TEMPLATE = os.path.join(DATA_DIR, 'combined-%s.csv')
 TIMESTAMP_COLUMN_HEADER = 'Timestamp'
-DATETIME_FORMAT = xh.protocol.Data.DATETIME_FORMAT
+DATETIME_FORMAT = xh.datalogging.DATETIME_FORMAT
 # See Dygraph.dateParser:
 # https://github.com/danvk/dygraphs/blob/master/dygraph-utils.js#L517
 DYGRAPH_FORMAT = '%Y-%m-%d %H:%M:%S UTC'
@@ -31,24 +31,24 @@ GAP_VALUE = 'NaN'
 
 
 TEMPERATURE_NAMES = {
-	'datalog-0x13a200408cca0e-AD0-F.csv': 'Bathroom a',
-	'datalog-0x13a200408cca0e-AD1-F.csv': 'Outdoor',
+	'datalog-0x0013a200408cca0e-AD0.csv': 'Bathroom a',
+	'datalog-0x0013a200408cca0e-AD1.csv': 'Outdoor',
 	# use AD2 to take over but not connect to old line
-	'datalog-0x13a200408cca0e-AD2-F.csv': 'Bathroom b',
-	'datalog-0x13a200409028b6-AD0-F.csv': 'Bedroom',
+	'datalog-0x0013a200408cca0e-AD2.csv': 'Bathroom b',
+	'datalog-0x0013a200409028b6-AD0.csv': 'Bedroom',
 
 
-	'datalog-0x13a200408cca0e-AD3-F.csv': '0e AD3',
-	'datalog-0x13a200409028b6-AD1-F.csv': 'b6 AD1',
-	'datalog-0x13a200409028b6-AD2-F.csv': 'b6 AD2',
-	'datalog-0x13a200409028b6-AD3-F.csv': 'b6 AD3',
+	'datalog-0x0013a200408cca0e-AD3.csv': '0e AD3',
+	'datalog-0x0013a200409028b6-AD1.csv': 'b6 AD1',
+	'datalog-0x0013a200409028b6-AD2.csv': 'b6 AD2',
+	'datalog-0x0013a200409028b6-AD3.csv': 'b6 AD3',
 }
 OUT_TEMPERATURE_FILE_NAME = OUT_FILE_NAME_TEMPLATE % 'temperature'
 
 
 VOLTAGE_NAMES = {
-	'datalog-0x13a200409028b6-VCC.csv': 'Bedroom',
-	'datalog-0x13a200408cca0e-VCC.csv': 'Bathroom',
+	'datalog-0x0013a200409028b6-VCC.csv': 'Bedroom',
+	'datalog-0x0013a200408cca0e-VCC.csv': 'Bathroom',
 }
 OUT_VOLTAGE_FILE_NAME = OUT_FILE_NAME_TEMPLATE % 'voltage'
 
@@ -61,7 +61,7 @@ def addRow(combinedMap, nColumns, d, columnIndex, valueStr):
 	row[columnIndex] = valueStr
 
 
-def writeCombinedCsv(outFileName, inNameMap):
+def writeCombinedCsv(outFileName, inNameMap, mapFn=None):
 	combinedMap = {}
 	columnNames = inNameMap.values()
 	nColumns = len(columnNames)
@@ -81,6 +81,8 @@ def writeCombinedCsv(outFileName, inNameMap):
 				if lastD is not None and (d - lastD) > GAP_DT:
 					addRow(combinedMap, nColumns, d-GAP_DT,
 							columnIndex, GAP_VALUE)
+				if mapFn:
+					valueStr = mapFn(valueStr)
 				addRow(combinedMap, nColumns, d,
 						columnIndex, valueStr)
 				lastD = d
@@ -94,7 +96,17 @@ def writeCombinedCsv(outFileName, inNameMap):
 			outFile.write(','.join(row) + '\n')
 
 
-writeCombinedCsv(OUT_TEMPERATURE_FILE_NAME, TEMPERATURE_NAMES)
+def _voltsToC(volts):
+	return volts * 100 - 50
+
+def _voltsToF(volts):
+	return _voltsToC(volts) * (9.0/5.0) + 32
+
+def voltsToF(voltsStr):
+	return str(_voltsToF(float(voltsStr)))
+
+
+writeCombinedCsv(OUT_TEMPERATURE_FILE_NAME, TEMPERATURE_NAMES, mapFn=voltsToF)
 writeCombinedCsv(OUT_VOLTAGE_FILE_NAME, VOLTAGE_NAMES)
 
 if DATA_UPLOAD_TARGET:

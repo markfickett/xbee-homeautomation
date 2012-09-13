@@ -66,8 +66,7 @@ class TemperatureLogger(xh.Plugin):
 			if sourceSerial not in serials:
 				return
 			self.__recordValue(sourceSerial,
-				datetime.datetime.utcnow(),
-				str(PIN.VCC),
+				PIN.VCC,
 				frame.getVolts())
 		elif isinstance(frame, xh.protocol.InputSample):
 			sourceSerial = frame.getRemoteSerial()
@@ -78,31 +77,14 @@ class TemperatureLogger(xh.Plugin):
 				self.__logSample(sourceSerial, t, sample)
 
 
-	@staticmethod
-	def __voltsToF(volts):
-		return ((volts*100 - 50) * (9.0/5.0) + 32)
-
-
 	def __logSample(self, sourceSerial, timestamp, sample):
 		p = sample.getPinName()
-		name = str(p)
-		if p in (PIN.AD0, PIN.AD1, PIN.AD2, PIN.AD3):
-			value = self.__voltsToF(sample.getVolts())
-			name = name + '-F'
-		elif p is PIN.VCC:
-			value = sample.getVolts()
-		else:
-			raise RuntimeError(('%s plugin not configured to handle'
-				+ ' pin %s from module 0x%x.')
-				% (self.__class__.__name__, p, sourceSerial))
-		self.__recordValue(sourceSerial, timestamp, name, value)
+		value = sample.getVolts()
+		self.__recordValue(sourceSerial, p, value, timestamp=timestamp)
 
 
-	def __recordValue(self, sourceSerial, timestamp, textName, value):
-		name = '0x%x-%s' % (sourceSerial, textName)
-		log.debug('%s\t%s\t%.3f'
-			% (xh.datalogging.formatTimestamp(timestamp),
-				name, value))
-		xh.datalogging.log(name, value, timestamp)
+	def __recordValue(self, sourceSerial, pinName, value, timestamp=None):
+		xh.datalogging.logPinValue(
+			sourceSerial, pinName, value, timestamp=timestamp)
 
 
