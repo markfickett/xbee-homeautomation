@@ -92,7 +92,7 @@ class Command(Frame):
 	__frameIdLock = threading.Lock()
 
 	# For sending, keep an Xbee object singleton and make thread-safe.
-	_XbeeSingleton = None
+	_xbeeSingleton = None
 	__xbeeSingletonLock = threading.Lock()
 
 
@@ -267,8 +267,8 @@ class Command(Frame):
 
 
 	@classmethod
-	def SetXbeeSingleton(cls, xb):
-		cls._XbeeSingleton = xb
+	def setXbeeSingleton(cls, xb):
+		cls._xbeeSingleton = xb
 
 
 	def send(self, xb=None):
@@ -284,11 +284,11 @@ class Command(Frame):
 		log.debug('sending %s' % self)
 
 		if xb is None:
-			if Command._XbeeSingleton is None:
+			if Command._xbeeSingleton is None:
 				raise RuntimeError('No xb kwarg provided to '
 					+ 'send and Xbee singleton not set '
 					+ '(see setXbeeSingleton).')
-			senderXbee = Command._XbeeSingleton
+			senderXbee = Command._xbeeSingleton
 		else:
 			senderXbee = xb
 
@@ -305,7 +305,7 @@ class Command(Frame):
 		else:
 			sendFn = senderXbee.at
 
-		if senderXbee is Command._XbeeSingleton:
+		if senderXbee is Command._xbeeSingleton:
 			with Command.__xbeeSingletonLock:
 				sendFn(**kwargs)
 		else:
@@ -325,7 +325,7 @@ class Command(Frame):
 
 
 	@classmethod
-	def _CreateFromDict(cls, d, usedKeys):
+	def _createFromDict(cls, d, usedKeys):
 		frameIdKey = str(Command.FIELD.frame_id)
 		frameId = d.get(frameIdKey)
 		frameId = encoding.stringToNumber(d[frameIdKey])

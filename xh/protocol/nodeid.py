@@ -76,7 +76,7 @@ class NodeId(Frame):
 
 
 	@classmethod
-	def _CreateFromDict(cls, d, usedKeys):
+	def _createFromDict(cls, d, usedKeys):
 		id = NodeId()
 		return id
 

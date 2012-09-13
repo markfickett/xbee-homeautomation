@@ -58,22 +58,22 @@ class Frame:
 
 
 	@classmethod
-	def CreateFromDict(cls, d, usedKeys):
+	def createFromDict(cls, d, usedKeys):
 		"""
 		Create a new instance of a Frame subclass. This calls protected
 		methods which subclasses should/may override.
-		@see _CreateFromDict, _updateFromDict
+		@see _createFromDict, _updateFromDict
 		@param d an API dict from which to draw values
 		@param usedKeys a set to which to add the names of any used
 			keys, naming keys for values from the API dict
 		"""
-		frame = cls._CreateFromDict(d, usedKeys)
+		frame = cls._createFromDict(d, usedKeys)
 		frame._updateFromDict(d, usedKeys)
 		return frame
 
 
 	@classmethod
-	def _CreateFromDict(cls, d, usedKeys):
+	def _createFromDict(cls, d, usedKeys):
 		"""
 		Create a new instance of a Frame subclass. Frame subclasses
 		must override this.

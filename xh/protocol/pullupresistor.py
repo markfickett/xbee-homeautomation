@@ -35,7 +35,7 @@ class PullUpResistor(Command):
 
 
 	@classmethod
-	def _PinNumberToBitFieldIndex(cls, pinNumber):
+	def _pinNumberToBitFieldIndex(cls, pinNumber):
 		try:
 			return cls._PIN_NUMBER_ORDER.index(pinNumber)
 		except ValueError:
@@ -70,7 +70,7 @@ class PullUpResistor(Command):
 
 	def setBitFieldFromPinNumbers(self, pinNumbers):
 		self.setBitField(encoding.indicesToBitField([
-			self._PinNumberToBitFieldIndex(p) for p in pinNumbers]))
+			self._pinNumberToBitFieldIndex(p) for p in pinNumbers]))
 
 
 	def setBitFieldFromPinNames(self, pinNames):

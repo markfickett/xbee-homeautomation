@@ -58,7 +58,7 @@ def run(args):
 	xh.setuputil.setLoggerRedisplayAfterEmit(logging.getLogger())
 	with xh.setuputil.initializedXbee(serialDevice=args.serialDevice) as xb:
 		log.info('connected to locally attached XBee')
-		xh.protocol.Command.SetXbeeSingleton(xb)
+		xh.protocol.Command.setXbeeSingleton(xb)
 		with (xh.util.noopContext() if args.noplugins
 				else xh.setuputil.activatedPlugins()):
 			log.info('started')
@@ -75,7 +75,7 @@ def run(args):
 
 def listNodeIds(serialDevice=None, timeout=None):
 	with xh.setuputil.initializedXbee(serialDevice=serialDevice) as xb:
-		xh.protocol.Command.SetXbeeSingleton(xb)
+		xh.protocol.Command.setXbeeSingleton(xb)
 
 		if timeout is None:
 			try:

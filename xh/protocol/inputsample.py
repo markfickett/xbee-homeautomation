@@ -78,12 +78,12 @@ class InputSample(Command):
 
 		for digitalPinNum in digitalPinNumbers:
 			digitalValue = digitalPinNum in digitalOnValues
-			self.__samples.append(DigitalSample.CreateFromRawValues(
+			self.__samples.append(DigitalSample.createFromRawValues(
 				digitalPinNum, digitalValue))
 
 		for analogPinNum, analogValueNum in zip(
 				analogPinNumbers, analogValues):
-			analogSample = AnalogSample.CreateFromRawValues(
+			analogSample = AnalogSample.createFromRawValues(
 				analogPinNum, analogValueNum)
 			self.__samples.append(analogSample)
 

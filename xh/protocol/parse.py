@@ -36,7 +36,7 @@ def ParseFromDict(d):
 		raise RuntimeError(('No Frame subclass to handle parsing '
 			+ 'Frame.TYPE.%s. Data to parse: %s') % (frameType, d))
 
-	frame = frameClass.CreateFromDict(d, usedKeys)
+	frame = frameClass.createFromDict(d, usedKeys)
 
 	unusedKeys = set(d.keys()).difference(usedKeys)
 	if unusedKeys:

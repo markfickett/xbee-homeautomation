@@ -90,7 +90,7 @@ class Data(Frame):
 
 
 	@classmethod
-	def _CreateFromDict(cls, d, usedKeys):
+	def _createFromDict(cls, d, usedKeys):
 		data = cls()
 
 		sourceAddrKey = str(cls.FIELD.source_addr)
@@ -105,7 +105,7 @@ class Data(Frame):
 		samplesKey = str(cls.FIELD.samples)
 		data._samples = []
 		for sd in d[samplesKey]:
-			data._samples += Sample.CreateFromDict(sd)
+			data._samples += Sample.createFromDict(sd)
 		usedKeys.add(samplesKey)
 
 		return data
@@ -140,7 +140,7 @@ class Sample:
 
 
 	@classmethod
-	def CreateFromDict(cls, d):
+	def createFromDict(cls, d):
 		"""
 		Determine whether a samples are analog or digital, then dispatch
 		parsing to the appropriate Sample subclass.
@@ -154,7 +154,7 @@ class Sample:
 			pinType = enumutil.fromString(cls.PIN_TYPE, pinTypeStr)
 
 			concreteClass = cls._Registry.get(pinType)
-			yield concreteClass.CreateFromRawValues(
+			yield concreteClass.createFromRawValues(
 				pinNum, numericValue)
 
 
@@ -182,7 +182,7 @@ class AnalogSample(Sample):
 
 
 	@classmethod
-	def CreateFromRawValues(cls, pinNum, numericValue):
+	def createFromRawValues(cls, pinNum, numericValue):
 		v = encoding.numberToVolts(numericValue)
 		if pinNum == cls._PIN_NUM_VCC:
 			pinName = PIN.VCC
@@ -210,7 +210,7 @@ class DigitalSample(Sample):
 
 
 	@classmethod
-	def CreateFromRawValues(cls, pinNum, numericValue):
+	def createFromRawValues(cls, pinNum, numericValue):
 		pinName = enumutil.fromString(PIN, 'DIO%d' % pinNum)
 		if numericValue in (True, False):
 			bit = numericValue
