@@ -7,8 +7,6 @@ import threading
 import xh
 from xh.protocol import PIN
 
-from datalogger import DataLogger
-
 log = logging.getLogger('TemperatureLogger')
 
 
@@ -23,7 +21,6 @@ class TemperatureLogger(xh.Plugin):
 
 	def __init__(self):
 		xh.Plugin.__init__(self, receiveFrames=True)
-		self.__dataLogger = DataLogger()
 
 
 	def activate(self):
@@ -104,8 +101,8 @@ class TemperatureLogger(xh.Plugin):
 	def __recordValue(self, sourceSerial, timestamp, textName, value):
 		name = '0x%x-%s' % (sourceSerial, textName)
 		log.debug('%s\t%s\t%.3f'
-			% (xh.protocol.Data.FormatTimestamp(timestamp),
+			% (xh.datalogging.formatTimestamp(timestamp),
 				name, value))
-		self.__dataLogger.recordValue(name, timestamp, value)
+		xh.datalogging.log(name, value, timestamp)
 
 
