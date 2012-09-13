@@ -73,6 +73,11 @@ class _DataLogger:
 		dataLog = self.__loggers.get(name)
 		if dataLog is None:
 			dataLog = logging.getLogger(name)
+
+			# Do not propagate to root logger which
+			# has the default handler and prints to stdout.
+			dataLog.propagate = False
+
 			handler = logging.handlers.RotatingFileHandler(
 				self._FILE_NAME_T % name,
 				maxBytes=self._MAX_BYTES_PER_LOGFILE,
