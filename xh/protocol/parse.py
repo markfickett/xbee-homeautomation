@@ -28,7 +28,7 @@ def ParseFromDict(d):
 	usedKeys = set()
 
 	frameTypeKey = str(Frame.FIELD.id)
-	frameType = enumutil.FromString(Frame.TYPE, d[frameTypeKey])
+	frameType = enumutil.fromString(Frame.TYPE, d[frameTypeKey])
 	usedKeys.add(frameTypeKey)
 
 	frameClass = FrameRegistry.get(frameType)

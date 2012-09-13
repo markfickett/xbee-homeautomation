@@ -69,7 +69,7 @@ class PullUpResistor(Command):
 
 
 	def setBitFieldFromPinNumbers(self, pinNumbers):
-		self.setBitField(encoding.IndicesToBitField([
+		self.setBitField(encoding.indicesToBitField([
 			self._PinNumberToBitFieldIndex(p) for p in pinNumbers]))
 
 
@@ -83,7 +83,7 @@ class PullUpResistor(Command):
 		if b is None:
 			return None
 		return set([self._PIN_NUMBER_ORDER[i] for i in
-			encoding.BitFieldToIndexSet(b)])
+			encoding.bitFieldToIndexSet(b)])
 
 
 	def getPinNamesFromBitField(self):
@@ -94,7 +94,7 @@ class PullUpResistor(Command):
 
 
 	def parseParameter(self, p):
-		self.setBitField(encoding.StringToNumber(p))
+		self.setBitField(encoding.stringToNumber(p))
 
 
 	def getNamedValues(self):

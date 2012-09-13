@@ -49,7 +49,7 @@ class Command(Frame):
 		'ID', # network id
 		'IR', # IO sample rate (see SampleRate)
 		'IS', # force sample on all digital, analog inputs
-		'KY', # xh.encoding.NumberToString(xh.Config.LINK_KEY)
+		'KY', # xh.encoding.numberToString(xh.Config.LINK_KEY)
 		'MY', # node's network ID (0 for coordinator)
 		'ND', # NodeDiscover
 		'NI', # string node name
@@ -212,7 +212,7 @@ class Command(Frame):
 		statusKey = str(Command.FIELD.status)
 		status = d.get(statusKey)
 		if status is not None:
-			status = Command.STATUS[encoding.StringToNumber(status)]
+			status = Command.STATUS[encoding.stringToNumber(status)]
 			self.setStatus(status)
 			usedKeys.add(statusKey)
 
@@ -226,11 +226,11 @@ class Command(Frame):
 		src = d.get(srcKey)
 		if src is not None:
 			self.__remoteNetworkAddress = (
-				encoding.StringToNumber(src))
+				encoding.stringToNumber(src))
 			usedKeys.add(srcKey)
 
 			srcLongKey = str(Command.FIELD.source_addr_long)
-			self.__remoteSerial = encoding.StringToNumber(
+			self.__remoteSerial = encoding.stringToNumber(
 				d[srcLongKey])
 			usedKeys.add(srcLongKey)
 
@@ -250,7 +250,7 @@ class Command(Frame):
 		command may not actually have a numeric parameter.
 		@return The parameter parsed as a number.
 		"""
-		parameter = encoding.StringToNumber(encoded)
+		parameter = encoding.stringToNumber(encoded)
 		if self.getName() not in (
 			Command.NAME.__getattribute__('%V'),
 			Command.NAME.ID,
@@ -299,7 +299,7 @@ class Command(Frame):
 		}
 		if self.isRemote():
 			kwargs['dest_addr_long'] = (
-				encoding.NumberToSerialString(
+				encoding.numberToSerialString(
 					self.getRemoteSerial()))
 			sendFn = senderXbee.remote_at
 		else:
@@ -313,7 +313,7 @@ class Command(Frame):
 
 
 	def _encodedFrameId(self):
-		return encoding.NumberToString(self.getFrameId())
+		return encoding.numberToString(self.getFrameId())
 
 
 	def _encodedParameter(self):
@@ -321,20 +321,20 @@ class Command(Frame):
 		if p is None:
 			return None
 		else:
-			return encoding.NumberToString(p)
+			return encoding.numberToString(p)
 
 
 	@classmethod
 	def _CreateFromDict(cls, d, usedKeys):
 		frameIdKey = str(Command.FIELD.frame_id)
 		frameId = d.get(frameIdKey)
-		frameId = encoding.StringToNumber(d[frameIdKey])
+		frameId = encoding.stringToNumber(d[frameIdKey])
 		usedKeys.add(frameIdKey)
 
 		nameKey = str(Command.FIELD.command)
 		name = d.get(nameKey)
 		if name is not None:
-			name = enumutil.FromString(Command.NAME, name)
+			name = enumutil.fromString(Command.NAME, name)
 			usedKeys.add(nameKey)
 
 		commandClass = CommandRegistry.get(name)

@@ -19,7 +19,7 @@ class VoltageSupplyThreshold(Command):
 	bug in xbee-python (see Data), however those returned from
 	InputSample are correct.
 	"""
-	__THRESHOLD_MAX = encoding.NumberToVolts(0xFFFF)
+	__THRESHOLD_MAX = encoding.numberToVolts(0xFFFF)
 
 	# recommended useful extrema from Xbee Series 2 datasheet,
 	# which are also more extreme than pro or S2B models
@@ -51,7 +51,7 @@ class VoltageSupplyThreshold(Command):
 		self.__threshold = min(threshold, self.__THRESHOLD_MAX)
 
 		self.setParameter(
-			int(encoding.VoltsToNumber(self.__threshold)))
+			int(encoding.voltsToNumber(self.__threshold)))
 
 
 	def getThresholdVolts(self):
@@ -59,7 +59,7 @@ class VoltageSupplyThreshold(Command):
 
 
 	def parseParameter(self, p):
-		self.__threshold = encoding.StringToVolts(p)
+		self.__threshold = encoding.stringToVolts(p)
 
 
 	def getNamedValues(self):

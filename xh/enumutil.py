@@ -1,4 +1,4 @@
-def FromString(enumeration, s):
+def fromString(enumeration, s):
 	"""
 	@return the enumeration value which matches the given string.
 	@throw ValueError if no match is found.

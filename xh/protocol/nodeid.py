@@ -90,42 +90,42 @@ class NodeId(Frame):
 
 		parentAddrKey = str(NodeId.FIELD.parent_source_addr)
 		self.setParentNetworkAddress(
-			encoding.StringToNumber(d[parentAddrKey]))
+			encoding.stringToNumber(d[parentAddrKey]))
 		usedKeys.add(parentAddrKey)
 
 		deviceTypeKey = str(NodeId.FIELD.device_type)
 		self.setDeviceType(DEVICE_TYPE[
-			encoding.StringToNumber(d[deviceTypeKey])])
+			encoding.stringToNumber(d[deviceTypeKey])])
 		usedKeys.add(deviceTypeKey)
 
 		profileKey = str(NodeId.FIELD.digi_profile_id)
-		self.setProfileId(encoding.StringToNumber(d[profileKey]))
+		self.setProfileId(encoding.stringToNumber(d[profileKey]))
 		usedKeys.add(profileKey)
 
 		manuKey = str(NodeId.FIELD.manufacturer_id)
-		self.setManufacturerId(encoding.StringToNumber(d[manuKey]))
+		self.setManufacturerId(encoding.stringToNumber(d[manuKey]))
 		usedKeys.add(manuKey)
 
 		srcKey = str(NodeId.FIELD.source_event)
 		self.setSourceEvent(NodeId.EVENT[
-			encoding.StringToNumber(d[srcKey]) - 1])
+			encoding.stringToNumber(d[srcKey]) - 1])
 		usedKeys.add(srcKey)
 
 		addrKey = str(NodeId.FIELD.source_addr)
-		self.setNetworkAddress(encoding.StringToNumber(d[addrKey]))
+		self.setNetworkAddress(encoding.stringToNumber(d[addrKey]))
 		usedKeys.add(addrKey)
 
 		serKey = str(NodeId.FIELD.source_addr_long)
-		self.setSerial(encoding.StringToNumber(d[serKey]))
+		self.setSerial(encoding.stringToNumber(d[serKey]))
 		usedKeys.add(serKey)
 
 		sAddrKey = str(NodeId.FIELD.sender_addr)
 		self.setSenderNetworkAddress(
-			encoding.StringToNumber(d[sAddrKey]))
+			encoding.stringToNumber(d[sAddrKey]))
 		usedKeys.add(sAddrKey)
 
 		sSerKey = str(NodeId.FIELD.sender_addr_long)
-		self.setSenderSerial(encoding.StringToNumber(d[sSerKey]))
+		self.setSenderSerial(encoding.stringToNumber(d[sSerKey]))
 		usedKeys.add(sSerKey)
 
 

@@ -53,19 +53,19 @@ INTERACT_BANNER = ('The xbee object is available as "xb". A received frame list'
 def run(args):
 	log.debug('collecting plugins')
 	if not args.noplugins:
-		xh.setuputil.CollectPlugins()
+		xh.setuputil.collectPlugins()
 	fl = getFrameLoggerPlugin()
-	xh.setuputil.SetLoggerRedisplayAfterEmit(logging.getLogger())
-	with xh.setuputil.InitializedXbee(serialDevice=args.serialDevice) as xb:
+	xh.setuputil.setLoggerRedisplayAfterEmit(logging.getLogger())
+	with xh.setuputil.initializedXbee(serialDevice=args.serialDevice) as xb:
 		log.info('connected to locally attached XBee')
 		xh.protocol.Command.SetXbeeSingleton(xb)
-		with (xh.util.NoopContext() if args.noplugins
-				else xh.setuputil.ActivatedPlugins()):
+		with (xh.util.noopContext() if args.noplugins
+				else xh.setuputil.activatedPlugins()):
 			log.info('started')
 
 			runLocalScript()
 
-			xh.setuputil.RunPythonStartup()
+			xh.setuputil.runPythonStartup()
 			namespace = globals()
 			namespace.update(locals())
 			code.interact(banner=INTERACT_BANNER, local=namespace)
@@ -74,12 +74,12 @@ def run(args):
 
 
 def listNodeIds(serialDevice=None, timeout=None):
-	with xh.setuputil.InitializedXbee(serialDevice=serialDevice) as xb:
+	with xh.setuputil.initializedXbee(serialDevice=serialDevice) as xb:
 		xh.protocol.Command.SetXbeeSingleton(xb)
 
 		if timeout is None:
 			try:
-				nTimeoutResponse = xh.synchronous.SendAndWait(
+				nTimeoutResponse = xh.synchronous.sendAndWait(
 					xh.protocol.NodeDiscoveryTimeout())
 			except xh.synchronous.TimeoutError, e:
 				log.error(str(e))
@@ -87,14 +87,14 @@ def listNodeIds(serialDevice=None, timeout=None):
 			nTimeoutMillis = nTimeoutResponse.getTimeoutMillis()
 			timeout = nTimeoutMillis / 1000.0
 
-		nodeInfoResponses = xh.synchronous.SendAndAccumulate(
+		nodeInfoResponses = xh.synchronous.sendAndAccumulate(
 			xh.protocol.NodeDiscover(),
 			timeout)
 		return [r.getNodeId() for r in nodeInfoResponses]
 
 
 def list(args):
-	xh.setuputil.CollectPlugins()
+	xh.setuputil.collectPlugins()
 	pm = PluginManagerSingleton.get()
 	pluginInfoStr = 'Plugins:'
 	for p in pm.getAllPlugins():
@@ -134,7 +134,7 @@ def setup(args):
 		parser.error(
 			'Must either clear or supply serial numbers for setup.')
 
-	xh.setuputil.CollectPlugins()
+	xh.setuputil.collectPlugins()
 	pm = PluginManagerSingleton.get()
 	pluginInfo = pm.getPluginByName(args.plugin)
 	if pluginInfo is None:

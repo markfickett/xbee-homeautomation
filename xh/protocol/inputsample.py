@@ -47,24 +47,24 @@ class InputSample(Command):
 		offset = 0
 
 		# The number of sample sets is expected to always be 1.
-		numSets = encoding.StringToNumber(encoded[offset:offset+1])
+		numSets = encoding.stringToNumber(encoded[offset:offset+1])
 		if numSets != self._EXPECTED_NUM_SETS:
 			raise RuntimeError(('Number of sample sets is expected '
 			+ 'to always be %d, but is %d.')
 			% (self._EXPECTED_NUM_SETS, numSets))
 		offset += 1
 
-		digitalPinNumbers = encoding.BitFieldToIndexSet(
-			encoding.StringToNumber(encoded[offset:offset+2]))
+		digitalPinNumbers = encoding.bitFieldToIndexSet(
+			encoding.stringToNumber(encoded[offset:offset+2]))
 		offset += 2
 
-		analogPinNumbers = sorted(encoding.BitFieldToIndexSet(
-			encoding.StringToNumber(encoded[offset:offset+1])))
+		analogPinNumbers = sorted(encoding.bitFieldToIndexSet(
+			encoding.stringToNumber(encoded[offset:offset+1])))
 		offset += 1
 
 		if digitalPinNumbers:
-			digitalOnValues = encoding.BitFieldToIndexSet(
-				encoding.StringToNumber(
+			digitalOnValues = encoding.bitFieldToIndexSet(
+				encoding.stringToNumber(
 					encoded[offset:offset+2]))
 			offset += 2
 		else:
@@ -72,7 +72,7 @@ class InputSample(Command):
 
 		analogValues = []
 		while offset + 2 <= len(encoded):
-			analogValues.append(encoding.StringToNumber(
+			analogValues.append(encoding.stringToNumber(
 				encoded[offset:offset+2]))
 			offset += 2
 

@@ -101,7 +101,7 @@ class Frame:
 
 	def _parseOptions(self, encodedOptions):
 		self.__options = Frame.OPTIONS[
-			encoding.StringToNumber(encodedOptions) - 1]
+			encoding.stringToNumber(encodedOptions) - 1]
 
 
 	def getNamedValues(self):

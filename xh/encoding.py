@@ -8,7 +8,7 @@ MILLIVOLTS_PER_VOLT = 1e-3
 BYTES_PER_SERIAL = 8		# number of bytes in an XBee serial number
 
 
-def NumberToString(n, padToBytes=1):
+def numberToString(n, padToBytes=1):
 	"""
 	Pack a number of arbitrary size into (little-endian) a string.
 	@param padToBytes Left-pad the string with null bytes so that
@@ -25,14 +25,14 @@ def NumberToString(n, padToBytes=1):
 	return s
 
 
-def NumberToSerialString(n):
+def numberToSerialString(n):
 	"""
 	Pack a number for use as an Xbee module serial number (must be 8 bytes).
 	"""
-	return NumberToString(n, padToBytes=BYTES_PER_SERIAL)
+	return numberToString(n, padToBytes=BYTES_PER_SERIAL)
 
 
-def StringToNumber(s):
+def stringToNumber(s):
 	"""
 	Unpack a (little-endian) string to a number.
 	Example: '>\xf7' => 0x3ef7 or '\n\xe4' => 2788 (0x0ae4)
@@ -44,15 +44,15 @@ def StringToNumber(s):
 	return n
 
 
-def StringToBoolean(s):
+def stringToBoolean(s):
 	"""
 	Unpack a string to boolean. The string is expected to be a packed
 	number, where 0 is False and 1 is True.
 	"""
-	return NumberToBoolean(StringToNumber(s))
+	return numberToBoolean(stringToNumber(s))
 
 
-def NumberToBoolean(n):
+def numberToBoolean(n):
 	"""
 	Unpack a number to boolean. The number must be 0 (False) or 1 (True).
 	"""
@@ -65,11 +65,11 @@ def NumberToBoolean(n):
 			+ 'boolean value, should be 0 or 1.') % n)
 
 
-def BooleanToString(b):
-	return NumberToString(b and 1 or 0)
+def booleanToString(b):
+	return numberToString(b and 1 or 0)
 
 
-def NumberToVolts(n):
+def numberToVolts(n):
 	"""
 	Convert a number (in internal / API units) to volts read from an analog
 	input pin.
@@ -77,22 +77,22 @@ def NumberToVolts(n):
 	return n * (1200.0 / 1024.0) * MILLIVOLTS_PER_VOLT
 
 
-def StringToVolts(s):
+def stringToVolts(s):
 	"""
 	Unpack a string to a number, and convert that number to volts read from
 	an analog input pin.
 	"""
-	return NumberToVolts(StringToNumber(s))
+	return numberToVolts(stringToNumber(s))
 
 
-def VoltsToNumber(v):
+def voltsToNumber(v):
 	"""
 	Convert from volts to internal / API units.
 	"""
 	return (v / MILLIVOLTS_PER_VOLT) * (1024.0 / 1200.0)
 
 
-def BitFieldToIndexSet(bitField):
+def bitFieldToIndexSet(bitField):
 	"""
 	@param bitField encoded as an int
 	@return an set containing the indices of the bits which are set in the
@@ -110,7 +110,7 @@ def BitFieldToIndexSet(bitField):
 	return indices
 
 
-def IndicesToBitField(indices):
+def indicesToBitField(indices):
 	"""
 	Create and return a bit field (as a number) which has the bits with the
 	given indices set.

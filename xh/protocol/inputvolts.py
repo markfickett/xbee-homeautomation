@@ -20,7 +20,7 @@ class InputVolts(Command):
 
 
 	def parseParameter(self, p):
-		self.__volts = encoding.StringToVolts(p)
+		self.__volts = encoding.stringToVolts(p)
 
 
 	def getNamedValues(self):

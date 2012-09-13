@@ -108,5 +108,5 @@ PIN_NAME_TO_NUMBER = {
 }
 
 
-PIN_NUMBER_TO_NAMES = util.InvertedDictWithRepeatedValues(PIN_NAME_TO_NUMBER)
+PIN_NUMBER_TO_NAMES = util.invertedDictWithRepeatedValues(PIN_NAME_TO_NUMBER)
 

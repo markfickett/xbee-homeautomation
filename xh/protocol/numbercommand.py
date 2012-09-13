@@ -53,7 +53,7 @@ class NumberCommand(Command):
 
 
 	def parseParameter(self, p):
-		self.__num = encoding.StringToNumber(p)
+		self.__num = encoding.stringToNumber(p)
 
 
 	def getNamedValues(self):

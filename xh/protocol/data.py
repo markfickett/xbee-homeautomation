@@ -104,11 +104,11 @@ class Data(Frame):
 		data = cls()
 
 		sourceAddrKey = str(cls.FIELD.source_addr)
-		data._sourceAddress = encoding.StringToNumber(d[sourceAddrKey])
+		data._sourceAddress = encoding.stringToNumber(d[sourceAddrKey])
 		usedKeys.add(sourceAddrKey)
 
 		sourceAddrLongKey = str(cls.FIELD.source_addr_long)
-		data._sourceAddressLong = encoding.StringToNumber(
+		data._sourceAddressLong = encoding.stringToNumber(
 			d[sourceAddrLongKey])
 		usedKeys.add(sourceAddrLongKey)
 
@@ -161,7 +161,7 @@ class Sample:
 		for key, numericValue in d.iteritems():
 			pinTypeStr, pinNum = key.split('-')
 			pinNum = int(pinNum)
-			pinType = enumutil.FromString(cls.PIN_TYPE, pinTypeStr)
+			pinType = enumutil.fromString(cls.PIN_TYPE, pinTypeStr)
 
 			concreteClass = cls._Registry.get(pinType)
 			yield concreteClass.CreateFromRawValues(
@@ -193,11 +193,11 @@ class AnalogSample(Sample):
 
 	@classmethod
 	def CreateFromRawValues(cls, pinNum, numericValue):
-		v = encoding.NumberToVolts(numericValue)
+		v = encoding.numberToVolts(numericValue)
 		if pinNum == cls._PIN_NUM_VCC:
 			pinName = PIN.VCC
 		else:
-			pinName = enumutil.FromString(PIN, 'AD%d' % pinNum)
+			pinName = enumutil.fromString(PIN, 'AD%d' % pinNum)
 		return cls(pinName, v)
 
 
@@ -221,11 +221,11 @@ class DigitalSample(Sample):
 
 	@classmethod
 	def CreateFromRawValues(cls, pinNum, numericValue):
-		pinName = enumutil.FromString(PIN, 'DIO%d' % pinNum)
+		pinName = enumutil.fromString(PIN, 'DIO%d' % pinNum)
 		if numericValue in (True, False):
 			bit = numericValue
 		else:
-			bit = encoding.NumberToBoolean(numericValue)
+			bit = encoding.numberToBoolean(numericValue)
 		return cls(pinName, bit)
 
 

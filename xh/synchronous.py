@@ -10,8 +10,8 @@ from . import signals
 
 
 __all__ = [
-	'SendAndWait',
-	'SendAndAccumulate',
+	'sendAndWait',
+	'sendAndAccumulate',
 ]
 
 
@@ -37,7 +37,7 @@ class _Response:
 
 
 
-def SendAndWait(command, xb=None):
+def sendAndWait(command, xb=None):
 	"""
 	Send a Command and wait for its (single) response.
 	@return the Frame received in response
@@ -64,7 +64,7 @@ def SendAndWait(command, xb=None):
 		return r.get()
 
 
-def SendAndAccumulate(command, timeoutSeconds, xb=None):
+def sendAndAccumulate(command, timeoutSeconds, xb=None):
 	"""
 	Send a Command and wait to accumulate multiple responses.
 	@return a list of Frames received in response

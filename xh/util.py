@@ -2,11 +2,11 @@ import contextlib
 
 
 
-def InvertedDict(d):
+def invertedDict(d):
 	return dict([(v, k) for k, v in d.iteritems()])
 
 
-def InvertedDictWithRepeatedValues(d):
+def invertedDictWithRepeatedValues(d):
 	"""
 	@return a dict where each value in the original maps to a tuple of the
 		values in the original map which mapped to it
@@ -20,6 +20,6 @@ def InvertedDictWithRepeatedValues(d):
 
 
 @contextlib.contextmanager
-def NoopContext():
+def noopContext():
 	yield None
 

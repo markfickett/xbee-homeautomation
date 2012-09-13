@@ -60,7 +60,7 @@ class ConfigureIoPin(Command):
 
 		FUNCTION.RS485_TX_ENABLE_HIGH:	7,
 	}
-	VALUE_TO_FUNCTIONS = util.InvertedDictWithRepeatedValues(
+	VALUE_TO_FUNCTIONS = util.invertedDictWithRepeatedValues(
 		FUNCTION_TO_VALUE)
 
 
@@ -81,7 +81,7 @@ class ConfigureIoPin(Command):
 	COMMAND_NAME_TO_PIN_NUMBER = {}
 	for cmd, pin in _COMMAND_NAME_TO_A_PIN_NAME.iteritems():
 		COMMAND_NAME_TO_PIN_NUMBER[cmd] = PIN_NAME_TO_NUMBER[pin]
-	PIN_NUMBER_TO_COMMAND_NAME = util.InvertedDict(
+	PIN_NUMBER_TO_COMMAND_NAME = util.invertedDict(
 		COMMAND_NAME_TO_PIN_NUMBER)
 
 
@@ -166,7 +166,7 @@ class ConfigureIoPin(Command):
 
 
 	def parseParameter(self, p):
-		functionNum = encoding.StringToNumber(p)
+		functionNum = encoding.stringToNumber(p)
 		self.setParameter(functionNum)
 
 		interpretations = set(self.VALUE_TO_FUNCTIONS[functionNum])

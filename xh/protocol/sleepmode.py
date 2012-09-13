@@ -37,7 +37,7 @@ class SleepMode(Command):
 		MODE.CYCLIC_PIN_WAKE: 5,
 	}
 
-	_NUM_TO_MODE = util.InvertedDict(_MODE_TO_NUM)
+	_NUM_TO_MODE = util.invertedDict(_MODE_TO_NUM)
 
 
 	def __init__(self, mode=None, **kwargs):
@@ -58,7 +58,7 @@ class SleepMode(Command):
 
 
 	def parseParameter(self, p):
-		self.__mode = self._NUM_TO_MODE[encoding.StringToNumber(p)]
+		self.__mode = self._NUM_TO_MODE[encoding.stringToNumber(p)]
 
 
 	def getNamedValues(self):
