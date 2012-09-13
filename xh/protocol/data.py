@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from .. import encoding, enumutil
+from .. import datalogging, encoding, enumutil
 from ..deps import Enum
 from . import Frame, FrameRegistry, PIN, Registry
 
@@ -31,10 +31,6 @@ class Data(Frame):
 	)
 
 
-	# Ex: '2012 Jun 17 23:24:18 UTC'
-	DATETIME_FORMAT = '%Y %b %d %H:%M:%S UTC'
-
-
 	def __init__(self, setTimestampToNow=True):
 		Frame.__init__(self, frameType=Frame.TYPE.rx_io_data_long_addr)
 		self._sourceAddress = None
@@ -55,12 +51,6 @@ class Data(Frame):
 		@return the UTC creation timestamp of the sample data
 		"""
 		return self._timestamp
-
-
-	@classmethod
-	def FormatTimestamp(cls, timestamp):
-		return datetime.datetime.strftime(
-			timestamp, cls.DATETIME_FORMAT)
 
 
 	def getSourceAddress(self):
@@ -94,7 +84,7 @@ class Data(Frame):
 		if t is None:
 			t = ''
 		else:
-			t = ' ' + self.FormatTimestamp(t)
+			t = ' ' + datalogging.formatTimestamp(t)
 		return '%s%s%s' % (s, t,
 			self._FormatNamedValues(self.getNamedValues()))
 
