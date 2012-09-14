@@ -32,6 +32,14 @@ def numberToSerialString(n):
 	return numberToString(n, padToBytes=BYTES_PER_SERIAL)
 
 
+def buildSerial(highBits, lowBits):
+	"""
+	Combine the low and high bits (as received from SH/SL) to form a full
+	XBee serial number.
+	"""
+	return highBits * BYTE_BASE**4 + lowBits
+
+
 def stringToNumber(s):
 	"""
 	Unpack a (little-endian) string to a number.
