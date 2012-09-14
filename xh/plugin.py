@@ -1,6 +1,7 @@
 import logging
 
 from yapsy.IPlugin import IPlugin
+from yapsy.PluginManager import PluginManagerSingleton
 
 from . import Config, signals
 
@@ -46,6 +47,17 @@ class Plugin(IPlugin):
 
 	def _getConfigSection(self):
 		return 'xh.plugin.%s' % self.__class__.__name__
+
+
+	def getPluginObjByName(self, otherPluginName):
+		manager = PluginManagerSingleton.get()
+		pluginInfo = manager.getPluginByName(otherPluginName)
+		if not pluginInfo:
+			raise ValueError(
+				'No plugin %r. Available plugins are %s.'
+				% (otherPluginName,
+				[p.name for p in manager.getAllPlugins()]))
+		return pluginInfo.plugin_object
 
 
 	def setSerials(self, serials):
