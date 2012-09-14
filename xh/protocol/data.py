@@ -131,6 +131,13 @@ class Sample:
 		return self.__pinName
 
 
+	def getValue(self):
+		"""
+		Get the Sample's value (of whatever type it may be).
+		"""
+		raise NotImplementedError()
+
+
 	def __str__(self):
 		return '%s(%s, %s)' % (
 			self.__class__.__name__,
@@ -177,6 +184,9 @@ class AnalogSample(Sample):
 		return self.__volts
 
 
+	getValue = getVolts
+
+
 	def _formatValue(self):
 		return 'volts=%.3f' % self.getVolts()
 
@@ -203,6 +213,9 @@ class DigitalSample(Sample):
 
 	def getIsSet(self):
 		return self.__isSet
+
+
+	getValue = getIsSet
 
 
 	def _formatValue(self):
