@@ -1,0 +1,6 @@
+[Core]
+Name = Presence
+Module = presence
+
+[Documentation]
+Description = Track presence / availability of XBee modules.
