@@ -1,6 +1,0 @@
-[Core]
-Name = Temperature Logger
-Module = temperaturelogger
-
-[Documentation]
-Description = Log temperature (and other) values from a sensing module.

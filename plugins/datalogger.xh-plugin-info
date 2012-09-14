@@ -1,0 +1,6 @@
+[Core]
+name = Data Logger
+Module = datalogger
+
+[Documentation]
+Description = Log all received data via xh.datalogging.
