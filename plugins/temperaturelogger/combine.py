@@ -1,5 +1,8 @@
 """
 Generate a combined CSV for graphing via dygraph.
+
+Temperature values are from a TEMP36
+(see http://learn.adafruit.com/tmp36-temperature-sensor ).
 """
 
 import datetime
