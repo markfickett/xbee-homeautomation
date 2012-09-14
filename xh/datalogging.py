@@ -3,6 +3,7 @@ Write named data values to rotating csv files.
 """
 import datetime
 import logging
+import logging.handlers
 import os
 
 from .protocol import PIN
