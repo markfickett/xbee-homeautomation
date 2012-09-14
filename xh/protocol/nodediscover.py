@@ -36,11 +36,10 @@ class NodeDiscover(Command):
 
 		# serial high (4)
 		# serial low (4)
-		serial = encoding.stringToNumber(s[i:i+4])
-		i = i + 4
-		serial = serial * encoding.BYTE_BASE**4
-		serial = serial + encoding.stringToNumber(s[i:i+4])
-		i = i + 4
+		serial = encoding.buildSerial(
+			encoding.stringToNumber(s[i:i+4]),
+			encoding.stringToNumber(s[i+4:i+8]))
+		i = i + 8
 		id.setSerial(serial)
 
 		# node identifier string (null-terminated)
