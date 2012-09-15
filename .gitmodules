@@ -4,3 +4,6 @@
 [submodule "xh/deps/python-xbee"]
 	path = xh/deps/python-xbee
 	url = git@github.com:markfickett/python-xbee.git
+[submodule "xh/deps/yapsy"]
+	path = xh/deps/yapsy
+	url = git@github.com:markfickett/yapsy.git
