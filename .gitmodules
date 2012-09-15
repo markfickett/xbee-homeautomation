@@ -1,3 +1,6 @@
 [submodule "xh/deps/pysignals"]
 	path = xh/deps/pysignals
 	url = git://github.com/markfickett/PySignals.git
+[submodule "xh/deps/python-xbee"]
+	path = xh/deps/python-xbee
+	url = git@github.com:markfickett/python-xbee.git

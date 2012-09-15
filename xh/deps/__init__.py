@@ -8,23 +8,17 @@ import sys
 
 
 log = logging.getLogger('xh.deps')
-
+SUBMODULE_MSG = 'submodule %s. Try: git submodule update --init'
 failedImports = []
+
+def _addLocalPath(subdirName):
+	sys.path.append(os.path.join(os.path.dirname(__file__), subdirName))
 
 try:
 	import serial
 except ImportError as e:
 	failedImports.append(
 		('pySerial >=2.6 from http://pyserial.sourceforge.net/', e))
-
-try:
-	import xbee
-except ImportError as e:
-	failedImports.append(
-		('python-xbee from http://code.google.com/p/python-xbee/ (for '
-		+ 'voltage supply monitoring, version > 2.0, including '
-		+ 'http://code.google.com/p/python-xbee/source/detail?'
-		+ 'r=0e65c638e9bf .)', e))
 
 try:
 	from enum import Enum
@@ -37,13 +31,19 @@ except ImportError as e:
 	failedImports.append(
 		('yapsy from http://sourceforge.net/projects/yapsy/', e))
 
-PYSIGNALS_PATH = os.path.join(os.path.dirname(__file__), 'pysignals')
-sys.path.append(PYSIGNALS_PATH)
 try:
+	name = 'pysignals'
+	addLocalPath(name)
 	import pysignals
 except ImportError as e:
-	failedImports.append(
-		('submodule pysignals. Try: git submodule update --init', e))
+	failedImports.append((SUBMODULE_MSG % name, e))
+
+try:
+	name = 'python-xbee'
+	addLocalPath(name)
+	import xbee
+except ImportError as e:
+	failedImports.append((SUBMODULE_MSG % name, e))
 
 if failedImports:
 	msg = 'Unable to import required dependencies:'
@@ -51,5 +51,4 @@ if failedImports:
 		msg += '\n\t%s: requires %s' % (e.message, description)
 	log.error(msg)
 	raise e
-
 

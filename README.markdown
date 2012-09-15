@@ -55,7 +55,6 @@ External Dependencies
 
 * Python >= 2.7 (uses argparse, introduced in 2.7)
 * [pySerial](http://pyserial.sourceforge.net/) >= 2.6
-* [python-xbee](http://code.google.com/p/python-xbee/downloads/list) (developed with version 2.0.0)
 * [Enum](http://pypi.python.org/pypi/enum/) for enumerations
 * [Yapsy](http://sourceforge.net/projects/yapsy/) for plugin loading
 * [setuptools](pypi.python.org/pypi/setuptools) used by the installation scripts of some other packages
@@ -63,7 +62,8 @@ External Dependencies
 Included Dependencies
 ---------------------
 
-* [pysignals](https://github.com/theojulienne/PySignals) for decoupled communication (to and among plugins)
+* [pysignals](https://github.com/theojulienne/PySignals) for decoupled communication (to and among plugins), using submodule [forked on github](https://github.com/markfickett/PySignals)
+* [python-xbee](http://code.google.com/p/python-xbee/downloads/list), using submodule [forked on github](https://github.com/markfickett/python-xbee)
 
 Related Work
 ------------
