@@ -72,6 +72,7 @@ def activatedPlugins():
 		try:
 			pluginInfo.plugin_object.activate()
 			activated.append(pluginInfo)
+			log.debug('activated plugin %s', pluginInfo.name)
 		except:
 			log.error(('Exception activating plugin "%s". (Will not'
 				+ ' deactivate.)') % pluginInfo.name,
