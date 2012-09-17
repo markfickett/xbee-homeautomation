@@ -19,6 +19,7 @@ class Plugin(IPlugin):
 
 	def __init__(self, receiveFrames=False):
 		"""
+		Set up internal state, read configuration, etc.
 		@param receiveFrames If True, register to have _frameReceived
 			be called.
 		"""
@@ -37,6 +38,9 @@ class Plugin(IPlugin):
 
 
 	def activate(self):
+		"""
+		Start doing things: connect to signals, send commands, etc.
+		"""
 		IPlugin.activate(self)
 		if self.__receiveFrames:
 			def handleFrameCb(sender=None, signal=None, frame=None):
@@ -50,6 +54,10 @@ class Plugin(IPlugin):
 
 
 	def getPluginObjByName(self, otherPluginName):
+		"""
+		Get (the xh.Plugin object for) another plugin, specified by
+		name as it appears in that plugin's config file.
+		"""
 		manager = PluginManagerSingleton.get()
 		pluginInfo = manager.getPluginByName(otherPluginName)
 		if not pluginInfo:
