@@ -36,7 +36,8 @@ def log(name, value, timestamp=None, pinName=None, serial=None):
 	keyword arguments pinName and serial are included, they are sent with
 	the signal.
 	"""
-	_getLogger().log(name, value, timestamp=timestamp, **kwargs)
+	_getLogger().log(name, value, timestamp=timestamp,
+			pinName=pinName, serial=serial)
 
 
 def formatTimestamp(timestamp):
@@ -96,12 +97,13 @@ class _DataLogger:
 	def log(self, name, value, timestamp=None,
 			pinName=None, serial=None):
 		t = timestamp or datetime.datetime.utcnow()
-		formattedTime = formatTimestamp(t)
+		formattedTimestamp = formatTimestamp(t)
 		formattedValue = str(value)
 		self._getLogger(name).info('%s,%s',
-				formattedTime, formattedValue)
-		statusLog.debug('%s %s %s', name, formattedTime, formattedValue)
-		signals.DATA_LOGGED.send(
+				formattedTimestamp, formattedValue)
+		statusLog.debug('%s %s %s', name,
+				formattedTimestamp, formattedValue)
+		signals.DATA_LOGGED.send_robust(sender=None,
 			name=name,
 			value=value,
 			formattedValue=formattedValue,
