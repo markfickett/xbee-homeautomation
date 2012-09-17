@@ -7,7 +7,7 @@ import logging.handlers
 import os
 
 from .protocol import PIN
-from . import Config
+from . import Config, signals
 
 
 statusLog = logging.getLogger('DataLogging')
@@ -23,15 +23,20 @@ def logPinValue(serial, pinName, value, timestamp=None):
 	serialStr = formatSerial(serial)
 	if pinName not in PIN:
 		raise ValueError()
-	log('%s-%s' % (serialStr, str(pinName)), value, timestamp=timestamp)
+	log('%s-%s' % (serialStr, str(pinName)), value, timestamp=timestamp,
+			serial=serial, pinName=pinName)
 
 
-def log(name, value, timestamp=None):
+def log(name, value, timestamp=None, pinName=None, serial=None):
 	"""
 	Write a timestamped value to a named data log file.
-	@timestamp a datetime.datetime, defaulting to utcnow()
+	@param timestamp a datetime.datetime, defaulting to utcnow()
+
+	A DATA_LOGGED signal is sent when the value is logged. If the extra
+	keyword arguments pinName and serial are included, they are sent with
+	the signal.
 	"""
-	_getLogger().log(name, value, timestamp=timestamp)
+	_getLogger().log(name, value, timestamp=timestamp, **kwargs)
 
 
 def formatTimestamp(timestamp):
@@ -88,9 +93,21 @@ class _DataLogger:
 		return dataLog
 
 
-	def log(self, name, value, timestamp=None):
-		formattedTime = formatTimestamp(
-			timestamp or datetime.datetime.utcnow())
-		self._getLogger(name).info('%s,%s', formattedTime, value)
-		statusLog.debug('%s %s %s', name, formattedTime, value)
+	def log(self, name, value, timestamp=None,
+			pinName=None, serial=None):
+		t = timestamp or datetime.datetime.utcnow()
+		formattedTime = formatTimestamp(t)
+		formattedValue = str(value)
+		self._getLogger(name).info('%s,%s',
+				formattedTime, formattedValue)
+		statusLog.debug('%s %s %s', name, formattedTime, formattedValue)
+		signals.DATA_LOGGED.send(
+			name=name,
+			value=value,
+			formattedValue=formattedValue,
+			timestamp=timestamp,
+			formattedTimestamp=formattedTimestamp,
+			pinName=pinName,
+			serial=serial,
+		)
 
