@@ -52,14 +52,16 @@ INTERACT_BANNER = ('The xbee object is available as "xb". A received frame list'
 
 def run(args):
 	log.debug('collecting plugins')
-	if not args.noplugins:
+	if not args.noPlugins:
 		xh.setuputil.collectPlugins()
 	fl = getFrameLoggerPlugin()
 	xh.setuputil.setLoggerRedisplayAfterEmit(logging.getLogger())
-	with xh.setuputil.initializedXbee(serialDevice=args.serialDevice) as xb:
+	serialDevice = (xh.setuputil.FAKE_SERIAL if args.fakeSerial
+			else args.serialDevice)
+	with xh.setuputil.initializedXbee(serialDevice=serialDevice) as xb:
 		log.info('connected to locally attached XBee')
 		xh.protocol.Command.setXbeeSingleton(xb)
-		with (xh.util.noopContext() if args.noplugins
+		with (xh.util.noopContext() if args.noPlugins
 				else xh.setuputil.activatedPlugins()):
 			log.info('started')
 
@@ -113,8 +115,11 @@ def list(args):
 	log.info(pluginInfoStr)
 
 	try:
+		serialDevice = (setuputil.FAKE_SERIAL if args.fakeSerial
+				else args.serialDevice)
 		nodeInfoList = listNodeIds(
-			serialDevice=args.serialDevice,
+			fakeXbee=args.fakeXbee,
+			serialDevice=serialDevice,
 			timeout=args.timeout)
 	except:
 		log.debug('error listing available XBees', exc_info=True)
@@ -174,6 +179,7 @@ def setVerbosity(verbose, quiet):
 def main():
 	args = parser.parse_args()
 	setVerbosity(args.verbose, args.quiet)
+	xh.setuputil.setDependenciesLoggingLevel(logging.WARNING)
 	with xh.Config():
 		log.debug('opened config')
 		args.func(args)
@@ -199,14 +205,19 @@ def addCommonArguments(*subparsers):
 		verbosityGroup = commonGroup.add_mutually_exclusive_group()
 		verbosityGroup.add_argument('--verbose', '-v', action='count')
 		verbosityGroup.add_argument('--quiet', '-q', action='count')
-		commonGroup.add_argument('--serial-device', dest='serialDevice',
+		serialGroup = commonGroup.add_mutually_exclusive_group()
+		serialGroup.add_argument('--serial-device', dest='serialDevice',
 			help='Device to use for local XBee communication.')
+		serialGroup.add_argument('--fake-serial', dest='fakeSerial',
+			action='store_true',
+			help='Use a fake XBee object and do not look for or'
+			+ ' open a serial device.')
 
 subparsers = parser.add_subparsers(title='commands')
 
 runParser = subparsers.add_parser('run')
 runParser.set_defaults(func=run)
-runParser.add_argument('--no-plugins', action='store_true', dest='noplugins',
+runParser.add_argument('--no-plugins', action='store_true', dest='noPlugins',
 	help='Do not load or activate any plugins.')
 
 listParser = subparsers.add_parser('list')

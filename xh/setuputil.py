@@ -12,13 +12,15 @@ import traceback
 
 from yapsy.PluginManager import PluginManagerSingleton
 
-from .deps import serial, xbee
+from .deps import serial, xbee, yapsy
+from xbee.tests.Fake import FakeDevice
 from . import Config, signals, protocol
 
 
 log = logging.getLogger('xh.setuputil')
 
-
+# special value for the serial device for which a fake is used
+FAKE_SERIAL = 'fake serial device'
 
 # ignore in finding Serial ports
 EXCLUDE_DEVICES = set([
@@ -99,9 +101,16 @@ def initializedXbee(serialDevice=None):
 	object representing the module, for sending frames.
 
 	A signals.FRAME_RECEIVED signal will be sent when a frame is received.
+
+	If FAKE_SERIAL is used for the serial device name, a fake object is
+	created (and no communication is actually done).
 	"""
-	device = serialDevice or pickSerialDevice()
-	serialObj = serial.Serial(device, Config.SERIAL_BAUD)
+
+	if serialDevice == FAKE_SERIAL:
+		serialObj = FakeDevice()
+	else:
+		device = serialDevice or pickSerialDevice()
+		serialObj = serial.Serial(device, Config.SERIAL_BAUD)
 
 	def parseFrameAndSendSignal(rawData):
 		frame = protocol.ParseFromDictSafe(rawData)
@@ -161,5 +170,14 @@ def setLoggerRedisplayAfterEmit(loggerInst):
 			readline.redisplay()
 			_previousReadlineBufferContents = b
 	handler.emit = newEmitFn
+
+
+def setDependenciesLoggingLevel(level):
+	"""
+	Set the logging level of dependencies which use the logging library.
+	This is intended, for example, to allow keeping third-party libraries
+	quiet while getting debug information from this library.
+	"""
+	yapsy.log.setLevel(level)
 
 
