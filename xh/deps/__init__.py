@@ -15,10 +15,11 @@ def _addLocalPath(subdirName):
 	sys.path.insert(0, os.path.join(os.path.dirname(__file__), subdirName))
 
 try:
+	name = 'pyserial'
+	_addLocalPath(name)
 	import serial
 except ImportError as e:
-	failedImports.append(
-		('pySerial >=2.6 from http://pyserial.sourceforge.net/', e))
+	failedImports.append((SUBMODULE_MSG % name, e))
 
 try:
 	from enum import Enum

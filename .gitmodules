@@ -7,3 +7,6 @@
 [submodule "xh/deps/yapsy"]
 	path = xh/deps/yapsy
 	url = git@github.com:markfickett/yapsy.git
+[submodule "xh/deps/pyserial"]
+	path = xh/deps/pyserial
+	url = git://github.com/makerbot/pyserial.git
