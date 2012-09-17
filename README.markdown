@@ -54,16 +54,16 @@ External Dependencies
 ---------------------
 
 * Python >= 2.7 (uses argparse, introduced in 2.7)
-* [pySerial](http://pyserial.sourceforge.net/) >= 2.6
 * [Enum](http://pypi.python.org/pypi/enum/) for enumerations
-* [Yapsy](http://sourceforge.net/projects/yapsy/) for plugin loading
 * [setuptools](pypi.python.org/pypi/setuptools) used by the installation scripts of some other packages
 
 Included Dependencies
 ---------------------
 
+* [pySerial](https://github.com/makerbot/pyserial) for communication over serial USB with the XBee device
 * [pysignals](https://github.com/theojulienne/PySignals) for decoupled communication (to and among plugins), using submodule [forked on github](https://github.com/markfickett/PySignals)
-* [python-xbee](http://code.google.com/p/python-xbee/downloads/list), using submodule [forked on github](https://github.com/markfickett/python-xbee)
+* [python-xbee](http://code.google.com/p/python-xbee/downloads/list) for low-level API-mode communication with the XBee device, using submodule [forked on github](https://github.com/markfickett/python-xbee)
+* [Yapsy](http://sourceforge.net/projects/yapsy/) for plugin loading, using submodule [forked on github](https://github.com/markfickett/yapsy)
 
 Related Work
 ------------
