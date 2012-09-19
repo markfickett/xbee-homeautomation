@@ -5,6 +5,7 @@ import datetime
 import logging
 import logging.handlers
 import os
+import re
 
 from .protocol import PIN
 from . import Config, signals
@@ -14,6 +15,8 @@ statusLog = logging.getLogger('DataLogging')
 
 # Ex: '2012 Jun 17 23:24:18 UTC'
 DATETIME_FORMAT = '%Y %b %d %H:%M:%S UTC'
+_FILE_NAME_T = os.path.join(Config.DATA_DIR, 'datalog-%s.csv')
+_FILE_NAME_RE = re.compile(_FILE_NAME_T % '(.*)')
 
 
 def logPinValue(serial, pinName, value, timestamp=None):
@@ -44,11 +47,43 @@ def formatTimestamp(timestamp):
 	return datetime.datetime.strftime(timestamp, DATETIME_FORMAT)
 
 
+def parseTimestamp(timestampStr):
+	return datetime.datetime.strptime(timestampStr, DATETIME_FORMAT)
+
+
 def formatSerial(serial):
 	"""
 	Pretty-print an XBee serial number as a 16-character hex string.
 	"""
 	return '0x%016x' % serial
+
+
+def getLogFileNames():
+	"""
+	@return a map of dataset names to absolute path of existing log files.
+	"""
+	dataFileNames = [os.path.join(Config.DATA_DIR, fileName)
+			for fileName in os.listdir(Config.DATA_DIR)]
+	datasetToLogFileName = {}
+	for fileName in dataFileNames:
+		match = _FILE_NAME_RE.match(fileName)
+		if match:
+			datasetToLogFileName[match.group(1)] = fileName
+	return datasetToLogFileName
+
+
+def parseLogFile(logFile):
+	"""
+	@param logFile an open file (or other like object)
+	@return a list of (datetime, string value) tuples, in chronological
+		order (oldest first)
+	"""
+	data = []
+	for line in logFile:
+		dateStr, valueStr = line.strip().split(',')
+		d = parseTimestamp(dateStr)
+		data.append((d, valueStr))
+	return data
 
 
 global _dataLoggerSingleton
@@ -65,12 +100,11 @@ def _getLogger():
 class _DataLogger:
 	_MAX_BYTES_PER_LOGFILE = 5 * 1024 * 1024 # 5MB
 	_MAX_FILES_PER_NAME = 100
-	_FILE_NAME_T = os.path.join(Config.DATA_DIR, 'datalog-%s.csv')
 
 
 	def __init__(self):
 		self.__loggers = {}
-		statusLog.debug('will log data to %s', self._FILE_NAME_T)
+		statusLog.debug('will log data to %s', _FILE_NAME_T)
 
 
 	def _getLogger(self, name):
@@ -86,7 +120,7 @@ class _DataLogger:
 			dataLog.propagate = False
 
 			handler = logging.handlers.RotatingFileHandler(
-				self._FILE_NAME_T % name,
+				_FILE_NAME_T % name,
 				maxBytes=self._MAX_BYTES_PER_LOGFILE,
 				backupCount=self._MAX_FILES_PER_NAME)
 			dataLog.addHandler(handler)

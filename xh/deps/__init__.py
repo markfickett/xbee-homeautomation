@@ -11,12 +11,19 @@ log = logging.getLogger('xh.deps')
 SUBMODULE_MSG = 'submodule %s. Try: git submodule update --init'
 failedImports = []
 
-def _addLocalPath(subdirName):
-	sys.path.insert(0, os.path.join(os.path.dirname(__file__), subdirName))
+
+def addRelativePath(subdirName, relativeTo):
+	"""
+	Add a module path (for a dependency) by specifying a path relative to
+	some file (typically __file__).
+	"""
+	sys.path.insert(0, os.path.join(
+			os.path.dirname(relativeTo), subdirName))
+
 
 try:
 	name = 'pyserial'
-	_addLocalPath(name)
+	addRelativePath(name, __file__)
 	import serial
 except ImportError as e:
 	failedImports.append((SUBMODULE_MSG % name, e))
@@ -28,21 +35,21 @@ except ImportError as e:
 
 try:
 	name = 'pysignals'
-	_addLocalPath(name)
+	addRelativePath(name, __file__)
 	import pysignals
 except ImportError as e:
 	failedImports.append((SUBMODULE_MSG % name, e))
 
 try:
 	name = 'python-xbee'
-	_addLocalPath(name)
+	addRelativePath(name, __file__)
 	import xbee
 except ImportError as e:
 	failedImports.append((SUBMODULE_MSG % name, e))
 
 try:
-	name = 'yapsy/package'
-	_addLocalPath(name)
+	name = os.path.join('yapsy', 'package')
+	addRelativePath(name, __file__)
 	import yapsy
 except ImportError as e:
 	failedImports.append((SUBMODULE_MSG % name, e))

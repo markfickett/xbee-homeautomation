@@ -16,10 +16,10 @@ class Config:
 	ConfigParser.
 	"""
 	SERIAL_BAUD = 9600
-	PLUGIN_DIR = os.path.abspath(os.path.join(
-			os.path.dirname(__file__), '..', 'plugins'))
-	DATA_DIR = os.path.abspath(os.path.join(
-			os.path.dirname(__file__), '..', 'data'))
+	PLUGIN_DIR = os.path.normpath(os.path.abspath(os.path.join(
+			os.path.dirname(__file__), '..', 'plugins')))
+	DATA_DIR = os.path.normpath(os.path.abspath(os.path.join(
+			os.path.dirname(__file__), '..', 'data')))
 	PLUGIN_INFO_EXTENSION = 'xh-plugin-info'
 	CONFIG_FILE_NAME = '~/.xhconfig'
 
