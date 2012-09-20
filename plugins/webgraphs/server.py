@@ -81,20 +81,19 @@ class Server(xh.Plugin):
 	def _dataLogged(self, name=None, value=None, timestamp=None,
 			formattedValue=None, formattedTimestamp=None,
 			serial=None, pinName=None):
-		log.info('got data: %s=%s', name, formattedValue)
 		with self.__httpd.xhdataLock:
 			d = self.__httpd.xhdata.get(name)
 			if d is None:
-				d = {}
+				d = []
 				self.__httpd.xhdata[name] = d
-			d[timestamp] = value
+			d.append((timestamp, formattedValue))
 
 
 
 class _HttpHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	def do_GET(self):
 		if self.path == '/':
-			return self.handleMainPage()
+			return self.__handleMainPage()
 		else:
 			self.send_response(RESPONSE_NOT_FOUND)
 			self.end_headers()
@@ -106,14 +105,16 @@ class _HttpHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		self.end_headers()
 
 
-	def handleMainPage(self):
+	def __handleMainPage(self):
 		self.__sendOkHeaders()
 
 		with self.server.xhdataLock:
 			data = dict(self.server.xhdata)
-		log.debug('using data from %d datasets', len(data))
 		graphs = graphconfig.graphs
-		log.debug('building %d graphs', len(graphs))
+
+		numPoints = sum([len(d) for d in data.values()])
+		log.debug('building %d graphs from %d points in %d datasets',
+				len(graphs), numPoints, len(data))
 
 		chartDivs = ''
 		for name, _ in graphs:
