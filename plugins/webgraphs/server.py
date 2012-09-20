@@ -12,7 +12,7 @@ import templates
 
 
 log = logging.getLogger('webgraph.Server')
-HOST_NAME = 'localhost'
+HOST_NAME = '' # accessable by any name
 PORT_NUMBER = 8080
 
 RESPONSE_OK = 200
@@ -58,7 +58,8 @@ class Server(xh.Plugin):
 
 
 	def runHttpdUntilStopped(self):
-		log.info('listening at http://%s:%d', HOST_NAME, PORT_NUMBER)
+		log.info('listening at http://%s:%d',
+				HOST_NAME or '*', PORT_NUMBER)
 		self.__httpd.serve_forever()
 		self.__httpd.server_close()
 		self.__httpdStoppedEvent.set()
