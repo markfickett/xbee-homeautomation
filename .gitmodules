@@ -3,10 +3,10 @@
 	url = git://github.com/markfickett/PySignals.git
 [submodule "xh/deps/python-xbee"]
 	path = xh/deps/python-xbee
-	url = git@github.com:markfickett/python-xbee.git
+	url = git://github.com/markfickett/python-xbee.git
 [submodule "xh/deps/yapsy"]
 	path = xh/deps/yapsy
-	url = git@github.com:markfickett/yapsy.git
+	url = git://github.com/markfickett/yapsy.git
 [submodule "xh/deps/pyserial"]
 	path = xh/deps/pyserial
 	url = git://github.com/makerbot/pyserial.git
