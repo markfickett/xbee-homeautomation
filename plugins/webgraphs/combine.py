@@ -29,6 +29,81 @@ def _getJsDateString(d):
 	return 'new Date(%d)' % _getEpochMillis(d)
 
 
+def _buildSeriesData(seriesDefinitions, allLogData, mapFn):
+	"""
+	Convert from log data, named by data source, of the form:
+		{ loggedName: [ datetime: rawValueStr, ... ], ...  }
+	to series data, with semantic names and mapped values, of the form:
+		{ seriesName: { datetime: mappedValueStr, ... }, ... }
+	Also insert gap markers (GAP_VALUE) where no data was logged for GAP_DT.
+	"""
+	allSeriesData = {}
+	for logName, optionsList in seriesDefinitions.iteritems():
+		logData = allLogData.get(logName)
+		if not logData:
+			log.warning('no data for %s, series are %s',
+					logName, logData.keys())
+			continue
+
+		dataStartIndex = 0
+		for optionsDict in optionsList:
+			dataStartIndex = _addToSeriesData(allSeriesData,
+					optionsDict, logName, logData,
+					mapFn, dataStartIndex)
+
+		n = len(logData)
+		if dataStartIndex < n:
+			log.warning('only used %d of %d entries for %s.',
+					dataStartIndex, n, logName)
+
+	return allSeriesData
+
+
+def _addToSeriesData(allSeriesData, optionsDict, logName, logData,
+		mapFn, startDataIndex):
+	"""
+	Update the series data dict with data from one log-data source according
+	to one series definition.
+
+	If optionsDict contains 'lastDate', do not process any logged data
+	dated later than lastDate.
+	"""
+	n = len(logData)
+	if not startDataIndex < n:
+		log.warning('already processed all logged data, skipping'
+				+ ' series defined by %s', optionsDict)
+		return startDataIndex
+
+	dataIndex = startDataIndex
+	seriesTitle = optionsDict.get('title', logName)
+	seriesData = allSeriesData.get(seriesTitle)
+	if seriesData is None:
+		seriesData = {}
+		allSeriesData[seriesTitle] = seriesData
+
+	previousDate = None
+	lastDate = optionsDict.get('lastDate')
+	if lastDate:
+		lastDate = xh.datalogging.parseTimestamp(lastDate)
+
+	while dataIndex < n:
+		d, valueStr = logData[dataIndex]
+		if lastDate is not None and d > lastDate:
+			seriesData[lastDate + (d - lastDate)/2] = GAP_VALUE
+			return dataIndex
+
+		if mapFn:
+			valueStr = mapFn(valueStr)
+		seriesData[d] = valueStr
+		if previousDate is not None and (d - previousDate) > GAP_DT:
+			seriesData[previousDate+GAP_DT] = GAP_VALUE
+		previousDate = d
+
+		dataIndex += 1
+
+	return dataIndex
+
+
 def buildJsData(graphDefinitions, allLogData):
 	"""
 	Use graph definitions to transform log data into javascript blobs
@@ -36,30 +111,11 @@ def buildJsData(graphDefinitions, allLogData):
 	"""
 	seriesDefinitions = graphDefinitions['series']
 
-	# build a dict of {name for output: {date object: numeric value}}
-	# insert gap markers
-	allSeriesData = {}
-	for logName, optionsList in seriesDefinitions.iteritems():
-		if len(optionsList) != 1:
-			raise RuntimeError('for now expect all to have one')
-		optionsDict = optionsList[0]
-		logData = allLogData.get(logName)
-		if not logData:
-			log.warning('no data for %s, series are %s',
-					logName, allLogData.keys())
-			continue
-		seriesTitle = optionsDict.get('title', logName)
-		mapFn = optionsDict['map']
-		seriesData = allSeriesData.get(seriesTitle)
-		if seriesData is None:
-			seriesData = {}
-			allSeriesData[seriesTitle] = seriesData
-		lastD = None
-		for d, valueStr in logData:
-			seriesData[d] = mapFn(valueStr)
-			if lastD is not None and (d - lastD) > GAP_DT:
-				seriesData[lastD+GAP_DT] = GAP_VALUE
-			lastD = d
+	# Reorganize data to be categorized by series (name of a line on a graph
+	# and not log (name of a data source, often an XBee).
+	# Insert gap markers.
+	allSeriesData = _buildSeriesData(seriesDefinitions, allLogData,
+		graphDefinitions.get('map'))
 
 	seriesTitles = allSeriesData.keys()
 	numSeries = len(seriesTitles)
