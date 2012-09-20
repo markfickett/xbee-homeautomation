@@ -29,28 +29,30 @@ graphs.append(('temperature', {
 	'map': voltsToF,
 	'series': {
 		'0x0013a200408cca0e-AD0': [
-			{
-				'title': 'Bathroom a',
+			{	'title': 'Bathroom',
 			},
 		],
 		'0x0013a200408cca0e-AD1': [
-			{
-				'title': 'Outside',
+			{	'title': 'Outside',
+				'lastDate': '2012 Sep 12 03:44:30 UTC',
+			},
+			{	'title': 'Living Room (on wires)',
 			},
 		],
 		'0x0013a200408cca0e-AD2': [
-			{
-				'title': 'Bathroom b',
+			{	'title': 'Bathroom',
+				'lastDate': '2012 Sep 12 03:44:30 UTC',
+			},
+			{	'title': 'Living Room (on board)',
 			},
 		],
 		'0x0013a200409028b6-AD0': [
-			{
-				'title': 'Bedroom',
+			{	'title': 'Bedroom',
 			},
 		],
 	},
 	'annotations': [
-		{	'series': 'Bathroom a',
+		{	'series': 'Bathroom',
 			'x': '2012 Aug 27 22:54:44 UTC',
 			'shortText': 'X',
 			'text': 'no reverse-voltage protection (sensor fried)',
@@ -87,7 +89,7 @@ graphs.append(('temperature', {
 			'text': 'shortened number of sleep periods'
 				+ ' from 10 to 5',
 		},
-		{	'series': 'Bathroom b',
+		{	'series': 'Bathroom',
 			'x': '2012 Sep 09 00:44:28 UTC',
 			'shortText': 'X',
 			'text': 'bogus -58F recorded for bathroom/outdoor:'
@@ -98,35 +100,38 @@ graphs.append(('temperature', {
 			'shortText': 'S',
 			'text': 'moved coordinator XBee to server machine',
 		},
-		{	'series': 'Bathroom b',
+		{	'series': 'Bathroom',
 			'x': '2012 Sep 12 03:34:44 UTC',
 			'shortText': 'B',
 			'text': 'new board for bathroom/outdoor XBee:'
 				+ ' seats properly',
 		},
-		{	'series': 'Bathroom b',
+		{	'series': 'Living Room (on board)',
 			'x': '2012 Sep 13 03:32:39 UTC',
 			'shortText': 'Lr',
 			'text': 'move outdoor/bathroom XBee to living room:'
 				+ ' closer to coordinator XBee',
 		},
-		{	'series': 'Bathroom b',
+		{	'series': 'Living Room (on board)',
 			'x': '2012 Sep 13 17:37:15 UTC',
 			'shortText': 'Su',
 			'text': 'guess: sun through the window on the sensor',
 		},
-		{
-			'series': 'Bedroom',
+		{	'series': 'Bedroom',
 			'x': '2012 Sep 14 00:00:01 UTC',
 			'shortText': 'F',
 			'text': 'start evacuative window fan in LR'
 				+ ' with BR window open',
 		},
-		{
-			'series': 'Bedroom',
+		{	'series': 'Bedroom',
 			'x': '2012 Sep 14 02:45:20 UTC',
 			'shortText': 'F',
 			'text': 'evacuative window fan on',
+		},
+		{	'series': 'Living Room (on board)',
+			'x': '2012 Sep 19 21:35:23 UTC',
+			'shortText': 'D',
+			'text': 'leave door open',
 		},
 	],
 }))

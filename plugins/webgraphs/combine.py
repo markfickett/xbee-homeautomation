@@ -81,7 +81,6 @@ def _addToSeriesData(allSeriesData, optionsDict, logName, logData,
 		seriesData = {}
 		allSeriesData[seriesTitle] = seriesData
 
-	previousDate = None
 	lastDate = optionsDict.get('lastDate')
 	if lastDate:
 		lastDate = xh.datalogging.parseTimestamp(lastDate)
@@ -95,9 +94,6 @@ def _addToSeriesData(allSeriesData, optionsDict, logName, logData,
 		if mapFn:
 			valueStr = mapFn(valueStr)
 		seriesData[d] = valueStr
-		if previousDate is not None and (d - previousDate) > GAP_DT:
-			seriesData[previousDate+GAP_DT] = GAP_VALUE
-		previousDate = d
 
 		dataIndex += 1
 
@@ -113,18 +109,23 @@ def buildJsData(graphDefinitions, allLogData):
 
 	# Reorganize data to be categorized by series (name of a line on a graph
 	# and not log (name of a data source, often an XBee).
-	# Insert gap markers.
 	allSeriesData = _buildSeriesData(seriesDefinitions, allLogData,
 		graphDefinitions.get('map'))
 
 	seriesTitles = allSeriesData.keys()
 	numSeries = len(seriesTitles)
-	# build a combined dict of {date object: (row entries)}
+	# Build a combined dict of {date object: (row entries)}.
+	# Insert gap markers.
 	rowData = {}
 	for seriesName, seriesValuesDict in allSeriesData.iteritems():
 		seriesIndex = seriesTitles.index(seriesName)
-		for d, v in seriesValuesDict.iteritems():
+		prevD = None
+		for d, v in sorted(seriesValuesDict.items()):
+			if prevD is not None and (d - prevD > GAP_DT):
+				_addToRow(rowData, prevD + GAP_DT, GAP_VALUE,
+						seriesIndex, numSeries)
 			_addToRow(rowData, d, v, seriesIndex, numSeries)
+			prevD = d
 
 	# build javascript text
 	dataJsStr = '[\n'
