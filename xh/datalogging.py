@@ -137,13 +137,14 @@ class _DataLogger:
 				formattedTimestamp, formattedValue)
 		statusLog.debug('%s %s %s', name,
 				formattedTimestamp, formattedValue)
-		signals.DATA_LOGGED.send_robust(sender=None,
+		responses = signals.DATA_LOGGED.send_robust(sender=None,
 			name=name,
 			value=value,
 			formattedValue=formattedValue,
-			timestamp=timestamp,
+			timestamp=t,
 			formattedTimestamp=formattedTimestamp,
 			pinName=pinName,
 			serial=serial,
 		)
+		signals.logErrors(responses)
 

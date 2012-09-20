@@ -89,12 +89,6 @@ def activatedPlugins():
 				% pluginInfo.name, exc_info=True)
 
 
-def _isErrorTuple(o):
-	return (isinstance(o, tuple)
-		and len(o) == 3
-		and type(o[0]) == type)
-
-
 @contextlib.contextmanager
 def initializedXbee(serialDevice=None):
 	"""
@@ -118,14 +112,7 @@ def initializedXbee(serialDevice=None):
 		if frame:
 			responses = signals.FRAME_RECEIVED.send_robust(
 					sender=None, frame=frame)
-			for receiver, responseOrErr in responses:
-				if not _isErrorTuple(responseOrErr):
-					continue
-				formatted = ''.join(traceback.
-					format_exception(*responseOrErr))
-				log.error(('error in receiver %s handling %s '
-				+ '(parsed successfully from %s):\n%s')
-				% (receiver, frame, rawData, formatted))
+			signals.logErrors(responses)
 
 	xb = xbee.ZigBee(serialObj, callback=parseFrameAndSendSignal)
 
