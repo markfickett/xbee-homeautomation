@@ -16,6 +16,10 @@ def _voltsToF(volts):
         return _voltsToC(volts) * (9.0/5.0) + 32
 
 
+def voltsToC(voltsStr):
+	return str(_voltsToC(float(voltsStr)))
+
+
 def voltsToF(voltsStr):
 	"""
 	Convert a string-formatted volts value to a string-formatted
@@ -24,8 +28,8 @@ def voltsToF(voltsStr):
         return str(_voltsToF(float(voltsStr)))
 
 
-graphs.append(('temperature', {
-	'title': 'Temperature (deg F)',
+fahrenheit = {
+	'title': 'Temperature (F)',
 	'map': voltsToF,
 	'series': {
 		'0x0013a200408cca0e-AD0': [
@@ -134,7 +138,15 @@ graphs.append(('temperature', {
 			'text': 'leave door open',
 		},
 	],
-}))
+}
+graphs.append(('fahrenheit', fahrenheit))
+
+centigrade = dict(fahrenheit)
+centigrade.update({
+	'title': 'Temperature (C)',
+	'map': voltsToC,
+})
+graphs.append(('centigrade', centigrade))
 
 graphs.append(('voltage', {
 	'title': 'Voltage',
@@ -207,4 +219,3 @@ graphs.append(('voltage', {
 		},
 	],
 }))
-
