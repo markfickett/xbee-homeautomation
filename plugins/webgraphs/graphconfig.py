@@ -4,7 +4,8 @@ Read a local graph configuration file.
 A graph configuration file defines a number of Python dicts which describe how
 to rename, dice up, and otherwise transform log data -- typically (time, volts)
 pairs -- into various named lines on various graphs. The config structure is
-somewhat informed by Dygraph's options and native data structure.
+somewhat informed by Dygraphs's options and native data structure (see 
+http://dygraphs.com/).
 
 An minimal example:
 
@@ -68,6 +69,22 @@ fahrenheit = {
 		],
 		...
 	},
+	# text annotations to appear on this graph
+	'annotations': [
+		# Aside from the date (x), annotation dicts are dumped
+		# wholesale via json and used directly by Dygraphs.
+		{
+			# series (line) to attach to
+			'series': 'Outside',
+			# timestamp of a point to attach to
+			'x': '2012 Sep 18 08:12:24 UTC',
+			# text to show in a box next to the line
+			'shortText': 'F',
+			# text to show on hover, in a tooltip
+			'text': 'first frost',
+		},
+		...
+	],
 }
 """
 
