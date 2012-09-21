@@ -124,7 +124,6 @@ class _HttpHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		drawCallsJsStr = ''
 		annotationsJsStr = ''
 		for name, valueDict in graphConfigs:
-			log.debug('getting js for %s', valueDict.get('title'))
 			labelsJsStr, dataJsStr, annJsStr = combine.buildJsData(
 					valueDict, data)
 			drawCallsJsStr += templates.DRAW_CALL % {
