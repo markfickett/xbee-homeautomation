@@ -13,7 +13,7 @@ import templates
 
 log = logging.getLogger('webgraph.Server')
 HOST_NAME = '' # accessable by any name
-PORT_NUMBER = 8080
+PORT_NUMBER = 25563
 
 RESPONSE_OK = 200
 RESPONSE_NOT_FOUND = 404
