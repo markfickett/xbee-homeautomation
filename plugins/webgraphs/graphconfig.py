@@ -1,3 +1,76 @@
+"""
+Read a local graph configuration file.
+
+A graph configuration file defines a number of Python dicts which describe how
+to rename, dice up, and otherwise transform log data -- typically (time, volts)
+pairs -- into various named lines on various graphs. The config structure is
+somewhat informed by Dygraph's options and native data structure.
+
+An minimal example:
+
+fahrenheit = {
+	'title': 'Temperature (F)',
+	'map': tmp36VoltsToF,
+	'series': {
+		'0x0013a20082fab0-AD0': [{'title': 'Outside'}],
+	}
+}
+
+Comprehensively:
+
+# The variable name in Python is used to form variable names in javascript. Any
+# dictionary defined in the global namespace of the config file is used as a
+# graph config.
+fahrenheit = {
+	# overall graph title: big letters above the chart area
+	'title': 'Temperature (F)',
+
+	# in case of multiple graphs, order on the page
+	'order': 1,
+
+	# (optional, defaults to float) parsing function applied to all data in
+	# this graph, converts from a string read from the logs to (typically)
+	# a number
+	'parse': float,
+
+	# (optional, defaults to noop) mapping function applied to all data in
+	# this graph; arbitrary conversion (such as voltage numbers to
+	# temperatures, for a particular sensor)
+	'map': tmp36VoltsToF,
+
+	'series': {
+		# which log data set to draw from
+		'0x0013a20082fab0-AD0': [
+			# a list of series (lines) the data will contribute to
+			{
+				# name of the series (line) to contribute to
+				'title': 'Outside',
+
+				# (optional, defaults to noop) function which
+				# adjusts parsed values from the log, applied
+				# after parsing and before graph-level mapping;
+				# for example, to adjust sensor readings based
+				# on calibration
+				'preMap': lambda x: x + 0.02,
+
+				# optional most-recent date which will be
+				# included for this series
+				'lastDate': '2012 Sep 20 04:01:58 UTC',
+			},
+			{
+				# A second series might be used if the same
+				# physical sensor were moved: from outside,
+				# where it was through the 20th, to inside.
+				'title': 'Living Room',
+				'preMap': lambda x: x + 0.02,
+			},
+			...
+		],
+		...
+	},
+}
+"""
+
 import os
 import logging
 
@@ -16,7 +89,10 @@ def checkForLocalConfig():
 	if os.path.isfile(_CONFIG_FILE_PATH):
 		return True
 	else:
-		log.warning('no local graph config file %s', _CONFIG_FILE_PATH)
+		log.warning('No local graph config file found at %s. A graph'
+				+ ' config defines how to map log data to named'
+				+ ' lines on a graph; for details, see %s.',
+				_CONFIG_FILE_PATH, __file__)
 		return False
 
 
