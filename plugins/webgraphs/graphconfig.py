@@ -8,6 +8,18 @@ _CONFIG_FILE_PATH = os.path.join(os.path.dirname(__file__),
 		_CONFIG_FILE_NAME)
 
 
+def checkForLocalConfig():
+	"""
+	Check that the local graph config file exists. If not, log a warning.
+	@return whether the file exists
+	"""
+	if os.path.isfile(_CONFIG_FILE_PATH):
+		return True
+	else:
+		log.warning('no local graph config file %s', _CONFIG_FILE_PATH)
+		return False
+
+
 def _graphConfigCmp((nameA, configA), (nameB, configB)):
 	orderA = configA.get('order')
 	orderB = configB.get('order')
@@ -27,8 +39,7 @@ def get():
 	"""
 	localNs = {}
 	graphConfigs = []
-	if not os.path.isfile(_CONFIG_FILE_PATH):
-		log.warning('no local graph config file %s', _CONFIG_FILE_PATH)
+	if not checkForLocalConfig():
 		return graphConfigs
 	try:
 		execfile(_CONFIG_FILE_PATH, globals(), localNs)

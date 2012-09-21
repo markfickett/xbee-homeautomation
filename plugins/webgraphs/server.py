@@ -25,6 +25,7 @@ CONTENT_TYPE_HTML = 'text/html'
 class Server(xh.Plugin):
 	def __init__(self):
 		xh.Plugin.__init__(self)
+		graphconfig.checkForLocalConfig()
 
 
 	def activate(self):
