@@ -4,4 +4,4 @@ data/
 tmp.txt
 
 secretconfig.py
-xh.local.py
+*.local.py

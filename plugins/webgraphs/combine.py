@@ -10,6 +10,8 @@ TIMESTAMP_COLUMN_HEADER = 'Timestamp'
 GAP_VALUE = 'datagap'
 GAP_DT = datetime.timedelta(minutes=10)
 EPOCH = datetime.datetime.utcfromtimestamp(0)
+_UNUSEDS_TITLE = 'Unconfigured'
+_UNUSEDS_VAR_NAME = 'unconfigured'
 
 
 def _addToRow(rowDataMap, timestamp, value, columnIndex, numColumns):
@@ -29,7 +31,7 @@ def _getJsDateString(d):
 	return 'new Date(%d)' % _getEpochMillis(d)
 
 
-def _buildSeriesData(seriesDefinitions, allLogData, mapFn):
+def _buildSeriesData(seriesDefinitions, allLogData, parseFn, mapFn):
 	"""
 	Convert from log data, named by data source, of the form:
 		{ loggedName: [ datetime: rawValueStr, ... ], ...  }
@@ -49,7 +51,7 @@ def _buildSeriesData(seriesDefinitions, allLogData, mapFn):
 		for optionsDict in optionsList:
 			dataStartIndex = _addToSeriesData(allSeriesData,
 					optionsDict, logName, logData,
-					mapFn, dataStartIndex)
+					parseFn, mapFn, dataStartIndex)
 
 		n = len(logData)
 		if dataStartIndex < n:
@@ -60,7 +62,7 @@ def _buildSeriesData(seriesDefinitions, allLogData, mapFn):
 
 
 def _addToSeriesData(allSeriesData, optionsDict, logName, logData,
-		mapFn, startDataIndex):
+		parseFn, mapFn, startDataIndex):
 	"""
 	Update the series data dict with data from one log-data source according
 	to one series definition.
@@ -85,15 +87,29 @@ def _addToSeriesData(allSeriesData, optionsDict, logName, logData,
 	if lastDate:
 		lastDate = xh.datalogging.parseTimestamp(lastDate)
 
+	# Assemble the function to parse the log value (a string), do any
+	# series-specific and graph-specific mappings, and the format it as
+	# a string again for javascript.
+	preMapFn = optionsDict.get('preMap')
+	if preMapFn:
+		if mapFn:
+			parseAndMapFn = lambda s: str(mapFn(
+					preMapFn(parseFn(s))))
+		else:
+			parseAndMapFn = lambda s: str(preMapFn(parseFn(s)))
+	else:
+		if mapFn:
+			parseAndMapFn = lambda s: str(mapFn(parseFn(s)))
+		else:
+			parseAndMapFn = lambda s: str(parseFn(s))
+
 	while dataIndex < n:
 		d, valueStr = logData[dataIndex]
 		if lastDate is not None and d > lastDate:
 			seriesData[lastDate + (d - lastDate)/2] = GAP_VALUE
 			return dataIndex
 
-		if mapFn:
-			valueStr = mapFn(valueStr)
-		seriesData[d] = valueStr
+		seriesData[d] = parseAndMapFn(valueStr)
 
 		dataIndex += 1
 
@@ -109,8 +125,10 @@ def buildJsData(graphDefinitions, allLogData):
 
 	# Reorganize data to be categorized by series (name of a line on a graph
 	# and not log (name of a data source, often an XBee).
+	parseFn = graphDefinitions.get('parse', float)
+	mapFn = graphDefinitions.get('map')
 	allSeriesData = _buildSeriesData(seriesDefinitions, allLogData,
-		graphDefinitions.get('map'))
+		parseFn, mapFn)
 
 	seriesTitles = allSeriesData.keys()
 	numSeries = len(seriesTitles)
@@ -148,12 +166,34 @@ def buildJsData(graphDefinitions, allLogData):
 	labelsJsStr = json.dumps(labels)
 
 	annotationsParsed = []
-	for annotationDict in graphDefinitions['annotations'] or []:
+	for annotationDict in graphDefinitions.get('annotations', []):
 		d = dict(annotationDict)
 		d['x'] = _getEpochMillis(xh.datalogging.parseTimestamp(d['x']))
 		annotationsParsed.append(d)
 	annotationJsStr = json.dumps(annotationsParsed)
 	
 	return labelsJsStr, dataJsStr, annotationJsStr
+
+
+def addGraphForUnusedData(graphConfigs, dataKeys):
+	"""
+	Add a graph config for all the dataKeys (from logs) which are not
+	otherwise used.
+	"""
+	usedDataKeys = set()
+	for name, graphConfig in graphConfigs:
+		usedDataKeys.update(set(graphConfig.get('series', {}).keys()))
+	unusedDataKeys = set(dataKeys)
+	unusedDataKeys.difference_update(usedDataKeys)
+	if not unusedDataKeys:
+		return
+
+	log.warning('creating graph of raw values for unconfigured '
+			+ 'log data sets: %s', unusedDataKeys)
+	unusedsConfig = {
+		'title': _UNUSEDS_TITLE,
+		'series': dict([(k, [{}]) for k in unusedDataKeys]),
+	}
+	graphConfigs.append((_UNUSEDS_VAR_NAME, unusedsConfig))
 
 

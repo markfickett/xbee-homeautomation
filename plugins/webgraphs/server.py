@@ -110,18 +110,20 @@ class _HttpHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 		with self.server.xhdataLock:
 			data = dict(self.server.xhdata)
-		graphs = graphconfig.graphs
+		graphConfigs = graphconfig.get()
+		combine.addGraphForUnusedData(graphConfigs, data.keys())
 
 		numPoints = sum([len(d) for d in data.values()])
 		log.debug('building %d graphs from %d points in %d datasets',
-				len(graphs), numPoints, len(data))
+				len(graphConfigs), numPoints, len(data))
 
 		chartDivs = ''
-		for name, _ in graphs:
+		for name, _ in graphConfigs:
 			chartDivs += templates.CHART_DIV % name
 		drawCallsJsStr = ''
 		annotationsJsStr = ''
-		for name, valueDict in graphs:
+		for name, valueDict in graphConfigs:
+			log.debug('getting js for %s', valueDict.get('title'))
 			labelsJsStr, dataJsStr, annJsStr = combine.buildJsData(
 					valueDict, data)
 			drawCallsJsStr += templates.DRAW_CALL % {
