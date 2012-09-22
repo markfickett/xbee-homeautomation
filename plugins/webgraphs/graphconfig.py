@@ -19,6 +19,12 @@ fahrenheit = {
 
 Comprehensively:
 
+# The special name 'html' is inserted at the beginning of the generated page's
+# body verbatim.
+html = """
+<p>Temperatures from my basement and attic.</p>
+"""
+
 # The variable name in Python is used to form variable names in javascript. Any
 # dictionary defined in the global namespace of the config file is used as a
 # graph config.
@@ -124,11 +130,15 @@ def _graphConfigCmp((nameA, configA), (nameB, configB)):
 		return orderA.__cmp__(orderB)
 
 
-def get():
+def getConfigsAndHtml():
 	"""
 	Get configuration data for graphs. This executes %s
-	and treats any dictionaries defined therein as graph configs, returning
-	a dict of {variableName: graphConfig}.
+	and treats any dictionaries defined therein as graph configs; and this
+	looks for the special variable 'html', for a raw HTML blob.
+
+	@return a tumple of (dict of {variableName: graphConfig},
+		string or None) which are the graph configs and an optional
+		HTML blob
 	"""
 	localNs = {}
 	graphConfigs = []
@@ -145,10 +155,10 @@ def get():
 		if isinstance(value, dict):
 			graphConfigs.append((name, value))
 	graphConfigs.sort(cmp=_graphConfigCmp)
-	return graphConfigs
+	return graphConfigs, localNs.get('html')
 
 
-get.__doc__ = get.__doc__ % _CONFIG_FILE_NAME
+getConfigsAndHtml.__doc__ = getConfigsAndHtml.__doc__ % _CONFIG_FILE_NAME
 
 
 def tmp36VoltsToC(volts):

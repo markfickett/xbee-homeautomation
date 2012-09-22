@@ -111,7 +111,7 @@ class _HttpHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 		with self.server.xhdataLock:
 			data = dict(self.server.xhdata)
-		graphConfigs = graphconfig.get()
+		graphConfigs, localHtml = graphconfig.getConfigsAndHtml()
 		combine.addGraphForUnusedData(graphConfigs, data.keys())
 
 		numPoints = sum([len(d) for d in data.values()])
@@ -137,6 +137,7 @@ class _HttpHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				'dataJs': annJsStr,
 			}
 		self.wfile.write(templates.MAIN_PAGE % {
+			'localHtml': localHtml or '',
 			'chartDivsHtml': chartDivs,
 			'drawCallsJs': drawCallsJsStr,
 			'annotationsJs': annotationsJsStr
