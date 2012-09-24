@@ -21,9 +21,7 @@ Comprehensively:
 
 # The special name 'html' is inserted at the beginning of the generated page's
 # body verbatim.
-html = """
-<p>Temperatures from my basement and attic.</p>
-"""
+html = "<p>Temperatures from my basement and attic.</p>"
 
 # The variable name in Python is used to form variable names in javascript. Any
 # dictionary defined in the global namespace of the config file is used as a
