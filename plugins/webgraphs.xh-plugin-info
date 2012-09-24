@@ -3,4 +3,4 @@ Name = Web Graphs
 Module = webgraphs
 
 [Documentation]
-Description = Web server to create and display graphs of logged data.
+Description = Basic web server to create and display graphs of logged data.

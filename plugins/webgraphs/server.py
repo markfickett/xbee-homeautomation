@@ -23,6 +23,19 @@ CONTENT_TYPE_HTML = 'text/html'
 
 
 class Server(xh.Plugin):
+	"""
+	A very basic server to display graphs of logged data.
+
+	This reads logged data and munges, renames, and rearranges it for
+	Dygraphs to read in javascript. It updates as it receives DATA_LOGGED
+	signals from xh.datalogging (and makes updates available to new HTTP
+	requests).
+
+	It has numerous obvious areas for improvement: client-to-server
+	communication (for controlling home automation via web or mobile),
+	user authentication (necessary for the above), AJAX fetches of data
+	updates, and general better organization and usage of standards.
+	"""
 	def __init__(self):
 		xh.Plugin.__init__(self)
 		graphconfig.checkForLocalConfig()
