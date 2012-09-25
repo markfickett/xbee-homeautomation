@@ -81,11 +81,19 @@ def listNodeIds(serialDevice=None, timeout=None):
 			try:
 				nTimeoutResponse = xh.synchronous.sendAndWait(
 					xh.protocol.NodeDiscoveryTimeout())
+				sleepResponse = xh.synchronous.sendAndWait(
+					xh.protocol.SleepPeriod())
 			except xh.synchronous.TimeoutError, e:
 				log.error(str(e))
 				return []
-			nTimeoutMillis = nTimeoutResponse.getTimeoutMillis()
-			timeout = nTimeoutMillis / 1000.0
+			timeoutMillis = nTimeoutResponse.getTimeoutMillis()
+			sleepMillis = sleepResponse.getPeriodMillis()
+			if (sleepMillis != xh.protocol.SleepPeriod.
+					DEFAULT_PERIOD_MILLIS):
+				timeoutMillis += sleepMillis
+				log.info('will wait an extra %dms for sleeping'
+						+ ' devices', sleepMillis)
+			timeout = timeoutMillis / 1000.0
 
 		nodeInfoResponses = xh.synchronous.sendAndAccumulate(
 			xh.protocol.NodeDiscover(),
@@ -107,16 +115,11 @@ def list(args):
 		pluginInfoStr += '\n\t' + ' '.join(infos)
 	log.info(pluginInfoStr)
 
-	try:
-		serialDevice = (setuputil.FAKE_SERIAL if args.fakeSerial
-				else args.serialDevice)
-		nodeInfoList = listNodeIds(
-			fakeXbee=args.fakeXbee,
-			serialDevice=serialDevice,
-			timeout=args.timeout)
-	except:
-		log.debug('error listing available XBees', exc_info=True)
-		nodeInfoList = []
+	serialDevice = (xh.setuputil.FAKE_SERIAL if args.fakeSerial
+			else args.serialDevice)
+	nodeInfoList = listNodeIds(
+		serialDevice=serialDevice,
+		timeout=args.timeout)
 
 	nodeInfoStr = 'XBees:'
 	for n in nodeInfoList:
