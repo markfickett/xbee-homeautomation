@@ -17,6 +17,7 @@ class SleepPeriod(NumberCommand):
 	_MIN = 0x20 # in internal units
 	_MAX = 0xAF0
 	_EXTERNAL_PER_INTERNAL = 10
+	DEFAULT_PERIOD_MILLIS = 0x20 * _EXTERNAL_PER_INTERNAL
 
 	def __init__(self, periodMillis=None, **kwargs):
 		NumberCommand.__init__(self, Command.NAME.SP, 'periodMillis',
