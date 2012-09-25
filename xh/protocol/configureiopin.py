@@ -126,7 +126,14 @@ class ConfigureIoPin(Command):
 
 
 	def __init__(self, pinName=None, pinNumber=None, fromCommandName=None,
-		function=None, **kwargs):
+			function=None, **kwargs):
+		"""
+		@param pinName one of the PIN enum values
+		@param pinNumber an integer pin number
+		@param fromCommandName the name (a Command.NAME enum value) of
+			one of the specific pin-configuration commands (such as
+			ATD0, ATP1, etc) which implicitly specifies the pin
+		"""
 
 		if len(filter(lambda x: x is not None,
 		[pinName, pinNumber, fromCommandName])) != 1:
