@@ -1,7 +1,8 @@
 XBee Home Automation
 ====================
 
-Tools for XBee-based sensor/control networks, with an emphasis on ease of setup, extensability, and ability to integrate with existing systems.
+A library for XBee-based sensor/control networks, with an emphasis on ease of setup, extensability, and ability to integrate with existing systems.
+
 
 Examples
 --------
@@ -41,11 +42,38 @@ Print information about a connected XBees and installed plugins:
 		addr=0x372 parentAddr=0xfffe deviceType=ROUTER profileId=0xc105
 		serial=0x13a200abcd1234
 
+A plugin which forwards a digital pin value from one XBee to another:
+
+	from xh.protocol import ConfigureIoPin, Data, DigitalSample
+	from ConfigureIoPin.FUNCTION import DIGITAL_OUT_LOW, DIGITAL_OUT_HIGH
+	class PinForwarder(xh.Plugin):
+		__SRC = 0x13a200ccdd0011
+		__DST = 0x13a200abcd1234
+		def __init__(self):
+			xh.Plugin.__init__(self, receiveFrames=True)
+		def _frameReceived(self, frame):
+			if isinstance(frame, Data) and (frame.
+					getSourceAddressLong() == self.__SRC):
+				self.__forwardValues(frame)
+		def __forwardValues(self, frame):
+			for sample in frame.getSamples():
+				if not isinstance(sample, DigitalSample):
+					continue
+				outFunction = (DIGITAL_OUT_HIGH
+						if sample.getIsSet()
+						else DIGITAL_OUT_LOW)
+				cmd = ConfigureIoPin(dest=self.__DEST,
+						pinName=sample.getPinName(),
+						function=outFunction)
+				cmd.send()
+
+
 External Dependencies
 ---------------------
 
 * Python >= 2.7 (uses argparse, introduced in 2.7)
 * [Enum](http://pypi.python.org/pypi/enum/) for enumerations
+
 
 Included Dependencies
 ---------------------
