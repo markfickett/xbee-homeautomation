@@ -6,8 +6,6 @@ Attach to the pysically connected XBee, run plugins and a Python interpreter.
  $ %(prog)s run
 Print information about available XBees and plugins.
  $ %(prog)s list
-Associate an XBee (by serial number) with a plugin.
- $ %(prog)s setup --plugin 'Temperature Logger' --serial 0x0013a200abcd1234
 """
 
 import argparse
@@ -132,28 +130,6 @@ def list(args):
 	log.info(nodeInfoStr)
 
 
-def setup(args):
-	if args.plugin is None:
-		parser.error('Must specify plugin for setup.')
-	if args.clear == bool(args.serial):
-		parser.error(
-			'Must either clear or supply serial numbers for setup.')
-
-	xh.setuputil.collectPlugins()
-	pm = PluginManagerSingleton.get()
-	pluginInfo = pm.getPluginByName(args.plugin)
-	if pluginInfo is None:
-		parser.error('No plugin named %r.' % args.plugin)
-	pluginObj = pluginInfo.plugin_object
-	if args.clear:
-		pluginObj.clearSerials()
-	else:
-		serials = set(args.serial)
-		if not args.replace:
-			serials = serials.union(pluginObj.getSerials())
-		pluginObj.setSerials(serials)
-
-
 LOG_LEVELS = [
 	logging.FATAL,
 	logging.CRITICAL,
@@ -174,15 +150,6 @@ def setVerbosity(verbose, quiet):
 		parser.error('%d V%s is all the more verbose one can be.'
 			% (maxVs, '' if maxVs == 1 else 's'))
 	logging.getLogger().setLevel(LOG_LEVELS[verbosity])
-
-
-def main():
-	args = parser.parse_args()
-	setVerbosity(args.verbose, args.quiet)
-	xh.setuputil.setDependenciesLoggingLevel(logging.WARNING)
-	with xh.Config():
-		log.debug('opened config')
-		args.func(args)
 
 
 def dec_or_hex_int(string):
@@ -213,6 +180,16 @@ def addCommonArguments(*subparsers):
 			help='Use a fake XBee object and do not look for or'
 			+ ' open a serial device.')
 
+
+def main():
+	args = parser.parse_args()
+	setVerbosity(args.verbose, args.quiet)
+	xh.setuputil.setDependenciesLoggingLevel(logging.WARNING)
+	with xh.Config():
+		log.debug('opened config')
+		args.func(args)
+
+
 subparsers = parser.add_subparsers(title='commands')
 
 runParser = subparsers.add_parser('run')
@@ -227,19 +204,8 @@ listParser.add_argument('--timeout', '-t', type=float,
 		'Useful if sleeping nodes will not respond within the default '
 		'ND timeout, NT.')
 
-setupParser = subparsers.add_parser('setup')
-setupParser.set_defaults(func=setup)
-setupParser.add_argument('plugin', help='The name of a plugin.')
-setupParser.add_argument('--clear', '-c', action='store_true',
-	help='Clear all XBee-plugin associations.')
-setupParser.add_argument('--serial', '-s', type=dec_or_hex_int, action='append',
-	help='The serial number (hex or decimal) of an XBee module.'
-	+ ' May be repated.')
-setupParser.add_argument('--replace', '-r', action='store_true',
-	help='Replace all existing XBee-plugin associations.'
-	+ 'By default, adds a new association.')
-
-addCommonArguments(runParser, listParser, setupParser)
+addCommonArguments(runParser, listParser)
 
 
-main()
+if __name__ == '__main__':
+	main()

@@ -13,8 +13,6 @@ class Plugin(IPlugin):
 	"""
 	Base class that all xh plugins must inherit.
 	"""
-	__CONFIG_NUM_SERIALS = 'numSerials'
-	__CONFIG_SERIAL_T = 'serial%d'
 
 
 	def __init__(self, receiveFrames=False):
@@ -26,15 +24,6 @@ class Plugin(IPlugin):
 		IPlugin.__init__(self)
 
 		self.__receiveFrames = bool(receiveFrames)
-
-		self.clearSerials()
-		c = Config.get()
-		sec = self._getConfigSection()
-		if c.has_section(sec):
-			n = c.getint(sec, self.__CONFIG_NUM_SERIALS)
-			for i in xrange(n):
-				s = c.getint(sec, self.__CONFIG_SERIAL_T % i)
-				self.__serials.add(s)
 
 
 	def activate(self):
@@ -49,7 +38,18 @@ class Plugin(IPlugin):
 			self.__handleFrameCb = handleFrameCb
 
 
+	@staticmethod
+	def _getConfig():
+		"""
+		@return the common ConfigParser object for settings/preferences
+		"""
+		return Config.get()
+
+
 	def _getConfigSection(self):
+		"""
+		@return the config section name for this plugin
+		"""
 		return 'xh.plugin.%s' % self.__class__.__name__
 
 
@@ -66,30 +66,6 @@ class Plugin(IPlugin):
 				% (otherPluginName,
 				[p.name for p in manager.getAllPlugins()]))
 		return pluginInfo.plugin_object
-
-
-	def setSerials(self, serials):
-		"""
-		@param serials list of Xbee serial numbers which this plugin
-			should associate with, stored in config
-		"""
-		self.__serials = set([int(s) for s in serials])
-
-		c = Config.get()
-		sec = self._getConfigSection()
-		if not c.has_section(sec):
-			c.add_section(sec)
-		c.set(sec, self.__CONFIG_NUM_SERIALS, str(len(self.__serials)))
-		for i, s in enumerate(self.__serials):
-			c.set(sec, self.__CONFIG_SERIAL_T % i, str(s))
-
-
-	def getSerials(self):
-		return set(self.__serials)
-
-
-	def clearSerials(self):
-		self.__serials = set()
 
 
 	def _frameReceived(self, frame):
