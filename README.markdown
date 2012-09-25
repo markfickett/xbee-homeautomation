@@ -6,7 +6,7 @@ Tools for XBee-based sensor/control networks, with an emphasis on ease of setup,
 Examples
 --------
 
-Connect to the attached XBee, start plugins, and run a Python interpreter:
+Connect to the attached XBee, start plugins, and run a Python interpreter from which commands may be interactively sent to the local or remote XBees:
 
 	$ xh.py run
 	The xbee object is available as "xb". A received frame list is
@@ -36,19 +36,6 @@ Print information about a connected XBees and installed plugins:
 		NodeId status=0x0 NI='Living Room' manufacturerId=0x101e
 		addr=0x372 parentAddr=0xfffe deviceType=ROUTER profileId=0xc105
 		serial=0x13a200abcd1234
-
-Associate an XBee with a plugin; the plugin can then know to send the XBee commands and handle its samples and responses:
-
-	$ xh.py setup 'Temperature Logger' -s 0x13a200abcd1234
-	$ xh.py -v run
-	...
-	[DEBUG TemperatureLogger] 2012 Aug 24 00:35:24 UTC 0x13a200abcd1234
-		Fahrenheit	80.797
-	[DEBUG TemperatureLogger] 2012 Aug 24 00:35:24 UTC 0x13a200abcd1234
-		Light	12.935
-	[DEBUG xh.protocol.Command] sending #3 %V remoteSerial=0x13a200abcd1234
-	[DEBUG TemperatureLogger] 2012 Aug 24 00:37:51 UTC 0x13a200abcd1234
-		Vcc	4.078
 
 External Dependencies
 ---------------------
