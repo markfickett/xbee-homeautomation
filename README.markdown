@@ -68,6 +68,14 @@ A plugin which forwards a digital pin value from one XBee to another:
 				cmd.send()
 
 
+Features/Uses and Limitations
+-----------------------------
+
+* Allows sending commands to XBees at an interactive Python prompt and using online Python help to discover commands' arguments; generates specific exceptions for malformed commands, avoiding silent failures.
+* Uses signals to communicate asynchronous events, for decoupled design.
+* Written for Series 2 (ZigBee Mesh) XBee. (The underlying python-xbee library supports multiple XBee varieties.)
+
+
 External Dependencies
 ---------------------
 
