@@ -25,10 +25,14 @@ Print information about a connected XBees and installed plugins:
 
 	$ xh.py list
 	[INFO xh] Plugins:
-		Frame Logger (FrameLogger/) Log all received frames using the
-		Python logging module.
-		Temperature Logger (temperaturelogger/) Log temperature (and
-		other) values from a sensing module. XBee 0x13a200abcd1234
+		Data Logger (datalogger/) Log all received data via
+			xh.datalogging.
+		Frame Logger (framelogger/) Log all received frames using the
+			Python logging module.
+		Presence (presence/) Track presence / availability of XBee
+			modules.
+		Web Graphs (webgraphs/) Basic web server to create and display
+			graphs of logged data.
 	[INFO xh] XBees:
 		NodeId status=0x0 NI='Attic' manufacturerId=0x101e
 		addr=0x49b9 parentAddr=0xfffe deviceType=ROUTER profileId=0xc105
