@@ -104,11 +104,6 @@ def list(args):
 			infos.append('v' + p.version)
 		if p.description is not None:
 			infos.append(p.description)
-		serials = p.plugin_object.getSerials()
-		if serials:
-			infos.append('XBee'
-				+ ('' if len(serials) is 1 else 's'))
-			infos.append(', '.join(['0x%x' % s for s in serials]))
 		pluginInfoStr += '\n\t' + ' '.join(infos)
 	log.info(pluginInfoStr)
 
