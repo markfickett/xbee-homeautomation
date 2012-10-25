@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 from .. import encoding, enumutil
@@ -31,26 +30,11 @@ class Data(Frame):
 	)
 
 
-	def __init__(self, setTimestampToNow=True):
+	def __init__(self):
 		Frame.__init__(self, frameType=Frame.TYPE.rx_io_data_long_addr)
 		self._sourceAddress = None
 		self._sourceAddressLong = None
 		self._samples = []
-		if setTimestampToNow:
-			self.setTimestampToNow()
-		else:
-			self._timestamp = None
-
-
-	def setTimestampToNow(self):
-		self._timestamp = datetime.datetime.utcnow()
-
-
-	def getTimestamp(self):
-		"""
-		@return the UTC creation timestamp of the sample data
-		"""
-		return self._timestamp
 
 
 	def getSourceAddress(self):
@@ -81,11 +65,7 @@ class Data(Frame):
 	def __str__(self):
 		s = 'data'
 		t = self.getTimestamp()
-		if t is None:
-			t = ''
-		else:
-			t = ' ' + str(t)
-		return '%s%s%s' % (s, t,
+		return '%s %s%s' % (s, t,
 			self._FormatNamedValues(self.getNamedValues()))
 
 

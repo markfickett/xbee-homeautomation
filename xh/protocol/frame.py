@@ -1,3 +1,4 @@
+import datetime
 from .. import encoding
 from ..deps import Enum
 from . import Registry
@@ -47,6 +48,14 @@ class Frame:
 				+ 'one of the TYPE enum values.') % frameType)
 		self.__frameType = frameType
 		self.__options = None
+		self._timestamp = datetime.datetime.utcnow()
+
+
+	def getTimestamp(self):
+		"""
+		@return the UTC creation timestamp of the sample data
+		"""
+		return self._timestamp
 
 
 	def getFrameType(self):
