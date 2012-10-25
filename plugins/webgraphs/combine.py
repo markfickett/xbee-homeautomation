@@ -1,3 +1,4 @@
+import collections
 import datetime
 import json
 import logging
@@ -12,14 +13,6 @@ GAP_DT = datetime.timedelta(minutes=10)
 EPOCH = datetime.datetime.utcfromtimestamp(0)
 _UNUSEDS_TITLE = 'Unconfigured'
 _UNUSEDS_VAR_NAME = 'unconfigured'
-
-
-def _addToRow(rowDataMap, timestamp, value, columnIndex, numColumns):
-	row = rowDataMap.get(timestamp)
-	if row is None:
-		row = [None]*numColumns
-		rowDataMap[timestamp] = row
-	row[columnIndex] = value
 
 
 def _getEpochMillis(d):
@@ -39,7 +32,7 @@ def _buildSeriesData(seriesDefinitions, allLogData, parseFn, mapFn):
 		{ seriesName: { datetime: mappedValueStr, ... }, ... }
 	Also insert gap markers (GAP_VALUE) where no data was logged for GAP_DT.
 	"""
-	allSeriesData = {}
+	allSeriesData = collections.defaultdict(dict)
 	for logName, optionsList in seriesDefinitions.iteritems():
 		logData = allLogData.get(logName)
 		if not logData:
@@ -78,10 +71,7 @@ def _addToSeriesData(allSeriesData, optionsDict, logName, logData,
 
 	dataIndex = startDataIndex
 	seriesTitle = optionsDict.get('title', logName)
-	seriesData = allSeriesData.get(seriesTitle)
-	if seriesData is None:
-		seriesData = {}
-		allSeriesData[seriesTitle] = seriesData
+	seriesData = allSeriesData[seriesTitle]
 
 	lastDate = optionsDict.get('lastDate')
 	if lastDate:
@@ -134,15 +124,16 @@ def buildJsData(graphDefinitions, allLogData):
 	numSeries = len(seriesTitles)
 	# Build a combined dict of {date object: (row entries)}.
 	# Insert gap markers.
-	rowData = {}
+	def makeRowFn():
+		return [None] * numSeries
+	rowData = collections.defaultdict(makeRowFn)
 	for seriesName, seriesValuesDict in allSeriesData.iteritems():
 		seriesIndex = seriesTitles.index(seriesName)
 		prevD = None
 		for d, v in sorted(seriesValuesDict.items()):
 			if prevD is not None and (d - prevD > GAP_DT):
-				_addToRow(rowData, prevD + GAP_DT, GAP_VALUE,
-						seriesIndex, numSeries)
-			_addToRow(rowData, d, v, seriesIndex, numSeries)
+				rowData[prevD + GAP_DT][seriesIndex] = GAP_VALUE
+			rowData[d][seriesIndex] = v
 			prevD = d
 
 	# build javascript text

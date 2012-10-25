@@ -1,4 +1,5 @@
 import BaseHTTPServer
+import collections
 import json
 import logging
 import os
@@ -53,7 +54,7 @@ class Server(xh.Plugin):
 
 		self.__httpd = BaseHTTPServer.HTTPServer(
 				(HOST_NAME, PORT_NUMBER), _HttpHandler)
-		self.__httpd.xhdata = {}
+		self.__httpd.xhdata = collections.defaultdict(list)
 		self._readExistingLogs()
 		self.__httpd.xhdataLock = threading.Lock()
 		self.__httpdThread = threading.Thread(
@@ -96,11 +97,8 @@ class Server(xh.Plugin):
 			formattedValue=None, formattedTimestamp=None,
 			serial=None, pinName=None):
 		with self.__httpd.xhdataLock:
-			d = self.__httpd.xhdata.get(name)
-			if d is None:
-				d = []
-				self.__httpd.xhdata[name] = d
-			d.append((timestamp, formattedValue))
+			dataList = self.__httpd.xhdata[name]
+			dataList.append((timestamp, formattedValue))
 
 
 
