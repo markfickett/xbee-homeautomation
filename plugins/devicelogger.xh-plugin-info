@@ -1,0 +1,6 @@
+[Core]
+Name = Device Logger
+Module = devicelogger
+
+[Documentation]
+Description = Log stats about devices (and indirectly the network).
