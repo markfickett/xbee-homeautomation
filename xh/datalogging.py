@@ -19,27 +19,25 @@ _FILE_NAME_T = os.path.join(Config.DATA_DIR, 'datalog-%s.csv')
 _FILE_NAME_RE = re.compile(_FILE_NAME_T % '(.*)')
 
 
-def logPinValue(serial, pinName, value, timestamp=None):
+def logPinValue(serial, timestamp, pinName, value):
 	"""
 	Log a pin's sample value.
 	"""
 	serialStr = formatSerial(serial)
 	if pinName not in PIN:
 		raise ValueError()
-	log('%s-%s' % (serialStr, str(pinName)), value, timestamp=timestamp,
-			serial=serial, pinName=pinName)
+	name = '%s-%s' % (serialStr, str(pinName))
+	log(name, timestamp, value=value, serial=serial, pinName=pinName)
 
 
-def log(name, value, timestamp=None, pinName=None, serial=None):
+def log(name, timestamp, value=None, pinName=None, serial=None):
 	"""
-	Write a timestamped value to a named data log file.
-	@param timestamp a datetime.datetime, defaulting to utcnow()
+	Write a timestamp or timestamped value to a named data log file.
 
-	A DATA_LOGGED signal is sent when the value is logged. If the extra
-	keyword arguments pinName and serial are included, they are sent with
-	the signal.
+	A DATA_LOGGED signal is sent. If the value or extra keyword arguments
+	pinName and serial are included, they are sent with the signal.
 	"""
-	_getLogger().log(name, value, timestamp=timestamp,
+	_getLogger().log(name, timestamp, value=value,
 			pinName=pinName, serial=serial)
 
 
@@ -75,15 +73,17 @@ def getLogFileNames():
 def parseLogFile(logFile):
 	"""
 	@param logFile an open file (or other like object)
-	@return a list of (datetime, string value) tuples, in chronological
-		order (oldest first)
+	@return a list of (datetime, string value or None) tuples, in
+		chronological order (oldest first)
 	"""
-	data = []
+	logData = []
 	for line in logFile:
-		dateStr, valueStr = line.strip().split(',')
-		d = parseTimestamp(dateStr)
-		data.append((d, valueStr))
-	return data
+		lineData = list(line.strip().split(','))
+		lineData[0] = parseTimestamp(lineData[0])
+		if len(lineData) < 2:
+			lineData.append(None)
+		logData.append(tuple(lineData))
+	return logData
 
 
 global _dataLoggerSingleton
@@ -128,20 +128,24 @@ class _DataLogger:
 		return dataLog
 
 
-	def log(self, name, value, timestamp=None,
+	def log(self, name, timestamp, value=None,
 			pinName=None, serial=None):
-		t = timestamp or datetime.datetime.utcnow()
-		formattedTimestamp = formatTimestamp(t)
-		formattedValue = str(value)
-		self._getLogger(name).info('%s,%s',
-				formattedTimestamp, formattedValue)
-		statusLog.debug('%s %s %s', name,
-				formattedTimestamp, formattedValue)
+		formattedTimestamp = formatTimestamp(timestamp)
+		if value is None:
+			statusLog.debug('%s %s', name, formattedTimestamp)
+			self._getLogger(name).info(formattedTimestamp)
+			formattedValue = None
+		else:
+			formattedValue = str(value)
+			statusLog.debug('%s %s %s', name,
+					formattedTimestamp, formattedValue)
+			self._getLogger(name).info('%s,%s',
+					formattedTimestamp, formattedValue)
 		responses = signals.DATA_LOGGED.send_robust(sender=None,
 			name=name,
 			value=value,
 			formattedValue=formattedValue,
-			timestamp=t,
+			timestamp=timestamp,
 			formattedTimestamp=formattedTimestamp,
 			pinName=pinName,
 			serial=serial,
