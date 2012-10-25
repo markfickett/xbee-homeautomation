@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from .deps import pysignals
 
@@ -23,9 +24,9 @@ def logErrors(responses):
 		if not _isErrorTuple(responseOrErr):
 			continue
 		formatted = ''.join(traceback.
-		format_exception(*responseOrErr))
-		log.error(('error in receiver %s handling %s:\n%s')
-				% (receiver, frame, rawData, formatted))
+				format_exception(*responseOrErr))
+		log.error('error in receiver %s:\n%s',
+				receiver, formatted)
 
 
 # sent when any frame is received by the local XBee
