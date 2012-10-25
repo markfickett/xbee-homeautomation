@@ -48,29 +48,24 @@ class DataLogger(xh.Plugin):
 			or self.__presence.getLocalSerial())
 		t = frame.getTimestamp()
 		for sample in frame.getSamples():
-			xh.datalogging.logPinValue(
-				serial,
-				sample.getPinName(),
-				sample.getValue(),
-				timestamp=t)
+			xh.datalogging.logPinValue(serial, t,
+				sample.getPinName(), sample.getValue())
 
 
 	def __logInputSample(self, frame):
 		serial = (frame.getRemoteSerial()
 			or self.__presence.getLocalSerial())
 		for sample in frame.getSamples():
-			xh.datalogging.logPinValue(
-				serial,
-				sample.getPinName(),
-				sample.getValue(),
-				timestamp=frame.getTimestamp())
+			xh.datalogging.logPinValue(serial, frame.getTimestamp(),
+				sample.getPinName(), sample.getValue())
 
 
 	def __logInputVolts(self, frame):
 		serial = (frame.getRemoteSerial()
 			or self.__presence.getLocalSerial())
 		v = frame.getVolts()
-		xh.datalogging.logPinValue(serial, PIN.VCC, v)
+		t = frame.getTimestamp()
+		xh.datalogging.logPinValue(serial, t, PIN.VCC, v)
 
 
 	def __poll(self):
