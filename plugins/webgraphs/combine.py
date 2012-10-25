@@ -37,7 +37,7 @@ def _buildSeriesData(seriesDefinitions, allLogData, parseFn, mapFn):
 		logData = allLogData.get(logName)
 		if not logData:
 			log.warning('no data for %s, series are %s',
-					logName, logData.keys())
+					logName, allLogData.keys())
 			continue
 
 		dataStartIndex = 0
@@ -106,6 +106,16 @@ def _addToSeriesData(allSeriesData, optionsDict, logName, logData,
 	return dataIndex
 
 
+def _defaultParseFn(valueStr):
+	"""
+	Parse typical logged values: numbers or no-value entries.
+	"""
+	if valueStr is None:
+		return 1.0
+	else:
+		return float(valueStr)
+
+
 def buildJsData(graphDefinitions, allLogData):
 	"""
 	Use graph definitions to transform log data into javascript blobs
@@ -115,7 +125,7 @@ def buildJsData(graphDefinitions, allLogData):
 
 	# Reorganize data to be categorized by series (name of a line on a graph
 	# and not log (name of a data source, often an XBee).
-	parseFn = graphDefinitions.get('parse', float)
+	parseFn = graphDefinitions.get('parse', _defaultParseFn)
 	mapFn = graphDefinitions.get('map')
 	allSeriesData = _buildSeriesData(seriesDefinitions, allLogData,
 		parseFn, mapFn)

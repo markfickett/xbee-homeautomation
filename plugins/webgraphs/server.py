@@ -121,13 +121,16 @@ class _HttpHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		self.__sendOkHeaders()
 
 		with self.server.xhdataLock:
-			data = dict(self.server.xhdata)
+			dataByLogName = dict(self.server.xhdata)
 		graphConfigs, localHtml = graphconfig.getConfigsAndHtml()
-		combine.addGraphForUnusedData(graphConfigs, data.keys())
+		combine.addGraphForUnusedData(graphConfigs,
+				dataByLogName.keys())
 
-		numPoints = sum([len(d) for d in data.values()])
+		numPoints = sum([len(d) for d in dataByLogName.values()])
 		log.debug('building %d graphs from %d points in %d datasets',
-				len(graphConfigs), numPoints, len(data))
+				len(graphConfigs),
+				numPoints,
+				len(dataByLogName))
 
 		chartDivs = ''
 		for name, _ in graphConfigs:
@@ -136,7 +139,7 @@ class _HttpHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		annotationsJsStr = ''
 		for name, valueDict in graphConfigs:
 			labelsJsStr, dataJsStr, annJsStr = combine.buildJsData(
-					valueDict, data)
+					valueDict, dataByLogName)
 			drawCallsJsStr += templates.DRAW_CALL % {
 				'name': name,
 				'title': json.dumps(valueDict['title']),
