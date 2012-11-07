@@ -49,6 +49,10 @@ def addSubparser(subparsers):
 
 
 def _addConfigEntry(panId, linkKey):
+	existingEntries = set(_getConfigEntries())
+	if (panId, linkKey) in existingEntries:
+		return
+
 	config = xh.Config.get()
 	if not config.has_section(_CONFIG_SECTION):
 		config.add_section(_CONFIG_SECTION)
