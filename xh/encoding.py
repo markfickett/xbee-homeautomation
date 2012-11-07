@@ -73,8 +73,12 @@ def numberToBoolean(n):
 			+ 'boolean value, should be 0 or 1.') % n)
 
 
+def booleanToNumber(b):
+	return 1 if b else 0
+
+
 def booleanToString(b):
-	return numberToString(b and 1 or 0)
+	return numberToString(booleanToNumber(b))
 
 
 def numberToVolts(n):
