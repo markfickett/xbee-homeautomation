@@ -172,6 +172,9 @@ class Command(Frame):
 
 
 	def setParameter(self, parameter):
+		"""
+		Sets the numeric representation of the Command's parameter.
+		"""
 		self.__parameter = parameter
 
 
