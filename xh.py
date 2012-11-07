@@ -12,6 +12,7 @@ import argparse
 import code
 import logging
 import os
+import random
 import time
 
 import xh
@@ -21,6 +22,8 @@ from yapsy.PluginManager import PluginManagerSingleton
 
 LOCAL_SCRIPT = os.path.join(os.path.dirname(__file__), 'xh.local.py')
 FRAME_LOGGER_NAME = 'Frame Logger'
+PAN_ID_BITS = 14 # ID command accepts <= 0x3FFF, rejects greater values
+LINK_KEY_BITS = 128
 
 log = logging.getLogger('xh')
 
@@ -127,6 +130,74 @@ def list(args):
 		nodeInfoStr += '\n\t' + lineStr
 	log.info(nodeInfoStr)
 
+def _setNetworkParams(panId, linkKey):
+	"""
+	Set the network parameters of the locally connected device.
+	@param panId: 16-bit network ID
+	@param linkKey: 128-bit link encryption key, or None for no encryption
+	"""
+	keyMsg = ('No encryption.' if linkKey is None
+			else ('Link key: 0x%X' % linkKey))
+	log.info('Will set PAN ID: 0x%X %s' % (panId, keyMsg))
+
+	commands = []
+
+	setIdCmd = xh.protocol.Command(xh.protocol.Command.NAME.ID)
+	setIdCmd.setParameter(panId)
+	commands.append(setIdCmd)
+
+	eeCmd = xh.protocol.EncryptionEnable()
+	eeCmd.setEnabled(linkKey is not None)
+	commands.append(eeCmd)
+
+	if linkKey is not None:
+		keyCmd = xh.protocol.Command(xh.protocol.Command.NAME.KY)
+		keyCmd.setParameter(linkKey)
+		commands.append(keyCmd)
+
+	commands.append(xh.protocol.Write())
+
+	for cmd in commands:
+		xh.synchronous.sendAndWait(cmd)
+
+	log.info('Done.')
+
+
+def _setNetworkParamsFromArgs(validArgs):
+	if validArgs.generate:
+		_setNetworkParams(
+			random.getrandbits(PAN_ID_BITS),
+			random.getrandbits(LINK_KEY_BITS)
+					if validArgs.genKey else None)
+	else:
+		_setNetworkParams(validArgs.panId, validArgs.linkKey)
+
+
+def _listNetworkParams():
+	"""
+	Print (via logging) previously used network parameters.
+	"""
+
+
+def setUpNetwork(args):
+	if args.genKey and not args.generate:
+		parser.error('--use-encryption must be used with --generate')
+	if args.linkKey and not args.panId:
+		parser.error('--link-key must be used with --pan-id')
+	if ((args.generate or args.genKey)
+			and (args.linkKey or args.panId)):
+		parser.error('Must either --generate new network parameters '
+			'(optionally with --use-encryption) '
+			'or specify --pan-id (and optionally --link-key).')
+
+	if args.generate or args.panId:
+		with xh.setuputil.initializedXbee() as xb:
+			log.info('connected to locally attached XBee')
+			xh.protocol.Command.setXbeeSingleton(xb)
+			_setNetworkParamsFromArgs(args)
+	else:
+		_listNetworkParams()
+
 
 LOG_LEVELS = [
 	logging.FATAL,
@@ -202,7 +273,23 @@ listParser.add_argument('--timeout', '-t', type=float,
 		'Useful if sleeping nodes will not respond within the default '
 		'ND timeout, NT.')
 
-addCommonArguments(runParser, listParser)
+netParser = subparsers.add_parser('network',
+	help='Set up network parameters for the local device. With no '
+		'arguments, lists previously-used network parameters.')
+netParser.set_defaults(func=setUpNetwork)
+netParser.add_argument('--generate', action='store_true',
+	help='Generate (and use, print, and store) a PAN ID.')
+netParser.add_argument('--use-encryption', action='store_true', dest='genKey',
+	help='When using --generate to make new network parameters, also '
+		'generate a network encryption key.')
+netParser.add_argument('--pan-id', type=dec_or_hex_int, dest='panId',
+	help='%d-bit PAN ID of the network (ATID), for example 1B37'
+		% PAN_ID_BITS)
+netParser.add_argument('--link-key', type=dec_or_hex_int, dest='linkKey',
+	help=('%d-bit Link encryption key (ATKY). Setting this also implies '
+		' enabling encryption (ATEE1).') % LINK_KEY_BITS)
+
+addCommonArguments(runParser, listParser, netParser)
 
 
 if __name__ == '__main__':
