@@ -16,7 +16,7 @@ class EncryptionEnable(Command):
 
 	def setEnabled(self, enabled):
 		self.__enabled = bool(enabled)
-		self.setParameter(encoding.booleanToString(self.__enabled))
+		self.setParameter(encoding.booleanToNumber(self.__enabled))
 
 
 	def getEnabled(self):
