@@ -60,9 +60,11 @@ def getLogFileNames():
 	"""
 	@return a map of dataset names to absolute path of existing log files.
 	"""
+	datasetToLogFileName = {}
+	if not os.path.isdir(Config.DATA_DIR):
+		return datasetToLogFileName
 	dataFileNames = [os.path.join(Config.DATA_DIR, fileName)
 			for fileName in os.listdir(Config.DATA_DIR)]
-	datasetToLogFileName = {}
 	for fileName in dataFileNames:
 		match = _FILE_NAME_RE.match(fileName)
 		if match:
@@ -105,6 +107,9 @@ class _DataLogger:
 	def __init__(self):
 		self.__loggers = {}
 		statusLog.debug('will log data to %s', _FILE_NAME_T)
+		if not os.path.isdir(Config.DATA_DIR):
+			statusLog.debug('creating %s', Config.DATA_DIR)
+			os.makedirs(Config.DATA_DIR)
 
 
 	def _getLogger(self, name):
