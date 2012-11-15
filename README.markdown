@@ -80,7 +80,7 @@ External Dependencies
 ---------------------
 
 * Python >= 2.7 (uses argparse, introduced in 2.7)
-* [Enum](http://pypi.python.org/pypi/enum/) for enumerations
+* [Enum](http://pypi.python.org/pypi/enum/) for enumerations (uses [setuptools](http://pypi.python.org/pypi/setuptools) for installation via [setup.py](http://packages.python.org/an_example_pypi_project/setuptools.html#setting-up-setup-py))
 
 
 Included Dependencies
