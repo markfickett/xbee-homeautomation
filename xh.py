@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 """Run or query the XBee Home Automation system.
 
 Examples:
