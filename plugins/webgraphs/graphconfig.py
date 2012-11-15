@@ -141,13 +141,13 @@ def getConfigsAndHtml():
 	localNs = {}
 	graphConfigs = []
 	if not checkForLocalConfig():
-		return graphConfigs
+		return graphConfigs, None
 	try:
 		execfile(_CONFIG_FILE_PATH, globals(), localNs)
 	except:
 		log.error('error loading graph configs from %s'
 				% _CONFIG_FILE_PATH, exc_info=True)
-		return graphConfigs
+		return graphConfigs, None
 
 	for name, value in localNs.iteritems():
 		if isinstance(value, dict):
